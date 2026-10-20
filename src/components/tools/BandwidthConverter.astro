@@ -1,0 +1,144 @@
+---
+// 带宽换算与流媒体耗时计算器 (Bandwidth Converter)
+---
+
+<div class="rounded-xl border border-[#26354D] bg-[#111C2E] p-5 sm:p-6 text-[#E6EDF6] space-y-4 my-6">
+  <div class="flex items-center justify-between pb-3 border-b border-[#26354D]">
+    <div class="flex items-center space-x-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#38BDF8]"></span>
+      <h3 class="text-sm sm:text-base font-bold tracking-tight">网络带宽与下载耗时换算器 (Mbps / MB/s Calculator)</h3>
+    </div>
+    <span class="text-xs font-mono text-[#A7B6CC]">1 Byte = 8 bits 严密换算</span>
+  </div>
+
+  <p class="text-xs text-[#A7B6CC] leading-relaxed">
+    机场测速软件常以 <strong>Mbps (兆比特/秒)</strong> 呈现，而文件下载和浏览器常以 <strong>MB/s (兆字节/秒)</strong> 统计。输入任意数值，即时完成换算与任务场景推算：
+  </p>
+
+  <!-- Interactive Input Row -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#0B1220] p-4 rounded-lg border border-[#26354D]">
+    <div>
+      <label for="input-mbps" class="block text-xs font-mono text-[#38BDF8] font-bold mb-1">
+        网络带宽 (Mbps / 兆比特每秒):
+      </label>
+      <div class="relative">
+        <input
+          id="input-mbps"
+          type="number"
+          min="1"
+          max="10000"
+          value="500"
+          class="w-full bg-[#111C2E] border border-[#26354D] rounded px-3 py-2 text-sm font-mono text-[#E6EDF6] focus:border-[#38BDF8] focus:outline-none"
+        />
+        <span class="absolute right-3 top-2 text-xs font-mono text-[#64748B]">Mbps</span>
+      </div>
+    </div>
+
+    <div>
+      <label for="input-mbs" class="block text-xs font-mono text-[#10B981] font-bold mb-1">
+        实际下载速率 (MB/s / 兆字节每秒):
+      </label>
+      <div class="relative">
+        <input
+          id="input-mbs"
+          type="number"
+          min="0.1"
+          max="1250"
+          step="0.1"
+          value="62.5"
+          class="w-full bg-[#111C2E] border border-[#26354D] rounded px-3 py-2 text-sm font-mono text-[#E6EDF6] focus:border-[#10B981] focus:outline-none"
+        />
+        <span class="absolute right-3 top-2 text-xs font-mono text-[#64748B]">MB/s</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theoretical Download Time Cards -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono pt-1">
+    <div class="p-3 rounded bg-[#0B1220] border border-[#26354D]">
+      <div class="text-[#64748B] text-[10px]">100MB 网页/图片包</div>
+      <div id="time-100mb" class="text-sm font-bold text-[#E6EDF6] mt-1">1.6 秒</div>
+    </div>
+    <div class="p-3 rounded bg-[#0B1220] border border-[#26354D]">
+      <div class="text-[#64748B] text-[10px]">1GB 高清电影片段</div>
+      <div id="time-1gb" class="text-sm font-bold text-[#38BDF8] mt-1">16.0 秒</div>
+    </div>
+    <div class="p-3 rounded bg-[#0B1220] border border-[#26354D]">
+      <div class="text-[#64748B] text-[10px]">10GB 大型游戏更新</div>
+      <div id="time-10gb" class="text-sm font-bold text-[#10B981] mt-1">2.7 分钟</div>
+    </div>
+    <div class="p-3 rounded bg-[#0B1220] border border-[#26354D]">
+      <div class="text-[#64748B] text-[10px]">4K流媒体缓冲要求</div>
+      <div id="time-4k" class="text-sm font-bold text-[#10B981] mt-1">极佳 (达标20倍)</div>
+    </div>
+  </div>
+
+  <!-- Technical Explainer -->
+  <div class="p-3 rounded bg-[#0B1220]/60 border border-[#26354D] text-[11px] text-[#A7B6CC] leading-relaxed">
+    <strong class="text-[#E6EDF6]">为什么 Speedtest 跑 500Mbps，看 YouTube 只有 50Mbps？</strong>
+    测速工具采用多线程（通常 8-16 个并发连接）拉取纯静态数据，能瞬间冲垮并占满突发通道；而在线视频多为单流拉取，受到播放器自适应码率 (ABR) 与服务端单连接 QoS 限速约束。因此，稳定的单流 50Mbps 远比不稳定的突发 500Mbps 更具实际体验价值。
+  </div>
+</div>
+
+<script>
+  const mbpsInput = document.getElementById('input-mbps') as HTMLInputElement;
+  const mbsInput = document.getElementById('input-mbs') as HTMLInputElement;
+
+  const t100mb = document.getElementById('time-100mb');
+  const t1gb = document.getElementById('time-1gb');
+  const t10gb = document.getElementById('time-10gb');
+  const t4k = document.getElementById('time-4k');
+
+  function updateFromMbps(mbps: number) {
+    if (isNaN(mbps) || mbps <= 0) return;
+    const mbs = mbps / 8;
+    if (mbsInput) mbsInput.value = mbs.toFixed(2);
+    updateTimes(mbs, mbps);
+  }
+
+  function updateFromMbs(mbs: number) {
+    if (isNaN(mbs) || mbs <= 0) return;
+    const mbps = mbs * 8;
+    if (mbpsInput) mbpsInput.value = mbps.toFixed(1);
+    updateTimes(mbs, mbps);
+  }
+
+  function updateTimes(mbs: number, mbps: number) {
+    // 100MB
+    const s100 = 100 / mbs;
+    if (t100mb) t100mb.textContent = s100 < 60 ? `${s100.toFixed(1)} 秒` : `${(s100 / 60).toFixed(1)} 分钟`;
+
+    // 1GB = 1024MB
+    const s1g = 1024 / mbs;
+    if (t1gb) t1gb.textContent = s1g < 60 ? `${s1g.toFixed(1)} 秒` : `${(s1g / 60).toFixed(1)} 分钟`;
+
+    // 10GB = 10240MB
+    const s10g = 10240 / mbs;
+    if (t10gb) t10gb.textContent = s10g < 60 ? `${s10g.toFixed(1)} 秒` : `${(s10g / 60).toFixed(1)} 分钟`;
+
+    // 4K (requires ~25 Mbps)
+    if (t4k) {
+      if (mbps >= 50) {
+        t4k.textContent = `极佳 (${(mbps / 25).toFixed(1)}倍冗余)`;
+        t4k.className = 'text-sm font-bold text-[#10B981] mt-1';
+      } else if (mbps >= 25) {
+        t4k.textContent = '基本满足4K播放';
+        t4k.className = 'text-sm font-bold text-[#38BDF8] mt-1';
+      } else if (mbps >= 10) {
+        t4k.textContent = '仅支持1080P高清';
+        t4k.className = 'text-sm font-bold text-[#F59E0B] mt-1';
+      } else {
+        t4k.textContent = '4K可能频繁缓冲';
+        t4k.className = 'text-sm font-bold text-[#EF4444] mt-1';
+      }
+    }
+  }
+
+  mbpsInput?.addEventListener('input', () => {
+    updateFromMbps(parseFloat(mbpsInput.value));
+  });
+
+  mbsInput?.addEventListener('input', () => {
+    updateFromMbs(parseFloat(mbsInput.value));
+  });
+</script>

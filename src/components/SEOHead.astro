@@ -1,0 +1,62 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  canonicalUrl?: string;
+  ogType?: string;
+  schema?: Record<string, any> | Array<Record<string, any>>;
+}
+
+const {
+  title,
+  description,
+  canonicalUrl = Astro.url.href,
+  ogType = 'website',
+  schema
+} = Astro.props;
+
+const siteName = '稳定机场指南';
+const formattedTitle = title.includes(siteName) ? title : `${title} - ${siteName}`;
+
+// Base default Organization schema
+const baseSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': 'https://jichangwending.world/#website',
+      url: 'https://jichangwending.world/',
+      name: siteName,
+      description: '基于可追溯测速、晚高峰样本与客观技术声明的中文机场评测与选购指南。',
+      inLanguage: 'zh-CN'
+    },
+    ...(schema ? (Array.isArray(schema) ? schema : [schema]) : [])
+  ]
+};
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{formattedTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:title" content={formattedTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="zh_CN" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonicalUrl} />
+<meta name="twitter:title" content={formattedTitle} />
+<meta name="twitter:description" content={description} />
+
+<!-- Robot Directives -->
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+<!-- Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify(baseSchema)} />

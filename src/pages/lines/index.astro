@@ -1,0 +1,241 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NetworkPathDiagram from '../../components/NetworkPathDiagram.astro';
+
+const pageTitle = '机场线路深度研究：IEPL、IPLC、BGP中转与新一代协议架构';
+const pageDescription = '全面解剖跨境机场网络底层拓扑：对比IEPL内网专线、IPLC物理租用线、BGP公网中转与普通直连的本质差异；深度分析VLESS Reality、Hysteria 2与Trojan协议抗封锁表现。';
+
+const linesFaqs = [
+  {
+    q: 'IEPL 与 IPLC 有什么本质区别？为什么市场上常混为一谈？',
+    a: 'IPLC（International Private Leased Circuit，国际私有租用线路）是最早期的电信级国际点对点专线，基于 SDH/SONET 物理传输网，提供端到端的物理层（L1）或数据链路层（L2）时分复用通道，隔离性极高但扩容不灵活。IEPL（International Ethernet Private Line，国际以太网专线）则是基于以太网封装的新一代专线技术，支持灵活的以太网虚电路（EVC）与带宽平滑无缝调整。在日常机场宣传中，两者都属于“内网物理专线”，其核心共性都是：完全不经过国家公网国际海缆出口，不过墙，晚高峰零拥塞、极低丢包。由于用户体验几乎一致，业界常统一简称为“内网专线”。'
+  },
+  {
+    q: '为什么说“BGP 入口”对专线机场的实际体验至关重要？',
+    a: '专线本身的物理跨国段虽然极其稳定，但用户必须先将流量从家里发送到专线的国内起点（入口机房）。如果入口机房只是单线电信，那么移动宽带或联通宽带的用户连接该机房时，必须经过省际跨网互联互通点（Peering Point），这会导致跨网延迟暴增并产生丢包。而多线 BGP（Border Gateway Protocol）入口机房同时接入中国电信、中国联通、中国移动等多家核心骨干网，能让不同运营商的用户通过本网光纤就近接入，彻底消除了国内段的跨网瓶颈。'
+  },
+  {
+    q: 'VLESS Reality 协议相比传统的 Trojan 和 VMess 到底先进在哪里？',
+    a: '传统的 Trojan 和 VMess 必须由机场管理员自行购买境外域名并配置真实的 TLS 证书。这种模式有两个致命缺陷：一是防火墙可以通过主动探测证书颁发机构（CA）与域名备案情况进行模式识别与阻断；二是大量节点证书特征高度同质化。而 Xray 团队推出的 VLESS Reality 协议彻底抛弃了自签或自购证书，通过“借用（Borrowing）”互联网上知名正规大厂（如 Apple、Microsoft、Cloudflare 等）的真实公网证书完成 TLS 握手，使防火墙在被动监听时看到的完全是与合法大厂服务器握手的一模一样的密码学指纹，消除了 SNI 模式特征。'
+  },
+  {
+    q: '基于 UDP 的 Hysteria 2 / TUIC 在什么场景下有明显优势？有什么副作用？',
+    a: '传统的 TCP 协议在遇到高丢包公网链路时，拥塞控制算法会剧烈收缩滑动窗口，导致速率断崖式下跌。而 Hysteria 2 和 TUIC 基于 QUIC (UDP) 开发，具备极其激进的自定义拥塞控制算法，即使在丢包率高达 30% 的恶劣公网线路上，也能通过暴力发包和快速乱序重组跑满带宽，非常适合在劣质宽带或偏远弱网环境下看视频。但其副作用也极其明显：国内部分省份的运营商（特别是部分地区的移动和电信）对大流量 UDP 端口部署了严苛的 QoS 限速甚至断流策略，长期运行容易被局端策略单向扼杀。'
+  },
+  {
+    q: '为什么有些机场宣称“双专线冗余”，但一旦专线故障依然全线变红？',
+    a: '真正的“双专线冗余”要求服务商同时采购两条完全不同物理路由走向的专线（例如一条走上海-日本海底光缆专线，另一条走深圳-香港陆缆专线），并在国内入口部署智能 BGP 路由自动探测收敛。在实际运营中，很多小型机场所谓的“双专线”只是在同一家专线上游采购了两个虚拟通道（VLAN），一旦上游主物理链路发生海底光缆施工或中断，所有子通道将同时瘫痪。此外，如果缺乏自动化故障转移（Failover）自动化调度系统，即使备用线路完好，也无法在毫秒级内将数万用户的流量平滑切流。'
+  }
+];
+
+const linesSchema = {
+  '@type': 'Article',
+  headline: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/lines/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  },
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: 'https://jichangwending.world/' },
+      { '@type': 'ListItem', position: 2, name: '线路研究', item: 'https://jichangwending.world/lines/' }
+    ]
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/lines/"
+  schema={linesSchema}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-rose-400">线路研究</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-rose-500/30 bg-rose-500/10 text-xs font-mono text-rose-400">
+        <span>● 物理层拓扑拆解 · 传输协议密码学分析 · 故障域定界</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        线路研究：IEPL、IPLC、BGP中转与新一代加密协议底层拓扑解剖
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted max-w-4xl leading-relaxed">
+        绝大多数用户在挑选机场时，只能看到营销宣传中的“千兆专线”、“全球加速”等模糊概念，却无法看清数据包在物理光纤与网络交换机中究竟流经了哪些跳数。
+        本页从计算机网络工程视角，全面剖析<strong>公网直连、隧道中转与物理内网专线的底层拓扑</strong>，解析 VLESS Reality 等前沿协议的抗封锁机理，并揭示观测盲区的成因。
+      </p>
+    </div>
+
+    <!-- Core Visualization Component: Network Path Diagram -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-xl font-bold text-obs-text">端到端网络路径与分层观测模型</h2>
+        <p class="text-xs text-obs-muted">展现从用户本地设备经国内入口、跨境段到落地机及目标网站的 5 层跳数关系</p>
+      </div>
+      <NetworkPathDiagram />
+    </section>
+
+    <!-- Line Architecture Comparison Table -->
+    <section class="space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">四大核心网络线路架构深度横向对比</h2>
+        <p class="text-xs text-obs-muted">物理链路决定性能上限，软件调优无法违背光纤与路由物理规律</p>
+      </div>
+
+      <div class="overflow-x-auto border border-obs-border rounded-xl">
+        <table class="w-full text-left text-xs text-obs-muted border-collapse">
+          <thead>
+            <tr class="bg-obs-panel border-b border-obs-border text-obs-text font-mono text-[11px]">
+              <th class="py-3 px-4">线路架构类型</th>
+              <th class="py-3 px-4">物理传输链路走向</th>
+              <th class="py-3 px-4">晚高峰丢包与抖动</th>
+              <th class="py-3 px-4">抗封锁与敏感期生存度</th>
+              <th class="py-3 px-4">带宽采购成本</th>
+              <th class="py-3 px-4">典型适用场景</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-obs-border/50">
+            <tr class="hover:bg-obs-panel/30">
+              <td class="py-3 px-4 font-bold text-obs-text">物理内网专线 (IEPL/IPLC)</td>
+              <td class="py-3 px-4 text-emerald-400">端到端物理点对点内网，绕过公网海缆与防火墙</td>
+              <td class="py-3 px-4 text-emerald-400">极优：丢包率 &lt; 0.1%，抖动 &lt; 2ms</td>
+              <td class="py-3 px-4 text-emerald-400">极高：不经过公网国际海缆，不受阻断</td>
+              <td class="py-3 px-4 font-mono text-rose-400">昂贵（数万元/Gbps/月）</td>
+              <td class="py-3 px-4">严肃生产力、4K晚高峰追剧、外贸企业</td>
+            </tr>
+            <tr class="hover:bg-obs-panel/30">
+              <td class="py-3 px-4 font-bold text-obs-text">国内多线 BGP 公网中转</td>
+              <td class="py-3 px-4">国内优质 BGP 入口 + 公网加密隧道至境外落地</td>
+              <td class="py-3 px-4 text-amber-400">良：丢包 1%~5%，晚高峰偶有波动</td>
+              <td class="py-3 px-4 text-amber-400">中：国内入口可抗阻断，但公网隧道易受干扰</td>
+              <td class="py-3 px-4 font-mono text-amber-400">中等（千元级/Gbps/月）</td>
+              <td class="py-3 px-4">日常浏览、高性价比大流量下载</td>
+            </tr>
+            <tr class="hover:bg-obs-panel/30">
+              <td class="py-3 px-4 font-bold text-obs-text">精品公网直连 (CN2 GIA / 9929)</td>
+              <td class="py-3 px-4">运营商 VIP 国际骨干路由直连境外机房</td>
+              <td class="py-3 px-4 text-amber-300">中优：非高峰低延时，高峰期带宽饱和轻微丢包</td>
+              <td class="py-3 px-4 text-rose-300">低：走公网出口，IP 易遭目标防火墙端口封锁</td>
+              <td class="py-3 px-4 font-mono text-amber-300">较高（百元至千元/Mbps）</td>
+              <td class="py-3 px-4">自建 VPS、海外独立建站、个人直连</td>
+            </tr>
+            <tr class="hover:bg-obs-panel/30">
+              <td class="py-3 px-4 font-bold text-obs-text">普通公网 163 直连</td>
+              <td class="py-3 px-4 text-rose-400">公共 163 民用国际出口直连境外</td>
+              <td class="py-3 px-4 text-rose-400">极差：晚高峰丢包 20%~40%，严重卡顿</td>
+              <td class="py-3 px-4 text-rose-400">极低：极其脆弱，端口与 IP 随时被黑名单封杀</td>
+              <td class="py-3 px-4 font-mono text-emerald-400">极低（十几元/TB 廉价 VPS）</td>
+              <td class="py-3 px-4">免费节点、公共爬虫、临时查阅文字</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Protocol Deep Dive: VLESS Reality, Trojan, Hysteria 2 -->
+    <section class="space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">主流传输协议密码学原理与防封锁能力</h2>
+        <p class="text-xs text-obs-muted">从特征伪装、TLS握手指纹到主动探测防御的技术代际演进</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-5 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-sky-400 font-bold">VLESS Reality</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">第四代无证书</span>
+          </div>
+          <h3 class="text-sm font-bold text-obs-text">借用大厂 TLS 握手真实指纹</h3>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            摒弃自建域名与 CA 证书。客户端与服务端通过借用知名正规站点的公网真实证书完成认证。主动探测流量将被转发至目标真实大厂网站，彻底防御中间人主动探测与模式识别。
+          </p>
+        </div>
+
+        <div class="p-5 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-purple-400 font-bold">Trojan / TLS</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">第三代标准HTTPS</span>
+          </div>
+          <h3 class="text-sm font-bold text-obs-text">将流量完美伪装成合法 HTTPS 网站</h3>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            模仿标准 HTTPS 流量协议流程。未通过密码校验的非法探测流量会被自动反向代理到伪装的合法静态网页。成熟稳定，受到各大主流开源客户端与路由器的最广泛支持。
+          </p>
+        </div>
+
+        <div class="p-5 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-emerald-400 font-bold">Hysteria 2 / TUIC</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">新一代 UDP/QUIC</span>
+          </div>
+          <h3 class="text-sm font-bold text-obs-text">恶劣丢包环境下的吞吐救星</h3>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            基于 QUIC 协议定制的抗丢包传输协议。针对丢包率高的高风险公网链路进行了算法级重写，能够在 20% 丢包环境下维持高速数据吞吐。需注意部分地区运营商针对 UDP 的 QoS 封控。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Source Conflict Disclosure Notice regarding Lightspeed and others -->
+    <section class="rounded-xl border border-amber-500/40 bg-amber-500/5 p-6 space-y-3 text-xs leading-relaxed text-obs-muted">
+      <div class="flex items-center gap-2 text-amber-300 font-bold text-sm">
+        <span>⚠ 本站关于收录品牌线路宣称的透明披露原则</span>
+      </div>
+      <p>
+        在入库资料 A 中，部分品牌存在<strong>线路命名冲突与宣传多版本并存</strong>现象。例如第一主推品牌“光速云”，在要点总结中提及“IEPL 与企业内网专线”，但在详细介绍中又提及“IPLC 与隧道中转”。
+        本站严格执行数据透明规范：展示层如实罗列原始资料中的全部说法，并明确标注“未独立物理勘验的宣称”。我们绝不替品牌私自美化、统一说法，更不据此绘制未经验证的双专线拓扑图。
+      </p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="rounded-xl border border-obs-border bg-obs-panel p-6 sm:p-8 space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">线路与协议常见技术疑问 (FAQ)</h2>
+        <p class="text-xs text-obs-muted">解答关于物理专线、BGP 路由与网络协议抗封锁的核心疑问</p>
+      </div>
+
+      <div class="divide-y divide-obs-border/60">
+        {linesFaqs.map((faq, idx) => (
+          <div class="py-4 space-y-2">
+            <h3 class="text-sm sm:text-base font-bold text-obs-text flex items-start gap-2">
+              <span class="text-rose-400 font-mono">Q{idx + 1}:</span>
+              <span>{faq.q}</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-obs-muted leading-relaxed pl-6">
+              {faq.a}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Internal Linking Navigation -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+      <a href="/stable/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-emerald-500/50 transition">
+        <div class="text-xs font-mono text-emerald-400 mb-1">指标核验 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">稳定机场核验规范</div>
+        <div class="text-xs text-obs-muted mt-1">晚高峰多样本统计与丢包模型</div>
+      </a>
+      <a href="/lab/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-indigo-500/50 transition">
+        <div class="text-xs font-mono text-indigo-400 mb-1">实测数据 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">测速实验室档案</div>
+        <div class="text-xs text-obs-muted mt-1">查阅 41 个品牌原始测速快照</div>
+      </a>
+      <a href="/troubleshoot/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-teal-500/50 transition">
+        <div class="text-xs font-mono text-teal-400 mb-1">网络排障 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">网络排障决策树</div>
+        <div class="text-xs text-obs-muted mt-1">排查协议握手超时与 TUN 驱动故障</div>
+      </a>
+    </section>
+
+  </div>
+</BaseLayout>

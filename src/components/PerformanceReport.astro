@@ -1,0 +1,157 @@
+---
+interface SpeedResult {
+  region: string;
+  latencyMs: number | null;
+  downloadMbps: number | null;
+  rawDownload?: string;
+  status: string;
+}
+
+interface Props {
+  brandName?: string;
+  testDate?: string;
+  environmentNote?: string;
+  provenance?: 'supplied_record' | 'historical_aggregate' | 'not_tested' | 'example';
+  results?: SpeedResult[];
+  accentColor?: string;
+}
+
+const {
+  brandName = '主流代表品牌 (光速云)',
+  testDate = '2026-10-19',
+  environmentNote = '来源资料记录快照（非晚高峰测试，仅供吞吐量标尺演示参考）',
+  provenance = 'supplied_record',
+  results = [
+    { region: '香港', latencyMs: 22, downloadMbps: 529, status: 'success' },
+    { region: '台湾', latencyMs: 41, downloadMbps: 114, status: 'success' },
+    { region: '新加坡', latencyMs: 46, downloadMbps: 387, status: 'success' },
+    { region: '日本', latencyMs: 57, downloadMbps: 135, status: 'success' },
+    { region: '美国', latencyMs: 143, downloadMbps: 18, status: 'success' }
+  ],
+  accentColor = '#38BDF8'
+} = Astro.props;
+
+
+// Determine provenance label and badge color
+const provenanceLabels: Record<string, { label: string; color: string; border: string }> = {
+  supplied_record: { label: '来源资料单次记录', color: 'text-[#38BDF8] bg-[#38BDF8]/10', border: 'border-[#38BDF8]/30' },
+  historical_aggregate: { label: '历史地区聚合统计', color: 'text-[#F59E0B] bg-[#F59E0B]/10', border: 'border-[#F59E0B]/30' },
+  not_tested: { label: '暂无实测样本 (Not Tested)', color: 'text-[#64748B] bg-[#64748B]/10', border: 'border-[#64748B]/30' },
+  example: { label: '样式规范演示 (Example)', color: 'text-[#818CF8] bg-[#818CF8]/10', border: 'border-[#818CF8]/30' }
+};
+
+const provInfo = provenanceLabels[provenance] || provenanceLabels.not_tested;
+
+// Calculate max benchmark for visual progress bar (fixed scale 600 Mbps)
+const MAX_SCALE_MBPS = 600;
+---
+
+<div class="relative rounded-lg border border-[#26354D] bg-[#111C2E] p-4 sm:p-5 text-[#E6EDF6] overflow-hidden my-6">
+  <!-- Subtle Header Bar -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 mb-4 border-b border-[#26354D] gap-2">
+    <div class="flex items-center space-x-2.5">
+      <span class="w-2.5 h-2.5 rounded-sm" style={`background-color: ${accentColor}`}></span>
+      <h3 class="text-sm sm:text-base font-bold tracking-tight text-[#E6EDF6]">
+        {brandName} 网络性能监测报告 (Performance Monitoring Report)
+      </h3>
+    </div>
+    <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+      <span class="px-2 py-0.5 rounded border text-[11px]" class:list={[provInfo.color, provInfo.border]}>
+        {provInfo.label}
+      </span>
+      <span class="text-[#A7B6CC] text-[11px] bg-[#17253D] px-2 py-0.5 rounded border border-[#26354D]">
+        记录时间: {testDate}
+      </span>
+    </div>
+  </div>
+
+  <!-- Environment & Constraints Alert -->
+  <div class="mb-4 text-xs font-mono leading-relaxed bg-[#0B1220] p-2.5 rounded border border-[#26354D] text-[#A7B6CC]">
+    <span class="text-[#38BDF8] font-semibold">测试环境与边界：</span> {environmentNote}
+  </div>
+
+  <!-- Results Section -->
+  {provenance === 'not_tested' || results.length === 0 ? (
+    <div class="py-8 text-center bg-[#0B1220]/60 rounded border border-dashed border-[#26354D] my-2">
+      <svg class="w-8 h-8 text-[#64748B] mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div class="text-sm font-medium text-[#A7B6CC]">暂无公开核验测速样本 (Not Tested)</div>
+      <p class="text-xs text-[#64748B] mt-1 max-w-md mx-auto">
+        本站遵循真实性原则，未对该品牌取得可复现测速前严格标记为空，绝不假造 0ms 延迟或编造虚拟满速柱状图。
+      </p>
+    </div>
+  ) : (
+    <div class="space-y-4">
+      {results.map((r) => {
+        const pct = r.downloadMbps !== null ? Math.min(100, Math.max(2, (r.downloadMbps / MAX_SCALE_MBPS) * 100)) : 0;
+        const isAnomaly = r.latencyMs !== null && r.latencyMs >= 1000;
+        return (
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs font-mono">
+              <div class="flex items-center space-x-2">
+                <span class={`w-2 h-2 rounded-full ${r.status === 'failure' ? 'bg-[#EF4444]' : (isAnomaly ? 'bg-[#F59E0B]' : 'bg-[#10B981]')}`}></span>
+                <span class="font-bold text-[#E6EDF6]">{r.region}节点</span>
+                {isAnomaly && (
+                  <span class="text-[10px] px-1.5 py-0.2 rounded bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/40">
+                    异常样本待核实
+                  </span>
+                )}
+              </div>
+              <div class="flex items-center space-x-4 text-[#A7B6CC]">
+                <span>
+                  延迟: <strong class={`font-mono ${isAnomaly ? 'text-[#F59E0B]' : 'text-[#E6EDF6]'}`}>{r.latencyMs !== null ? `${r.latencyMs}ms` : '—'}</strong>
+                </span>
+                <span>
+                  下行: <strong class="text-[#38BDF8] font-mono">{r.downloadMbps !== null ? `${r.downloadMbps} Mbps` : '—'}</strong>
+                  {r.rawDownload && <span class="text-[10px] text-[#64748B] ml-1">({r.rawDownload})</span>}
+                </span>
+              </div>
+            </div>
+
+            <!-- Gauge / Progress Bar with Fixed Scale -->
+            <div class="w-full h-3 rounded bg-[#0B1220] border border-[#26354D] overflow-hidden p-0.5">
+              <div
+                class="h-full rounded-sm transition-all duration-500"
+                style={`width: ${pct}%; background: linear-gradient(90deg, #10B981 0%, ${accentColor} 100%);`}
+              ></div>
+            </div>
+          </div>
+        );
+      })}
+
+      <!-- HTML Data Table fallback for accessibility -->
+      <div class="mt-5 pt-3 border-t border-[#26354D]/60 overflow-x-auto">
+        <table class="w-full text-left text-xs font-mono">
+          <thead>
+            <tr class="text-[#A7B6CC] border-b border-[#26354D]">
+              <th class="py-1.5 pr-4">节点地区</th>
+              <th class="py-1.5 px-4">测量延迟 (RTT)</th>
+              <th class="py-1.5 px-4">下行吞吐 (Mbps)</th>
+              <th class="py-1.5 px-4">状态标记</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#26354D]/40 text-[#E6EDF6]">
+            {results.map((r) => (
+              <tr>
+                <td class="py-1.5 pr-4 font-semibold">{r.region}</td>
+                <td class="py-1.5 px-4">{r.latencyMs !== null ? `${r.latencyMs} ms` : '未测'}</td>
+                <td class="py-1.5 px-4 text-[#38BDF8]">{r.downloadMbps !== null ? `${r.downloadMbps} Mbps` : '未测'}</td>
+                <td class="py-1.5 px-4">
+                  <span class={`text-[10px] px-1.5 py-0.5 rounded ${r.status === 'success' ? 'text-[#10B981] bg-[#10B981]/10' : 'text-[#F59E0B] bg-[#F59E0B]/10'}`}>
+                    {r.status === 'success' ? 'Operational' : (r.status === 'failure' ? 'Failed' : 'Partial')}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )}
+
+  <!-- Watermark -->
+  <div class="absolute right-3 bottom-2 pointer-events-none text-[10px] font-mono text-white/15 select-none">
+    jichangwending.world
+  </div>
+</div>

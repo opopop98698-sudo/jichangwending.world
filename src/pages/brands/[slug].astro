@@ -1,0 +1,343 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PerformanceReport from '../../components/PerformanceReport.astro';
+import ServiceAvailabilityMatrix from '../../components/ServiceAvailabilityMatrix.astro';
+import NetworkPathDiagram from '../../components/NetworkPathDiagram.astro';
+import { AFFILIATE_LINKS } from '../../lib/links';
+import brandsData from '../../data/brands.json';
+
+export async function getStaticPaths() {
+  return brandsData.map((brand) => ({
+    params: { slug: brand.id },
+    props: { brand }
+  }));
+}
+
+const { brand } = Astro.props;
+const affData = AFFILIATE_LINKS[brand.id] || { affiliateUrl: null, officialUrl: null, commissionNotice: '' };
+
+const pageTitle = `${brand.name}怎么样？真实测速、套餐价格与线路稳定性评测档案`;
+const pageDescription = `深度解析${brand.name}：${brand.pricingStarting.period}折合¥${brand.pricingStarting.monthlyEquivalent}/月起，声称采用${brand.lineType}。本文基于${brand.source}整理真实测速、AI与流媒体解锁状态、优缺点及选购避坑指南。`;
+
+// Schema JSON-LD for Brand Page
+const brandSchema = {
+  '@type': 'Product',
+  name: brand.name,
+  description: pageDescription,
+  brand: {
+    '@type': 'Brand',
+    name: brand.name
+  },
+  offers: {
+    '@type': 'Offer',
+    price: brand.pricingStarting.amount,
+    priceCurrency: 'CNY',
+    availability: 'https://schema.org/InStock',
+    url: affData.affiliateUrl || `https://jichangwending.world/brands/${brand.id}/`
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={`https://jichangwending.world/brands/${brand.id}/`}
+  schema={brandSchema}
+>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-[#A7B6CC]">
+      <a href="/" class="hover:text-white">首页</a>
+      <span>/</span>
+      <a href="/brands/" class="hover:text-white">品牌库</a>
+      <span>/</span>
+      <span class="text-[#38BDF8]">{brand.name}</span>
+    </nav>
+
+    <!-- Hero Header -->
+    <div class="rounded-xl border border-[#26354D] bg-[#111C2E] p-6 sm:p-8">
+      <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div class="space-y-3">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#E6EDF6]">
+              {brand.name}
+            </h1>
+            {brand.isPrimaryRecommended && (
+              <span class="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-[#EF4444]/20 border border-[#EF4444]/40 text-[#EF4444]">
+                编辑第一主推 (含推广合作)
+              </span>
+            )}
+            {brand.isTop10 && !brand.isPrimaryRecommended && (
+              <span class="px-2 py-0.5 rounded text-xs font-mono bg-[#38BDF8]/15 border border-[#38BDF8]/30 text-[#38BDF8]">
+                编辑推荐位次 #{brand.editorialOrder}
+              </span>
+            )}
+            <span class="px-2 py-0.5 rounded text-xs font-mono bg-[#17253D] border border-[#26354D] text-[#A7B6CC]">
+              数据来源: {brand.source}
+            </span>
+          </div>
+
+          <p class="text-sm text-[#A7B6CC] leading-relaxed max-w-2xl">
+            {brand.comparisonSummary}
+          </p>
+
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-2 pt-1 text-xs font-mono">
+            <span class="px-2 py-1 rounded bg-[#0B1220] border border-[#26354D] text-[#38BDF8]">
+              {brand.lineType.slice(0, 24)}
+            </span>
+            <span class="px-2 py-1 rounded bg-[#0B1220] border border-[#26354D] text-[#10B981]">
+              协议: {brand.protocols.join('/')}
+            </span>
+            <span class="px-2 py-1 rounded bg-[#0B1220] border border-[#26354D] text-[#E6EDF6]">
+              {brand.clients.customApp && brand.clients.thirdParty ? '自研+第三方双支持' : (brand.clients.customApp ? '官方专属客户端' : '通用订阅导入')}
+            </span>
+          </div>
+        </div>
+
+        <!-- Pricing Card & CTA -->
+        <div class="md:w-64 flex-shrink-0 p-4 rounded-lg bg-[#0B1220] border border-[#26354D] flex flex-col justify-between space-y-3">
+          <div>
+            <div class="text-[11px] font-mono text-[#64748B] uppercase">当前起步参考价</div>
+            <div class="text-2xl font-bold font-mono text-[#10B981]">
+              {brand.pricingStarting.isApproximate ? '约 ' : ''}¥{brand.pricingStarting.monthlyEquivalent}
+              <span class="text-xs text-[#A7B6CC] font-normal">/月</span>
+            </div>
+            <div class="text-xs font-mono text-[#A7B6CC] mt-0.5">
+              {brand.pricingStarting.period} ¥{brand.pricingStarting.amount} ({brand.pricingStarting.trafficGB > 0 ? `${brand.pricingStarting.trafficGB}GB/月` : '流量待核'})
+            </div>
+          </div>
+
+          <div>
+            {affData.affiliateUrl ? (
+              <a
+                href={affData.affiliateUrl}
+                target="_blank"
+                rel="nofollow sponsored noopener"
+                class="w-full block text-center py-2 px-4 rounded text-xs font-bold bg-[#38BDF8] text-[#0B1220] hover:bg-[#38BDF8]/90 transition-colors"
+              >
+                访问官网选购
+              </a>
+            ) : (
+              <div class="w-full text-center py-2 px-4 rounded text-xs font-mono text-[#64748B] bg-[#111C2E] border border-[#26354D]">
+                暂无独立注册入口
+              </div>
+            )}
+            {affData.affiliateUrl && (
+              <div class="text-[10px] text-[#64748B] font-mono mt-1 text-center">
+                含推广合作，不影响实付价格
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Answer-First Summary -->
+    <section class="rounded-lg border border-[#26354D] bg-[#111C2E] p-6 space-y-3">
+      <h2 class="text-lg font-bold text-[#E6EDF6] flex items-center space-x-2">
+        <span class="w-2 h-2 rounded-full bg-[#38BDF8]"></span>
+        <span>核心测评结论 (Answer-First)</span>
+      </h2>
+      <p class="text-sm text-[#A7B6CC] leading-relaxed">
+        针对日常使用，<strong>{brand.name}</strong>的核心画像为：
+        <span class="text-[#E6EDF6]">{brand.comparisonSummary}</span>
+        在网络架构上，商家宣称采用 <code>{brand.lineType}</code>。
+        {brand.speedTest.results.length > 0 ? (
+          `在 ${brand.speedTest.date} 的来源测速中，香港节点测得下行 ${brand.speedTest.results[0].downloadMbps} Mbps，延迟 ${brand.speedTest.results[0].latencyMs} ms。但该测速属于非晚高峰单次采样，不代表全天候在线率。`
+        ) : (
+          `该品牌目前缺少可比的单节点公开实测数据（严格标记为 Not Tested），建议用户购买前以短期月付档位进行测试。`
+        )}
+      </p>
+    </section>
+
+    <!-- Section 2: Plans & Pricing Table -->
+    <section class="rounded-lg border border-[#26354D] bg-[#111C2E] p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-[#E6EDF6] flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
+          <span>已核实套餐明细与价格表</span>
+        </h2>
+        <span class="text-xs font-mono text-[#64748B]">单位: 人民币(元)</span>
+      </div>
+
+      {brand.plans.length > 0 ? (
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead>
+              <tr class="border-b border-[#26354D] text-[#A7B6CC]">
+                <th class="py-2 pr-4">套餐名称</th>
+                <th class="py-2 px-4">计费周期</th>
+                <th class="py-2 px-4">价格 (¥)</th>
+                <th class="py-2 px-4">流量配额</th>
+                <th class="py-2 px-4">重置方式</th>
+                <th class="py-2 pl-4">备注说明</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#26354D]/50 text-[#E6EDF6]">
+              {brand.plans.map((p) => (
+                <tr class="hover:bg-[#17253D]/50">
+                  <td class="py-2.5 pr-4 font-bold">{p.name}</td>
+                  <td class="py-2.5 px-4">{p.billing}</td>
+                  <td class="py-2.5 px-4 text-[#10B981] font-bold">¥{p.price}</td>
+                  <td class="py-2.5 px-4 text-[#38BDF8]">{p.trafficGB > 0 ? `${p.trafficGB} GB` : '待核实'}</td>
+                  <td class="py-2.5 px-4">{p.cycle}</td>
+                  <td class="py-2.5 pl-4 text-[#A7B6CC] text-[11px]">{p.notes || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div class="p-6 text-center text-xs font-mono text-[#64748B] bg-[#0B1220] rounded border border-dashed border-[#26354D]">
+          原始资料中未列出该品牌详细套餐表。本站坚持不伪造数据，完整套餐有待官方最新数据补充。
+        </div>
+      )}
+
+      <!-- Coupon Codes Alert -->
+      {brand.couponCodes.length > 0 && (
+        <div class="mt-3 p-3 rounded bg-[#0B1220] border border-[#26354D] flex flex-wrap items-center gap-3 text-xs font-mono">
+          <span class="text-[#F59E0B] font-bold">优惠信息记录：</span>
+          {brand.couponCodes.map((c) => (
+            <span class="px-2 py-0.5 rounded bg-[#17253D] border border-[#26354D] text-[#E6EDF6]">
+              代码: <code class="text-[#38BDF8] font-bold">{c.code}</code> ({c.discount || '有折扣'}) - {c.notes}
+            </span>
+          ))}
+        </div>
+      )}
+    </section>
+
+    <!-- Section 3: Performance Report Component -->
+    <PerformanceReport
+      brandName={brand.name}
+      testDate={brand.speedTest.date}
+      environmentNote={brand.speedTest.environmentNote}
+      provenance={brand.speedTest.provenance}
+      results={brand.speedTest.results}
+    />
+
+    <!-- Section 4: Service Availability Matrix Component -->
+    <ServiceAvailabilityMatrix
+      brandName={brand.name}
+      ai={brand.serviceAvailability.ai}
+      streaming={brand.serviceAvailability.streaming}
+      testNode={brand.nodesSummary}
+      testDate={brand.speedTest.date}
+    />
+
+    <!-- Section 5: Network Path Observatory Component -->
+    <NetworkPathDiagram
+      brandName={brand.name}
+      lineDeclaration={brand.lineType}
+      protocols={brand.protocols}
+      egressRegions={brand.regions}
+      isVendorClaim={true}
+    />
+
+    <!-- Section 6: Pros, Cons, Risks & Conflicts -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Pros -->
+      <div class="rounded-lg border border-[#26354D] bg-[#111C2E] p-5 space-y-3">
+        <h3 class="text-sm font-bold text-[#10B981] flex items-center space-x-1.5 font-mono">
+          <span>✓</span>
+          <span>核心优势与亮点 (Pros)</span>
+        </h3>
+        <ul class="space-y-2 text-xs text-[#E6EDF6]">
+          {brand.pros.map((item) => (
+            <li class="flex items-start space-x-2">
+              <span class="text-[#10B981] mt-0.5">●</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Cons & Conflicts -->
+      <div class="rounded-lg border border-[#26354D] bg-[#111C2E] p-5 space-y-3">
+        <h3 class="text-sm font-bold text-[#F59E0B] flex items-center space-x-1.5 font-mono">
+          <span>⚠️</span>
+          <span>局限、风险与资料冲突 (Cons & Conflicts)</span>
+        </h3>
+        <ul class="space-y-2 text-xs text-[#A7B6CC]">
+          {brand.cons.concat(brand.risks).concat(brand.gapsAndConflicts).map((item) => (
+            <li class="flex items-start space-x-2">
+              <span class="text-[#EF4444] mt-0.5">✕</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 7: Audience Matching -->
+    <section class="rounded-lg border border-[#26354D] bg-[#111C2E] p-6 space-y-4">
+      <h3 class="text-base font-bold text-[#E6EDF6]">使用人群匹配分析</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        <div class="p-3.5 rounded bg-[#0B1220] border border-[#26354D]">
+          <div class="font-bold text-[#10B981] mb-2 font-mono">[适合人群]</div>
+          <p class="text-[#E6EDF6] leading-relaxed">
+            {brand.suitableFor.join('；')}。
+          </p>
+        </div>
+        <div class="p-3.5 rounded bg-[#0B1220] border border-[#26354D]">
+          <div class="font-bold text-[#EF4444] mb-2 font-mono">[不适合人群]</div>
+          <p class="text-[#A7B6CC] leading-relaxed">
+            {brand.notSuitableFor.join('；')}。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8: Frequently Asked Questions -->
+    <section class="rounded-lg border border-[#26354D] bg-[#111C2E] p-6 space-y-4">
+      <h3 class="text-base font-bold text-[#E6EDF6]">关于 {brand.name} 的常见问答 (FAQ)</h3>
+      <div class="space-y-3 text-xs">
+        <div class="p-3 rounded bg-[#0B1220] border border-[#26354D] space-y-1">
+          <div class="font-bold text-[#38BDF8]">Q: {brand.name} 真的稳定吗？晚高峰会不会卡顿？</div>
+          <div class="text-[#A7B6CC] leading-relaxed">
+            A: 商家宣称采用 {brand.lineType}。
+            {brand.speedTest.results.length > 0 ? (
+              `在 ${brand.speedTest.date} 来源测速中，香港节点跑出 ${brand.speedTest.results[0].downloadMbps}Mbps。但请注意该记录属于非晚高峰单次采样，不能等同于晚高峰全天候零卡顿，建议先买月付实测。`
+            ) : (
+              `目前该品牌暂无公开的高峰测速样本，建议先以小额月付档位进行本地网络验证，不要直接盲目购买大额年付。`
+            )}
+          </div>
+        </div>
+
+        <div class="p-3 rounded bg-[#0B1220] border border-[#26354D] space-y-1">
+          <div class="font-bold text-[#38BDF8]">Q: {brand.name} 能退款吗？支持第三方客户端吗？</div>
+          <div class="text-[#A7B6CC] leading-relaxed">
+            A: 客户端方面，{brand.clients.thirdParty ? '支持导出通用订阅并导入 Clash/Shadowrocket 使用。' : '仅提供官方自研专属客户端，无法导出通用订阅。'}
+            退款方面，绝大多数机场明确标注特殊虚拟商品不支持退款，请务必核实当期规则。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Actions -->
+    <div class="pt-6 border-t border-[#26354D] flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="text-xs font-mono text-[#64748B]">
+        核验日期: {brand.verifiedDate} | 档案更新: {brand.updatedDate}
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <a
+          href="/brands/"
+          class="px-4 py-2 rounded text-xs font-medium bg-[#17253D] text-[#E6EDF6] hover:bg-[#26354D] border border-[#26354D] transition-colors"
+        >
+          返回品牌库列表
+        </a>
+        {affData.affiliateUrl && (
+          <a
+            href={affData.affiliateUrl}
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            class="px-5 py-2 rounded text-xs font-bold bg-[#38BDF8] text-[#0B1220] hover:bg-[#38BDF8]/90 transition-colors"
+          >
+            前往 {brand.name} 官网
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,114 @@
+---
+interface Props {
+  brandName?: string;
+  lineDeclaration?: string;
+  protocols?: string[];
+  ingressNote?: string;
+  egressRegions?: string[];
+  isVendorClaim?: boolean;
+}
+
+const {
+  brandName = '标准专线中转',
+  lineDeclaration = 'IEPL / IPLC 内网专线',
+  protocols = ['VLESS', 'Shadowsocks', 'Trojan'],
+  ingressNote = '国内多线 BGP 优化入口 (就近接入防丢包)',
+  egressRegions = ['香港', '日本', '新加坡', '美国'],
+  isVendorClaim = true
+} = Astro.props;
+
+---
+
+<div class="relative rounded-lg border border-[#26354D] bg-[#111C2E] p-4 sm:p-5 text-[#E6EDF6] overflow-hidden my-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 mb-4 border-b border-[#26354D] gap-2">
+    <div class="flex items-center space-x-2">
+      <span class="w-2.5 h-2.5 rounded-sm bg-[#10B981]"></span>
+      <h3 class="text-sm sm:text-base font-bold tracking-tight text-[#E6EDF6]">
+        {brandName} 网络路径与拓扑观测 (Network Path Observatory)
+      </h3>
+    </div>
+    <div class="flex items-center space-x-2 text-xs font-mono">
+      <span class="px-2 py-0.5 rounded border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#38BDF8] text-[11px]">
+        {isVendorClaim ? '据品牌资料声明绘制' : '实测拓扑路径'}
+      </span>
+    </div>
+  </div>
+
+  <!-- Topology Visual Steps (Desktop Flex / Mobile Vertical Flow) -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-3 py-3">
+    <!-- Step 1: User Device -->
+    <div class="p-3 rounded border border-[#26354D] bg-[#0B1220] flex flex-col justify-between space-y-2 relative">
+      <div>
+        <div class="text-[10px] font-mono text-[#38BDF8] uppercase tracking-wider mb-1">Step 01 / 源端</div>
+        <div class="text-xs font-bold text-[#E6EDF6]">本地用户设备</div>
+        <div class="text-[11px] text-[#A7B6CC] mt-1">PC / 手机 / 软路由</div>
+      </div>
+      <div class="pt-2 border-t border-[#26354D]/50 text-[10px] font-mono text-[#10B981]">
+        协议: {protocols.join(' / ')}
+      </div>
+      <!-- Step Arrow Desktop -->
+      <div class="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-[#38BDF8]">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+      </div>
+    </div>
+
+    <!-- Step 2: Ingress Relay -->
+    <div class="p-3 rounded border border-[#26354D] bg-[#0B1220] flex flex-col justify-between space-y-2 relative">
+      <div>
+        <div class="text-[10px] font-mono text-[#38BDF8] uppercase tracking-wider mb-1">Step 02 / 入口</div>
+        <div class="text-xs font-bold text-[#E6EDF6]">国内中转节点</div>
+        <div class="text-[11px] text-[#A7B6CC] mt-1">{ingressNote}</div>
+      </div>
+      <div class="pt-2 border-t border-[#26354D]/50 text-[10px] font-mono text-[#A7B6CC]">
+        防封锁保护真实IP
+      </div>
+      <div class="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-[#38BDF8]">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+      </div>
+    </div>
+
+    <!-- Step 3: Transit Backbone -->
+    <div class="p-3 rounded border border-[#38BDF8]/40 bg-[#17253D] flex flex-col justify-between space-y-2 relative">
+      <div>
+        <div class="text-[10px] font-mono text-[#10B981] uppercase tracking-wider mb-1">Step 03 / 跨境专线</div>
+        <div class="text-xs font-bold text-[#38BDF8]">{lineDeclaration}</div>
+        <div class="text-[11px] text-[#A7B6CC] mt-1">内网点对点传输，不经公网GFW</div>
+      </div>
+      <div class="pt-2 border-t border-[#38BDF8]/30 text-[10px] font-mono text-[#10B981]">
+        {lineDeclaration.includes('IPLC') ? '二层物理直连' : (lineDeclaration.includes('IEPL') ? '以太网专线' : '中转调度')}
+      </div>
+      <div class="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-[#38BDF8]">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+      </div>
+    </div>
+
+    <!-- Step 4: Overseas Egress -->
+    <div class="p-3 rounded border border-[#26354D] bg-[#0B1220] flex flex-col justify-between space-y-2">
+      <div>
+        <div class="text-[10px] font-mono text-[#38BDF8] uppercase tracking-wider mb-1">Step 04 / 落地</div>
+        <div class="text-xs font-bold text-[#E6EDF6]">海外落地枢纽</div>
+        <div class="text-[11px] text-[#A7B6CC] mt-1">{egressRegions.slice(0, 4).join(' / ')} 原生IP</div>
+      </div>
+      <div class="pt-2 border-t border-[#26354D]/50 text-[10px] font-mono text-[#38BDF8]">
+        访问 ChatGPT / 流媒体
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend & Evidence Note -->
+  <div class="mt-3 pt-3 border-t border-[#26354D]/60 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-[#A7B6CC] gap-2">
+    <div class="font-mono text-[11px]">
+      <strong class="text-[#E6EDF6]">架构说明：</strong>
+      {brandName} 声明采用 <span class="text-[#38BDF8] font-bold">{lineDeclaration}</span>。
+    </div>
+    <div class="text-[10px] font-mono text-[#64748B]">
+      *示意图据商家资料绘制，专线物理属性以跨网路由观测证据为准
+    </div>
+  </div>
+
+  <!-- Watermark -->
+  <div class="absolute right-3 bottom-2 pointer-events-none text-[10px] font-mono text-white/15 select-none">
+    jichangwending.world
+  </div>
+</div>

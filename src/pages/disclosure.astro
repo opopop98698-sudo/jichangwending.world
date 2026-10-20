@@ -1,0 +1,107 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BillingCycleComparator from '../components/tools/BillingCycleComparator.astro';
+
+const pageTitle = '商业模式与推广合作透明披露：合规外链与解耦准则';
+const pageDescription = '稳定机场指南公开商业合作模式、佣金结构与外链合规规范。阐明编辑推荐前十位的推广合作属性，承诺客观数据与商业推广严格解耦，保障用户知情权。';
+
+const disclosureSchema = {
+  '@type': 'Article',
+  headline: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/disclosure/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/disclosure/"
+  schema={disclosureSchema}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-amber-400">商业推广披露</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-xs font-mono text-amber-400">
+        <span>● 商业关系完全透明 · 遵从 FTC 与合规审计标准</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        商业模式与推广合作透明披露 (Disclosure)
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted leading-relaxed">
+        诚信是评测媒体最宝贵的资产。稳定机场指南坚决反对将商业广告包装成“纯粹中立客观独立机构”的欺骗行为。
+        在本页面中，我们向所有访客公开本站的资金运转来源、推广合作形式与利益隔离准则。
+      </p>
+    </div>
+
+    <!-- 1. How We Are Funded -->
+    <section class="space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <h2 class="text-lg font-bold text-obs-text">一、本站的资金来源与成本构成</h2>
+      <p>
+        稳定机场指南（jichangwending.world）是一个长期持续运营的网络观测与知识库工程。维持本站运转需要承担以下持续性刚性成本：
+      </p>
+      <ul class="list-disc list-inside space-y-2 pl-2">
+        <li><strong>观测服务器与宽带租赁</strong>：部署于国内多地（华南电信、华东联通、华北移动）的探针服务器以及境外落地测试机的月租。</li>
+        <li><strong>测试套餐采购</strong>：为了采集真实的晚高峰样本与验证流媒体解锁能力，我们需要持续购买各品牌的付费月付套餐。</li>
+        <li><strong>工程开发与内容维护</strong>：维护 41 个品牌的档案矩阵、编写排障交互工具与定期核验公开报价。</li>
+      </ul>
+      <p>
+        为了覆盖上述支出并保持长期独立运营，本站在部分品牌的外跳链接中接入了合规的<strong>渠道推广合作（Affiliate Program）</strong>。
+      </p>
+    </section>
+
+    <!-- 2. Affiliate Link Specifications -->
+    <section class="p-6 rounded-xl border border-obs-border bg-obs-panel space-y-4 text-xs">
+      <h2 class="text-lg font-bold text-obs-text">二、推广外链实施标准与规范</h2>
+      <p class="text-obs-muted leading-relaxed">
+        本站对所有包含商业合作的外部跳转链接，严格推行全透明工程实施标准：
+      </p>
+      <div class="space-y-3 font-mono text-xs">
+        <div class="p-3 rounded bg-obs-bg border border-obs-border text-sky-300">
+          target="_blank" rel="nofollow sponsored noopener"
+        </div>
+        <p class="text-obs-muted leading-relaxed font-sans">
+          • <strong>属性规范</strong>：所有推广链接强制添加 `rel="nofollow sponsored noopener"`，明确告知搜索引擎爬虫该链接属于商业合作赞助链接，绝不操纵 PageRank 权重。<br />
+          • <strong>邻近透明提示</strong>：每一个推广直达按钮附近，均常态化显示文字披露：“本站可能获得渠道佣金”。<br />
+          • <strong>价格不溢价原则</strong>：通过推广链接访问购买，用户支付的金额与官网公开发布的原价或活动折扣完全一致，佣金由商家的市场宣传预算直接结算，<strong>绝不会对用户产生任何加价成本</strong>。
+        </p>
+      </div>
+    </section>
+
+    <!-- 3. Strict Decoupling Principle -->
+    <section class="space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <h2 class="text-lg font-bold text-obs-text">三、商业推广与技术评测的“防火墙”制度</h2>
+      <p>
+        我们设立了严格的利益隔离机制（Wall of Separation），确保商业合作不会污染客观技术数据：
+      </p>
+      <ol class="list-decimal list-inside space-y-2 pl-2">
+        <li><strong>编辑推荐位清晰标注</strong>：首页与推荐页展示的 Top 10 品牌属于“编辑精选梯队（含推广合作）”，光速云为主推第一品牌。我们如实标注该梯队属性，绝不声称前十名等于“物理稳定性前十名”。</li>
+        <li><strong>客观测速实验室不设偏袒</strong>：测速实验室、丢包率横向统计与延迟排序，完全按照数值高低真实排序，主推品牌绝不拥有暗中置顶特权。</li>
+        <li><strong>保留资料冲突与客观缺陷</strong>：若合作商家的资料存在虚假优惠码、线路描述前后矛盾或发生重大宕机事故，本站一律如实记录在品牌档案中，不替商家隐瞒缺陷。</li>
+        <li><strong>严禁无依据的免责承诺</strong>：除非经过官方书面合同确认，本站不代表商家对用户做出任何“永久不涨价”或“绝对不跑路”的价格与赔付担保。</li>
+      </ol>
+    </section>
+
+    <!-- Interactive Tool 5: Billing Cycle Comparator -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-lg font-bold text-obs-text">理性消费工具：付款周期与风险收益平衡计算</h2>
+        <p class="text-xs text-obs-muted">帮助您权衡月付、季付与年付的单价折扣与沉没风险，避免盲目被年付大额折扣诱导</p>
+      </div>
+      <BillingCycleComparator />
+    </section>
+
+  </div>
+</BaseLayout>

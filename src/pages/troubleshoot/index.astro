@@ -1,0 +1,244 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TroubleshootTree from '../../components/tools/TroubleshootTree.astro';
+
+const pageTitle = '网络排障指南：节点全红、TUN冲突、流媒体阻断与订阅错误处置';
+const pageDescription = '机场连不上、节点超时全红、订阅更新报错？稳定机场指南网络排障中心提供交互式决策树与五层排障手册，快速定界本地代理、虚拟网卡驱动、DNS污染与落地IP风控。';
+
+const troubleshootFaqs = [
+  {
+    q: '电脑右下角代理软件开了，但浏览器依然无法打开任何境外网页，如何快速排查？',
+    a: '遵循以下四步极速自查：\n1. 检查“系统代理（System Proxy）”开关：很多时候客户端仅在后台运行但未勾选“设置为系统代理”。\n2. 检查系统代理端口映射：打开 Windows 设置 -> 网络和 Internet -> 代理，核对地址是否被正确写入为 127.0.0.1 且端口与客户端一致（Clash 默认为 7890，v2rayN 默认为 10809）。\n3. 检查安全杀毒软件：360 安全卫士、火绒或腾讯电脑管家经常在后台静默重置系统代理注册表，需将客户端加入白名单。\n4. 检查浏览器插件冲突：若安装了 SwitchyOmega 等代理插件，插件规则可能覆盖了系统代理，请将其切换为“系统代理”模式。'
+  },
+  {
+    q: '为什么开了代理后，国内微信、钉钉、QQ 和网银反而转圈断网？',
+    a: '这是典型的“路由分流模式错误（Mode Error）”或“GeoIP 数据库过时”：\n1. 检查客户端工作模式：确认是否误点击成了“Global（全局）”模式。在全局模式下，所有国内流量都会被强制发送到境外节点，导致国内应用触发异地安全拦截或直接丢包。必须切换回“Rule（规则分流）”模式。\n2. 更新本地 GeoIP 数据库：规则分流依赖 Country.mmdb 或 GeoIP.dat 数据库识别国内 IP。如果该数据库由于版本过旧缺失了部分国内 CDN 节点网段，就会把国内请求误判为代理流量。在客户端配置中点击“更新 GeoIP / GeoSite”即可解决。'
+  },
+  {
+    q: '开启 TUN 虚拟网卡模式后，电脑彻底无法上网甚至断开 Wi-Fi 怎么办？',
+    a: 'TUN 模式通过在系统内核中创建一张虚拟网卡接管全局网络栈。遇到断网通常是由“虚拟网卡驱动冲突”或“路由回环（Routing Loop）”引起：\n1. 冲突排查：检查电脑上是否同时运行了易联（EasyConnect）、Cisco AnyConnect、VMware 虚拟网卡或向日葵远程控制。这些软件的底层驱动会与 Wintun 产生严重的路由抢占。退出冲突软件后再重启客户端。\n2. 重置网络堆栈：以管理员身份打开 PowerShell，依次运行 `ipconfig /flushdns` 和 `netsh winsock reset`，然后重启计算机，重置被篡改的本地 LSP 网络链。'
+  },
+  {
+    q: '访问 ChatGPT 报“Sorry, you have been blocked (Error 1020 / 403)”怎么彻底解决？',
+    a: '该报错属于 OpenAI 针对数据中心机房 IP 的主动安全风控，而非网络不通：\n1. 更换为专门标注“原生解锁（Residential / Unlock）”的节点，避开万人共用的常规公共出口。\n2. 彻底清除浏览器环境缓存：OpenAI 会在浏览器 LocalStorage 与 Cookie 中埋入受风控标识。更换节点后，必须打开无痕隐身窗口（Incognito）或彻底清除 chatgpt.com 的站存数据后重试。\n3. 排查客户端 DNS 泄漏：确保客户端启用了远程 DNS 解析（如 DoH / Fake-IP），防止本地运营商 DNS 提前泄露国内真实 IP 解析记录。'
+  },
+  {
+    q: '节点测速延迟显示正常（如 50ms），但打开网页无限加载转圈是什么原因？',
+    a: '测速显示的是“客户端与国内中转入口之间的握手延迟（TCP/ICMP Ping）”，并不代表跨境段或境外落地的真实通信状态！如果机场的国内中转机与境外落地机之间的内网专线断开，或者落地机由于欠费被机房停机，中转机依然会秒回用户的本地 Ping 包（显示 50ms 绿标），但随后转发数据包时会在跨境段彻底超时丢弃。此时应切换至其他可用地区的节点，并向机场提交工单反馈。'
+  }
+];
+
+const troubleshootSchema = {
+  '@type': 'Article',
+  headline: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/troubleshoot/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  },
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: 'https://jichangwending.world/' },
+      { '@type': 'ListItem', position: 2, name: '网络排障', item: 'https://jichangwending.world/troubleshoot/' }
+    ]
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/troubleshoot/"
+  schema={troubleshootSchema}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-teal-400">网络排障</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-500/30 bg-teal-500/10 text-xs font-mono text-teal-400">
+        <span>● 交互式排障决策树 · 终端诊断命令清单 · 五层故障定界</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        网络排障中心：从现象到根因，精准自愈各种节点超时与断网异常
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted max-w-4xl leading-relaxed">
+        网络不通时，病急乱投医往往只会把本地配置越改越乱。
+        稳定机场指南网络排障中心提供<strong>交互式症状排障决策树、高频故障处置手册与系统级诊断命令</strong>。无论遇到节点全红、TUN 虚拟网卡断网、流媒体 403 阻断还是订阅更新 401 报错，均能按图索骥快速恢复。
+      </p>
+    </div>
+
+    <!-- Interactive Tool 7: Troubleshoot Decision Tree -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-xl font-bold text-obs-text">第一步：通过症状决策树定位故障域</h2>
+        <p class="text-xs text-obs-muted">点击您当前遇到的典型现象，系统自动生成排查步骤与终端自测命令</p>
+      </div>
+      <TroubleshootTree />
+    </section>
+
+    <!-- High Frequency Symptom Deep Dive: Five Scenarios -->
+    <section class="space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">五大高频故障深度排查标准操作流程 (SOP)</h2>
+        <p class="text-xs text-obs-muted">覆盖 95% 以上日常网络配置冲突与服务端故障场景</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- SOP 1 -->
+        <div class="p-6 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-obs-text">SOP 01: 节点测速全红（全部超时）</h3>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">高危</span>
+          </div>
+          <ol class="list-decimal list-inside text-xs text-obs-muted space-y-2 leading-relaxed">
+            <li><strong>核对本地系统时钟</strong>：TLS 协议要求本地时间与原子钟偏差小于 90 秒，偏差过大将直接导致握手失败。立即同步 Windows/macOS 互联网时间。</li>
+            <li><strong>检查套餐状态</strong>：登录机场后台，确认账户当月流量是否用尽、套餐是否已过有效期。</li>
+            <li><strong>更新节点订阅</strong>：机场入口 IP 发生阻断时会更新订阅解析，在客户端右键订阅点击“更新”获取最新入口。</li>
+            <li><strong>验证本地核心端口</strong>：检查客户端核心进程（如 clash-core）是否被杀毒软件误杀，确认本地 7890 端口处于监听状态。</li>
+          </ol>
+        </div>
+
+        <!-- SOP 2 -->
+        <div class="p-6 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-obs-text">SOP 02: 开启代理后国内应用转圈断网</h3>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">配置错乱</span>
+          </div>
+          <ol class="list-decimal list-inside text-xs text-obs-muted space-y-2 leading-relaxed">
+            <li><strong>切回规则模式</strong>：检查客户端是否被误触设为 Global（全局），切回 Rule（规则分流）。</li>
+            <li><strong>更新 GeoIP 数据库</strong>：规则引擎依靠 GeoIP 判断国内国外。在客户端设置中更新 Country.mmdb。</li>
+            <li><strong>排查 DNS 污染回环</strong>：若开启了 Fake-IP，确认直连域名规则列表（Direct List）中包含国内大型应用域名。</li>
+            <li><strong>关闭系统双代理重叠</strong>：检查是否同时开启了浏览器代理插件或手机模拟器代理。</li>
+          </ol>
+        </div>
+
+        <!-- SOP 3 -->
+        <div class="p-6 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-obs-text">SOP 03: ChatGPT 报 1020 / Netflix 仅自制剧</h3>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">出口风控</span>
+          </div>
+          <ol class="list-decimal list-inside text-xs text-obs-muted space-y-2 leading-relaxed">
+            <li><strong>切换落地住宅节点</strong>：选择带有“解锁”、“原生”或“Residential”字样的独立节点。</li>
+            <li><strong>彻底清理浏览器环境</strong>：使用无痕模式（Ctrl+Shift+N），或在设置中清除 chatgpt.com / netflix.com 的全量 Cookie。</li>
+            <li><strong>开启客户端 DoH 远程解析</strong>：避免本地 DNS 解析暴露真实地理归属导致直接触发风控。</li>
+            <li><strong>检查 WebRTC 泄露</strong>：在浏览器扩展中安装 WebRTC Control 禁用局域网真实公网 IP 嗅探。</li>
+          </ol>
+        </div>
+
+        <!-- SOP 4 -->
+        <div class="p-6 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-obs-text">SOP 04: 订阅更新失败 / 401 Unauthorized</h3>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">鉴权失效</span>
+          </div>
+          <ol class="list-decimal list-inside text-xs text-obs-muted space-y-2 leading-relaxed">
+            <li><strong>浏览器直接访问测试</strong>：复制订阅 URL 到浏览器打开，若返回 401 说明 Token 已被重置或账号冻结。</li>
+            <li><strong>后台重置订阅链接</strong>：登录官网控制台，点击“重置订阅/重置 Token”，复制全新链接重新导入。</li>
+            <li><strong>开启代理更新订阅</strong>：部分机场订阅转换 API 位于境外 Cloudflare 之后，国内直连更新易超时，开启现有可用节点后再更新。</li>
+            <li><strong>检查订阅转换服务状态</strong>：若使用了第三方公共订阅转换后端，可能该转换服务器宕机，建议使用机场官方直链。</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Terminal Diagnostic Commands Cheatsheet -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-xl font-bold text-obs-text">终端自检命令速查表 (Diagnostic Cheatsheet)</h2>
+        <p class="text-xs text-obs-muted">复制并在终端中执行，用客观返回值替代主观瞎猜</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 rounded-xl border border-obs-border bg-black/40 font-mono text-xs space-y-2">
+          <div class="text-sky-400 font-bold text-[11px] flex justify-between">
+            <span>Windows PowerShell 实用诊断</span>
+            <span>CLI</span>
+          </div>
+          <pre class="text-obs-muted text-[11px] overflow-x-auto leading-relaxed">
+<span class="text-emerald-400"># 1. 刷新系统 DNS 缓存</span>
+ipconfig /flushdns
+
+<span class="text-emerald-400"># 2. 检查本地代理端口 7890 是否处于监听</span>
+Test-NetConnection -ComputerName 127.0.0.1 -Port 7890
+
+<span class="text-emerald-400"># 3. 重置本地 TCP/IP 网络堆栈（需管理员权限重启）</span>
+netsh winsock reset
+
+<span class="text-emerald-400"># 4. 通过代理测试 Google 连通性与 HTTP 状态码</span>
+curl -x http://127.0.0.1:7890 -I https://www.google.com</pre>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-black/40 font-mono text-xs space-y-2">
+          <div class="text-purple-400 font-bold text-[11px] flex justify-between">
+            <span>macOS / Linux Terminal 实用诊断</span>
+            <span>BASH</span>
+          </div>
+          <pre class="text-obs-muted text-[11px] overflow-x-auto leading-relaxed">
+<span class="text-emerald-400"># 1. 检查本地代理监听端口</span>
+lsof -i :7890
+
+<span class="text-emerald-400"># 2. 刷新 macOS mDNS 本地解析缓存</span>
+sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+
+<span class="text-emerald-400"># 3. 验证出口落地 IP 及归属地</span>
+curl -x http://127.0.0.1:7890 https://api.ipify.org
+
+<span class="text-emerald-400"># 4. 持续追踪目标测试服务器丢包与跳数</span>
+traceroute 1.1.1.1</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="rounded-xl border border-obs-border bg-obs-panel p-6 sm:p-8 space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">网络排障深度问答 (FAQ)</h2>
+        <p class="text-xs text-obs-muted">解决关于系统代理、虚拟网卡驱动、DNS污染与落地风控的核心困惑</p>
+      </div>
+
+      <div class="divide-y divide-obs-border/60">
+        {troubleshootFaqs.map((faq, idx) => (
+          <div class="py-4 space-y-2">
+            <h3 class="text-sm sm:text-base font-bold text-obs-text flex items-start gap-2">
+              <span class="text-teal-400 font-mono">Q{idx + 1}:</span>
+              <span>{faq.q}</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-obs-muted leading-relaxed pl-6">
+              {faq.a}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Internal Linking Navigation -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+      <a href="/status/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-cyan-500/50 transition">
+        <div class="text-xs font-mono text-cyan-400 mb-1">基础设施状态 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">机场状态中心</div>
+        <div class="text-xs text-obs-muted mt-1">查看五层解耦模型与历史中断追踪</div>
+      </a>
+      <a href="/lines/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-purple-500/50 transition">
+        <div class="text-xs font-mono text-purple-400 mb-1">线路原理 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">线路拓扑深度研究</div>
+        <div class="text-xs text-obs-muted mt-1">理解协议加密与端到端网络跳数</div>
+      </a>
+      <a href="/recommend/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/50 transition">
+        <div class="text-xs font-mono text-sky-400 mb-1">备用切换 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">精选机场推荐总览</div>
+        <div class="text-xs text-obs-muted mt-1">换用高稳定性与多入口容灾品牌</div>
+      </a>
+    </section>
+
+  </div>
+</BaseLayout>

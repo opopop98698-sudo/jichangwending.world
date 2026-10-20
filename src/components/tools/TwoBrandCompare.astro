@@ -1,0 +1,128 @@
+---
+import brandsData from '../../data/brands.json';
+
+interface Props {
+  initialBrandA?: string;
+  initialBrandB?: string;
+}
+
+const { initialBrandA = 'lightspeed', initialBrandB = 'weifeng' } = Astro.props;
+---
+
+<div class="rounded-xl border border-[#26354D] bg-[#111C2E] p-5 sm:p-6 text-[#E6EDF6] space-y-5 my-6">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#26354D] gap-2">
+    <div class="flex items-center space-x-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span>
+      <h3 class="text-sm sm:text-base font-bold tracking-tight">两品牌资料即时对照 (Two-Brand Comparator)</h3>
+    </div>
+    <span class="text-xs font-mono text-[#A7B6CC]">支持 41 个品牌任意同条件比对</span>
+  </div>
+
+  <!-- Selectors Bar -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="space-y-1.5">
+      <label for="select-brand-a" class="block text-xs font-mono text-[#38BDF8] font-semibold">候选品牌 A：</label>
+      <select
+        id="select-brand-a"
+        class="w-full bg-[#0B1220] border border-[#26354D] rounded px-3 py-2 text-xs font-mono text-[#E6EDF6] focus:border-[#38BDF8] focus:outline-none"
+      >
+        {brandsData.map((b) => (
+          <option value={b.id} selected={b.id === initialBrandA}>
+            {b.isTop10 ? `[Top${b.editorialOrder}] ` : ''}{b.name} (¥{b.pricingStarting.monthlyEquivalent}/月起)
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div class="space-y-1.5">
+      <label for="select-brand-b" class="block text-xs font-mono text-[#10B981] font-semibold">候选品牌 B：</label>
+      <select
+        id="select-brand-b"
+        class="w-full bg-[#0B1220] border border-[#26354D] rounded px-3 py-2 text-xs font-mono text-[#E6EDF6] focus:border-[#10B981] focus:outline-none"
+      >
+        {brandsData.map((b) => (
+          <option value={b.id} selected={b.id === initialBrandB}>
+            {b.isTop10 ? `[Top${b.editorialOrder}] ` : ''}{b.name} (¥{b.pricingStarting.monthlyEquivalent}/月起)
+          </option>
+        ))}
+      </select>
+    </div>
+  </div>
+
+  <!-- Comparison Grid Display -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+    <!-- Brand A Column -->
+    <div id="col-brand-a" class="p-4 rounded-lg bg-[#0B1220] border border-[#38BDF8]/30 space-y-3 text-xs">
+      <!-- Injected via JS -->
+    </div>
+
+    <!-- Brand B Column -->
+    <div id="col-brand-b" class="p-4 rounded-lg bg-[#0B1220] border border-[#10B981]/30 space-y-3 text-xs">
+      <!-- Injected via JS -->
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ brandsData }}>
+  const selectA = document.getElementById('select-brand-a');
+  const selectB = document.getElementById('select-brand-b');
+  const colA = document.getElementById('col-brand-a');
+  const colB = document.getElementById('col-brand-b');
+
+  function renderBrandCard(brand, container, colorClass) {
+    if (!container || !brand) return;
+
+    const hasSpeed = brand.speedTest && brand.speedTest.results && brand.speedTest.results.length > 0;
+    const firstSpeed = hasSpeed ? brand.speedTest.results[0] : null;
+
+    container.innerHTML = `
+      <div class="flex items-center justify-between pb-2 border-b border-[#26354D]">
+        <div>
+          <span class="text-sm font-bold text-[#E6EDF6]">${brand.name}</span>
+          ${brand.isTop10 ? `<span class="ml-2 text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#38BDF8]/10 text-[#38BDF8] border border-[#38BDF8]/30">编辑推荐 #${brand.editorialOrder}</span>` : ''}
+        </div>
+        <div class="font-mono font-bold ${colorClass}">
+          ${brand.pricingStarting.isApproximate ? '约 ' : ''}¥${brand.pricingStarting.monthlyEquivalent}/月起
+        </div>
+      </div>
+
+      <div class="space-y-1.5 text-xs font-mono">
+        <div><span class="text-[#64748B]">起步套餐:</span> <span class="text-[#E6EDF6]">${brand.pricingStarting.period} ¥${brand.pricingStarting.amount} (${brand.pricingStarting.trafficGB}GB/月)</span></div>
+        <div><span class="text-[#64748B]">线路声明:</span> <span class="text-[#E6EDF6]">${brand.lineType.slice(0, 24)}</span></div>
+        <div><span class="text-[#64748B]">协议支持:</span> <span class="text-[#E6EDF6]">${brand.protocols.join('/')}</span></div>
+        <div><span class="text-[#64748B]">客户端支持:</span> <span class="text-[#E6EDF6]">${brand.clients.customApp && brand.clients.thirdParty ? '自研客户端 + 通用Clash' : (brand.clients.customApp ? '专属客户端免配' : '通用订阅导入')}</span></div>
+        <div><span class="text-[#64748B]">测速状态:</span> <span class="${hasSpeed ? 'text-[#10B981]' : 'text-[#64748B]'}">${hasSpeed ? `已测速 (${firstSpeed.region} ${firstSpeed.downloadMbps}Mbps / ${firstSpeed.latencyMs}ms)` : '未测试 (Not Tested)'}</span></div>
+        <div><span class="text-[#64748B]">AI解锁:</span> <span class="text-[#E6EDF6]">GPT: ${brand.serviceAvailability.ai.chatgpt} / Claude: ${brand.serviceAvailability.ai.claude}</span></div>
+      </div>
+
+      <div class="pt-2 border-t border-[#26354D]/60 space-y-1 text-[11px] text-[#A7B6CC]">
+        <div class="font-semibold text-[#E6EDF6]">适合人群：</div>
+        <p class="leading-relaxed">${brand.suitableFor.join('；')}。</p>
+      </div>
+
+      <div class="pt-3 border-t border-[#26354D] flex items-center space-x-2">
+        <a href="/brands/${brand.id}/" class="flex-1 py-1 px-2 rounded text-center text-xs font-mono bg-[#17253D] hover:bg-[#26354D] border border-[#26354D] text-[#E6EDF6]">
+          查看事实档案
+        </a>
+        ${brand.affiliateUrl ? `
+          <a href="${brand.affiliateUrl}" target="_blank" rel="nofollow sponsored noopener" class="flex-1 py-1 px-2 rounded text-center text-xs font-mono font-bold bg-[#38BDF8] text-[#0B1220] hover:bg-[#38BDF8]/90">
+            官网入口
+          </a>
+        ` : `
+          <span class="flex-1 py-1 px-2 rounded text-center text-xs font-mono text-[#64748B] bg-[#111C2E] border border-[#26354D]">无独立入口</span>
+        `}
+      </div>
+    `;
+  }
+
+  function update() {
+    const bA = brandsData.find(b => b.id === selectA.value);
+    const bB = brandsData.find(b => b.id === selectB.value);
+    renderBrandCard(bA, colA, 'text-[#38BDF8]');
+    renderBrandCard(bB, colB, 'text-[#10B981]');
+  }
+
+  selectA?.addEventListener('change', update);
+  selectB?.addEventListener('change', update);
+  update();
+</script>

@@ -1,0 +1,340 @@
+---
+// Symptom Diagnosis Decision Tree Component (排障决策树交互工具)
+---
+
+<div class="bg-obs-panel border border-obs-border rounded-xl p-6 shadow-xl" id="troubleshoot-tree">
+  <div class="flex items-center justify-between pb-4 border-b border-obs-border/70 mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-mono font-bold text-sm">
+        07
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-obs-text">网络排障诊断决策树</h3>
+        <p class="text-xs text-obs-muted">从现象出发，5层逐级定界故障域（本地端/客户端 → 运营商/出口 → 中转入口 → 专线/隧道 → 落地出口）</p>
+      </div>
+    </div>
+    <span class="text-xs font-mono text-obs-muted bg-obs-bg px-2.5 py-1 rounded border border-obs-border">零外呼纯前端诊断</span>
+  </div>
+
+  <!-- Step 1: Symptom Selector -->
+  <div class="space-y-4">
+    <label class="block text-xs font-bold uppercase tracking-wider text-obs-muted">
+      第一步：选择当前遇到的核心网络症状
+    </label>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="symptom-cards">
+      <button type="button" data-symptom="all_timeout" class="symptom-btn text-left p-3.5 rounded-lg border border-obs-border bg-obs-bg hover:border-sky-500/50 hover:bg-sky-500/5 transition cursor-pointer group">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-bold text-obs-text group-hover:text-sky-300">A. 全部节点红标/超时</span>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">高频</span>
+        </div>
+        <p class="text-[11px] text-obs-muted leading-relaxed">Clash/v2rayN测速全红，任何境外网站均无法访问，无一节点存活。</p>
+      </button>
+
+      <button type="button" data-symptom="specific_nodes" class="symptom-btn text-left p-3.5 rounded-lg border border-obs-border bg-obs-bg hover:border-sky-500/50 hover:bg-sky-500/5 transition cursor-pointer group">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-bold text-obs-text group-hover:text-sky-300">B. 部分地区不可用</span>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">中频</span>
+        </div>
+        <p class="text-[11px] text-obs-muted leading-relaxed">港台节点正常，美日或冷门节点超时；或者大部分绿色个别不可用。</p>
+      </button>
+
+      <button type="button" data-symptom="app_blocked" class="symptom-btn text-left p-3.5 rounded-lg border border-obs-border bg-obs-bg hover:border-sky-500/50 hover:bg-sky-500/5 transition cursor-pointer group">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-bold text-obs-text group-hover:text-sky-300">C. 节点有Ping但网站打不开</span>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">流媒体/AI</span>
+        </div>
+        <p class="text-[11px] text-obs-muted leading-relaxed">Google/YouTube秒开，但ChatGPT报错1020/403，或Netflix仅看自制剧。</p>
+      </button>
+
+      <button type="button" data-symptom="device_conflict" class="symptom-btn text-left p-3.5 rounded-lg border border-obs-border bg-obs-bg hover:border-sky-500/50 hover:bg-sky-500/5 transition cursor-pointer group">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-bold text-obs-text group-hover:text-sky-300">D. 单设备异常 / TUN冲突</span>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">配置端</span>
+        </div>
+        <p class="text-[11px] text-obs-muted leading-relaxed">手机正常电脑打不开；或开代理后国内微信/QQ转圈断网，开启TUN无反应。</p>
+      </button>
+
+      <button type="button" data-symptom="peak_lag" class="symptom-btn text-left p-3.5 rounded-lg border border-obs-border bg-obs-bg hover:border-sky-500/50 hover:bg-sky-500/5 transition cursor-pointer group">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-bold text-obs-text group-hover:text-sky-300">E. 晚高峰严重降速丢包</span>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">网络层</span>
+        </div>
+        <p class="text-[11px] text-obs-muted leading-relaxed">白天4K秒开，晚间20:00-23:30频繁断流、缓冲、SSH打字严重卡顿延时跳动。</p>
+      </button>
+
+      <button type="button" data-symptom="sub_update_fail" class="symptom-btn text-left p-3.5 rounded-lg border border-obs-border bg-obs-bg hover:border-sky-500/50 hover:bg-sky-500/5 transition cursor-pointer group">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-bold text-obs-text group-hover:text-sky-300">F. 订阅更新失败 / 401/502</span>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">管控端</span>
+        </div>
+        <p class="text-[11px] text-obs-muted leading-relaxed">订阅链接无法下载配置文件，提示网络错误、SSL证书过期或订阅已过期。</p>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dynamic Diagnosis Result Panel -->
+  <div id="diagnosis-panel" class="mt-6 pt-6 border-t border-obs-border hidden">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <h4 id="diag-title" class="text-sm font-bold text-obs-text">故障排查结论与处置方案</h4>
+      </div>
+      <span id="diag-domain" class="text-[11px] font-mono px-2 py-0.5 rounded bg-obs-panel border border-sky-500/30 text-sky-400">定位层级</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="p-3.5 rounded-lg bg-obs-bg border border-obs-border">
+        <div class="text-[11px] text-obs-muted mb-1">最大概率根因</div>
+        <div id="diag-cause" class="text-xs font-bold text-amber-300 leading-snug">分析中...</div>
+      </div>
+      <div class="p-3.5 rounded-lg bg-obs-bg border border-obs-border">
+        <div class="text-[11px] text-obs-muted mb-1">排查耗时预估</div>
+        <div id="diag-time" class="text-xs font-mono text-emerald-400 font-bold">1 - 3 分钟</div>
+      </div>
+      <div class="p-3.5 rounded-lg bg-obs-bg border border-obs-border">
+        <div class="text-[11px] text-obs-muted mb-1">所需权限/操作工具</div>
+        <div id="diag-tool" class="text-xs text-obs-text">终端 / 客户端配置</div>
+      </div>
+    </div>
+
+    <!-- Step by Step Action Guide -->
+    <div class="space-y-4">
+      <div class="text-xs font-bold uppercase tracking-wider text-obs-muted">逐级排查行动路线：</div>
+      <div id="diag-steps" class="space-y-2.5">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Terminal Command Snippet -->
+    <div class="mt-5 p-4 rounded-lg bg-black/40 border border-obs-border font-mono text-xs">
+      <div class="flex items-center justify-between text-obs-muted text-[10px] mb-2 pb-2 border-b border-obs-border/50">
+        <span>诊断验证终端命令（Windows PowerShell / macOS Terminal）</span>
+        <span class="text-sky-400">一键自测验证</span>
+      </div>
+      <pre id="diag-cmd" class="text-sky-300 overflow-x-auto whitespace-pre">curl -I https://www.google.com</pre>
+    </div>
+  </div>
+</div>
+
+<script>
+  interface Diagnosis {
+    title: string;
+    domain: string;
+    cause: string;
+    time: string;
+    tool: string;
+    steps: { order: string; action: string; desc: string }[];
+    cmd: string;
+  }
+
+  const diagnoses: Record<string, Diagnosis> = {
+    all_timeout: {
+      title: "全部节点超时（全红）定界排查",
+      domain: "本地系统代理 / 客户端配置 / 订阅欠费",
+      cause: "90%概率为本地系统代理端口未正确接管，或机场中转入口遭遇突发阻断/服务到期欠费",
+      time: "2 - 4 分钟",
+      tool: "客户端日志 / 机场用户中心 / 系统网络设置",
+      steps: [
+        {
+          order: "01",
+          action: "核对系统代理开关与端口",
+          desc: "查看客户端底栏端口（如7890），检查Windows设置->网络和Internet->代理，核对地址是否为 127.0.0.1:7890。若未开启或被360等杀毒软件静默关闭，手动开启系统代理。"
+        },
+        {
+          order: "02",
+          action: "检查机场控制台与账户状态",
+          desc: "登录机场后台，确认套餐是否因到期已停机、当月流量是否已100%耗尽。若已耗尽或过期，节点连接将被服务端直接拒绝（表现为全部超时）。"
+        },
+        {
+          order: "03",
+          action: "检查系统时间同步误差",
+          desc: "VMess/VLESS/Trojan等基于TLS/时间戳协议，若电脑本地时间与真实NTP时间偏差超过90秒，握手将彻底失败导致全红。前往系统设置重新点击'立即同步时间'。"
+        },
+        {
+          order: "04",
+          action: "更新一次订阅并检查节点入口域名解析",
+          desc: "若机场临时更换中转入口解析以规避阻断，旧配置里的入口IP已失效。在客户端右键订阅选择'更新'，获取最新节点列表后再测速。"
+        }
+      ],
+      cmd: "Test-NetConnection -ComputerName 127.0.0.1 -Port 7890\n# 如果TcpTestSucceeded为False，说明客户端核心未在运行或端口冲突"
+    },
+    specific_nodes: {
+      title: "部分节点超时（其他正常）定界排查",
+      domain: "落地机房维护 / 目标落地IP阻断 / 策略组分流配置",
+      cause: "该地区落地服务器遭受DDoS攻击、机房上游网络维护，或该地区中转入口故障",
+      time: "1 - 2 分钟",
+      tool: "客户端节点切换 / 策略组规则",
+      steps: [
+        {
+          order: "01",
+          action: "切换备用同地区节点",
+          desc: "同一地区通常有多台落地机（如HK 01, HK 02, HK 03）。单个节点宕机属于机房正常维护周期，切换到同组其他节点即可恢复。"
+        },
+        {
+          order: "02",
+          action: "核对分流规则组（Proxy Group）",
+          desc: "检查分流规则中该地区的策略组是否选为了'DIRECT'（直连）或错误的不可用子组。确保分流规则指向可用的活动节点。"
+        },
+        {
+          order: "03",
+          action: "查看机场官方公告频道",
+          desc: "进入机场官网或Telegram频道，查看是否有'美西机房骨干网调整'或'冷门地区节点维护'的通知公告。"
+        }
+      ],
+      cmd: "# 检查目标节点的落地IP连接响应\ncurl -x http://127.0.0.1:7890 -I https://api.ipify.org"
+    },
+    app_blocked: {
+      title: "节点有Ping但特定应用/流媒体打不开排查",
+      domain: "落地IP风控 / DNS污染 / 分流规则未命中",
+      cause: "目标平台（如OpenAI/Netflix）将该落地节点的机房数据中心IP列入黑名单，或DNS分流泄漏",
+      time: "3 - 5 分钟",
+      tool: "规则编辑器 / 节点住宅IP / DNS防泄漏设置",
+      steps: [
+        {
+          order: "01",
+          action: "定位是否属于目标服务IP风控",
+          desc: "ChatGPT报1020/Sorry you have been blocked，说明该节点的出口IP已被OpenAI风控。更换为标注有'原生'、'解锁'或'家庭宽带'的备用节点。"
+        },
+        {
+          order: "02",
+          action: "排查客户端分流规则缺失",
+          desc: "打开客户端分流规则，检查是否包含 openai.com / cdn.oaistatic.com / netflix.com 等域名规则。若被误判为 DIRECT（直连），国内请求将直接被拦截。"
+        },
+        {
+          order: "03",
+          action: "清除浏览器本地Cookie与安全存储",
+          desc: "很多平台在检测到代理切换后会在本地写入风控Cookie。使用无痕模式（Incognito）或清除目标站点的Cookie与Local Storage重试。"
+        },
+        {
+          order: "04",
+          action: "启用DNS防泄漏与DoH/DoT",
+          desc: "确保客户端配置中开启了fake-ip或DoH远程解析，避免本地运营商DNS劫持或提前暴露真实地理位置。"
+        }
+      ],
+      cmd: "curl -x http://127.0.0.1:7890 -I https://chatgpt.com\n# 检查HTTP响应码：200为正常，403/Cloudflare质询为IP受风控"
+    },
+    device_conflict: {
+      title: "单设备异常 / TUN虚拟网卡 / 国内应用冲突排查",
+      domain: "虚拟网卡驱动 / 路由回环 / 本地防火墙",
+      cause: "TUN模式虚拟网卡驱动故障、与公司VPN/杀毒软件冲突，或DNS回环导致国内应用断网",
+      time: "3 - 6 分钟",
+      tool: "设备管理器 / 虚拟网卡设置 / 驱动重装",
+      steps: [
+        {
+          order: "01",
+          action: "国内应用断网：核对分流模式与GeoIP数据库",
+          desc: "若微信、钉钉转圈，检查客户端模式是否被切换为'Global'（全局）。必须切回'Rule'（规则）模式，并更新客户端内的 Country.mmdb 或 GeoIP.dat。"
+        },
+        {
+          order: "02",
+          action: "TUN虚拟网卡驱动冲突修复",
+          desc: "在客户端设置中，将TUN模式的内核网卡（如Wintun）卸载并重新安装。若同时安装了AnyConnect、EasyConnect或堡垒机VPN，先退出冲突的第三方网络适配器。"
+        },
+        {
+          order: "03",
+          action: "重置本地TCP/IP协议栈与DNS缓存",
+          desc: "管理员身份打开PowerShell，运行修复命令清除残留的错误路由表，避免本地网络堆栈死锁。"
+        }
+      ],
+      cmd: "ipconfig /flushdns\nnetsh winsock reset\n# 执行后重启电脑彻底清除本地网络堆栈冲突"
+    },
+    peak_lag: {
+      title: "晚高峰（20:00-23:30）严重卡顿丢包定界",
+      domain: "跨境出口带宽超载 / 线路类型非专线 / UDP QoS限速",
+      cause: "所用线路为直连公网中转而非独享专线（IEPL/IPLC），在骨干网高峰期遭遇运营商限速与严重丢包",
+      time: "2 分钟判定",
+      tool: "MTR / Ping丢包测试 / 线路类型核对",
+      steps: [
+        {
+          order: "01",
+          action: "核对节点线路类型是直连还是专线",
+          desc: "直连公网线路（如直连SS、普通Trojan）在晚高峰跨境出口拥塞率极高。若对晚高峰稳定性有硬性要求，应切换至IEPL/IPLC内网专线节点。"
+        },
+        {
+          order: "02",
+          action: "测试丢包率与抖动（Jitter）而非单纯Ping值",
+          desc: "Ping可能显示80ms，但持续ping 100次发现丢包率高达25%。丢包导致TCP拥塞控制强制减速，视频频繁缓冲。建议阅读本站'线路研究'了解专线与中转差异。"
+        },
+        {
+          order: "03",
+          action: "临时切换为备用低延迟中转入口",
+          desc: "选择离本地物理距离最近的入口（如广东电信入口匹配华南用户，上海BGP入口匹配华东用户），减少省际公网回包抖动。"
+        }
+      ],
+      cmd: "# 连续发送100个数据包检测晚高峰真实丢包率\nping -n 50 1.1.1.1\n# 丢包率若 > 5%，长连接和视频体验将显著劣化"
+    },
+    sub_update_fail: {
+      title: "订阅更新失败 / 401 / 502 排查",
+      domain: "订阅分发域名受阻 / 鉴权Token失效 / 证书过期",
+      cause: "机场订阅转换域名被运营商DNS拦截、Token重置过期，或订阅服务遇到高并发宕机",
+      time: "2 - 3 分钟",
+      tool: "浏览器访问订阅URL / 机场控制台重置订阅",
+      steps: [
+        {
+          order: "01",
+          action: "在浏览器中直接打开订阅链接测试",
+          desc: "复制订阅链接粘贴到浏览器地址栏访问。若返回一串Base64文本或YAML文件，说明服务端正常，问题在客户端更新机制；若返回404/401，说明Token失效；若报连接超时，说明订阅域名被本地拦截。"
+        },
+        {
+          order: "02",
+          action: "在机场后台重新生成订阅链接",
+          desc: "登录机场后台，点击'重置订阅链接'或'重置密码'，生成新的Token并重新导入客户端，避免旧Token因机场安全重置而失效。"
+        },
+        {
+          order: "03",
+          action: "开启系统现有可用代理后再更新订阅",
+          desc: "许多机场的订阅分发服务器位于境外Cloudflare之后。国内直连更新容易超时，先开启一个现有的备用节点，勾选客户端的'通过代理更新订阅'再试。"
+        }
+      ],
+      cmd: "# 验证订阅链接能否正常下发HTTP 200响应\ncurl -I -L \"YOUR_SUBSCRIPTION_URL\""
+    }
+  };
+
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.symptom-btn');
+  const panel = document.getElementById('diagnosis-panel');
+  const titleEl = document.getElementById('diag-title');
+  const domainEl = document.getElementById('diag-domain');
+  const causeEl = document.getElementById('diag-cause');
+  const timeEl = document.getElementById('diag-time');
+  const toolEl = document.getElementById('diag-tool');
+  const stepsEl = document.getElementById('diag-steps');
+  const cmdEl = document.getElementById('diag-cmd');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const symptom = btn.dataset.symptom;
+      if (!symptom || !diagnoses[symptom]) return;
+
+      // Update button active state
+      buttons.forEach(b => {
+        b.classList.remove('border-sky-400', 'bg-sky-500/10', 'ring-1', 'ring-sky-400/50');
+        b.classList.add('border-obs-border', 'bg-obs-bg');
+      });
+      btn.classList.remove('border-obs-border', 'bg-obs-bg');
+      btn.classList.add('border-sky-400', 'bg-sky-500/10', 'ring-1', 'ring-sky-400/50');
+
+      const data = diagnoses[symptom];
+      if (titleEl) titleEl.textContent = data.title;
+      if (domainEl) domainEl.textContent = data.domain;
+      if (causeEl) causeEl.textContent = data.cause;
+      if (timeEl) timeEl.textContent = data.time;
+      if (toolEl) toolEl.textContent = data.tool;
+      if (cmdEl) cmdEl.textContent = data.cmd;
+
+      if (stepsEl) {
+        stepsEl.innerHTML = data.steps.map(s => `
+          <div class="flex items-start gap-3 p-3 rounded bg-obs-bg/80 border border-obs-border/70 text-xs">
+            <span class="font-mono text-sky-400 font-bold bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20 shrink-0">${s.order}</span>
+            <div>
+              <div class="font-bold text-obs-text mb-0.5">${s.action}</div>
+              <div class="text-obs-muted leading-relaxed">${s.desc}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      panel?.classList.remove('hidden');
+      panel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  });
+</script>

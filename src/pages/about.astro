@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pageTitle = '关于本站：建立可追溯、反黑箱的中文网络观测指南';
+const pageDescription = '稳定机场指南（jichangwending.world）致力于打破充斥虚假跑分与隐形返利的中文机场评测生态，以严格的网络工程观测模型、四维数据溯源与商业透明披露为立足之本。';
+
+const aboutSchema = {
+  '@type': 'AboutPage',
+  name: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/about/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/about/"
+  schema={aboutSchema}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-sky-400">关于本站</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-sky-500/30 bg-sky-500/10 text-xs font-mono text-sky-400">
+        <span>● 独立观测实验室 · 反虚假宣传宣言</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        关于稳定机场指南 (About Us)
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted leading-relaxed">
+        稳定机场指南（jichangwending.world）是一个专注于跨境网络通信稳定性核验、真实测速快照比对、线路拓扑解构与网络排障的专业中文知识与工具站。
+      </p>
+    </div>
+
+    <!-- The Problem We Solve -->
+    <section class="space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <h2 class="text-lg font-bold text-obs-text">我们为什么创建这个网站？</h2>
+      <p>
+        在当前的中文互联网中，绝大多数搜索“机场推荐”或“稳定机场”的用户，面临着极其严重的“信息不对称”与“商业黑箱”：
+      </p>
+      <ul class="list-disc list-inside space-y-2 pl-2">
+        <li><strong>虚假测速满天飞</strong>：大部分博客为了证明某家机场“飞快”，特意在清晨 4 点公网空闲时进行几秒钟的测速，截图宣称“千兆秒开”，却刻意隐瞒该机场在晚高峰 20:00 至 23:30 期间超过 30% 的严重丢包率。</li>
+        <li><strong>商业返利主导排名</strong>：许多评测站所谓的“全网排名前十”，本质上是完全按照商家给站长返利佣金比例高低排序的。给 50% 终身返利的垃圾机场被吹捧为顶级神仙机场，而真正斥巨资采购优质物理专线的低调品牌却无人问津。</li>
+        <li><strong>术语欺诈屡禁不止</strong>：普通公网中转甚至公网直连被包装为“企业级 IEPL 专线”，廉价 IDC 机房段被标榜为“独享原生住宅 IP”，用户付款后遭遇各种封禁与断流，退款无门。</li>
+      </ul>
+      <p>
+        正是为了改变这种恶劣的行业信息环境，我们建立了<strong>稳定机场指南</strong>。我们不制造盲目的崇拜，也不做不负责任的口号式背书。我们只相信严谨的物理拓扑、可追溯的数据样本以及对消费者透明公开的商业关系。
+      </p>
+    </section>
+
+    <!-- Core Tenets -->
+    <section class="space-y-6">
+      <h2 class="text-lg font-bold text-obs-text">核心运转五项原则 (Core Tenets)</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-sky-400 font-mono text-sm">01. 商业推广与技术测试彻底解耦</div>
+          <p class="text-obs-muted leading-relaxed">
+            我们承认并规范展示商业推广合作，并在编辑推荐区固定前十位明确标示“含推广合作”。然而在任何测速报告、丢包统计、客观测速实验室或用户主动排序中，均由纯粹的数据驱动，严禁暗中置顶主推品牌。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-emerald-400 font-mono text-sm">02. 尊重原始资料冲突，拒绝伪造统一</div>
+          <p class="text-obs-muted leading-relaxed">
+            当收录资料出现前后矛盾（如某品牌要点写 IEPL 但介绍写中转、或者存在多个不同优惠码）时，我们坚决保留冲突记录，如实向用户呈现原始多版本说法，绝不主观脑补或私自判定某一种为真。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-amber-400 font-mono text-sm">03. 四维状态模型，严谨限定数据边界</div>
+          <p class="text-obs-muted leading-relaxed">
+            所有公开展示的数据记录均具备来源属性、核验状态、时效鲜度与结果结构四维描述。非晚高峰快照绝对不升级为全天实测，未测试记录严格保留为 Not Tested，绝不凭空造假。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-purple-400 font-mono text-sm">04. 守护网络安全伦理，定界观测不越界</div>
+          <p class="text-obs-muted leading-relaxed">
+            我们坚持负责任披露（Responsible Disclosure），不公开服务商敏感的内部未授权端口与具体公网入口 IP，避免引来恶意攻击损坏普通消费者的正常使用环境。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Links -->
+    <section class="p-6 rounded-xl border border-obs-border bg-obs-panel space-y-4 text-xs">
+      <h3 class="font-bold text-obs-text text-sm">深度阅读与合规文档</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <a href="/methodology/" class="p-2.5 rounded bg-obs-bg border border-obs-border text-center hover:border-sky-400 text-sky-300">
+          评测方法论 &rarr;
+        </a>
+        <a href="/disclosure/" class="p-2.5 rounded bg-obs-bg border border-obs-border text-center hover:border-sky-400 text-sky-300">
+          推广披露声明 &rarr;
+        </a>
+        <a href="/privacy/" class="p-2.5 rounded bg-obs-bg border border-obs-border text-center hover:border-sky-400 text-sky-300">
+          隐私与安全 &rarr;
+        </a>
+        <a href="/corrections/" class="p-2.5 rounded bg-obs-bg border border-obs-border text-center hover:border-sky-400 text-sky-300">
+          数据勘误通道 &rarr;
+        </a>
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>

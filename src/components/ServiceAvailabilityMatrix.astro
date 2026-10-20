@@ -1,0 +1,163 @@
+---
+interface Props {
+  brandName?: string;
+  ai?: {
+    chatgpt: string;
+    claude: string;
+    gemini: string;
+  };
+  streaming?: {
+    netflix: string;
+    disney: string;
+    youtube: string;
+    hbo: string;
+    tiktok: string;
+    spotify: string;
+  };
+  testNode?: string;
+  testDate?: string;
+}
+
+const {
+  brandName = '主流收录品牌',
+  ai = { chatgpt: 'partial', claude: 'success', gemini: 'partial' },
+  streaming = { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' },
+  testNode = '核心香港/日本节点',
+  testDate = '2026-10-19 来源快照'
+} = Astro.props;
+
+
+// Status styling mapping
+const statusStyles: Record<string, { label: string; sub: string; badge: string; icon: string }> = {
+  success: {
+    label: '原生支持',
+    sub: '解锁完整功能',
+    badge: 'border-[#10B981]/40 bg-[#10B981]/10 text-[#10B981]',
+    icon: '●'
+  },
+  partial: {
+    label: '部分支持',
+    sub: '需视节点切换',
+    badge: 'border-[#F59E0B]/40 bg-[#F59E0B]/10 text-[#F59E0B]',
+    icon: '▲'
+  },
+  failure: {
+    label: '受限/失败',
+    sub: '当次测试不可用',
+    badge: 'border-[#EF4444]/40 bg-[#EF4444]/10 text-[#EF4444]',
+    icon: '✕'
+  },
+  not_tested: {
+    label: '未测试',
+    sub: '缺乏独立证据',
+    badge: 'border-[#64748B]/40 bg-[#64748B]/10 text-[#64748B]',
+    icon: '—'
+  }
+};
+
+const getStatus = (val?: string) => statusStyles[val || 'not_tested'] || statusStyles.not_tested;
+
+const aiItems = [
+  { name: 'ChatGPT / OpenAI', key: ai.chatgpt, tip: '支持GPT-4o与联网功能' },
+  { name: 'Claude (Anthropic)', key: ai.claude, tip: '高风控抗屏蔽要求' },
+  { name: 'Google Gemini', key: ai.gemini, tip: '需匹配特定出口地区' }
+];
+
+const streamingItems = [
+  { name: 'Netflix (奈飞)', key: streaming.netflix, tip: '原创与非自制完整片库' },
+  { name: 'Disney+ (迪士尼)', key: streaming.disney, tip: '全区版权解锁' },
+  { name: 'YouTube Premium', key: streaming.youtube, tip: '4K画质不降权送中' },
+  { name: 'HBO Max', key: streaming.hbo, tip: '美欧版权原生支持' },
+  { name: 'TikTok (国际抖音)', key: streaming.tiktok, tip: '免拔卡跨区直连' },
+  { name: 'Spotify (音乐)', key: streaming.spotify, tip: '跨区账号正常登录' }
+];
+---
+
+<div class="relative rounded-lg border border-[#26354D] bg-[#111C2E] p-4 sm:p-5 text-[#E6EDF6] overflow-hidden my-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 mb-4 border-b border-[#26354D] gap-2">
+    <div class="flex items-center space-x-2">
+      <span class="w-2.5 h-2.5 rounded-sm bg-[#818CF8]"></span>
+      <h3 class="text-sm sm:text-base font-bold tracking-tight text-[#E6EDF6]">
+        {brandName} AI 与流媒体可用性矩阵 (Service Availability Matrix)
+      </h3>
+    </div>
+    <div class="text-xs font-mono text-[#A7B6CC]">
+      测试范围: <span class="text-[#E6EDF6]">{testNode}</span> | {testDate}
+    </div>
+  </div>
+
+  <!-- Part 1: AI Tools Section -->
+  <div class="mb-5">
+    <div class="flex items-center space-x-2 mb-3">
+      <span class="text-xs font-mono font-semibold uppercase tracking-wider text-[#38BDF8]">
+        [AI 生产力平台]
+      </span>
+      <span class="text-[11px] text-[#A7B6CC]">高风控、原生IP要求严格</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      {aiItems.map((item) => {
+        const s = getStatus(item.key);
+        return (
+          <div class="p-3 rounded border border-[#26354D] bg-[#0B1220]/70 flex flex-col justify-between space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-[#E6EDF6]">{item.name}</span>
+              <span class={`text-[10px] font-mono px-1.5 py-0.5 rounded border flex items-center space-x-1 ${s.badge}`}>
+                <span class="text-[8px] mr-1">{s.icon}</span>
+                {s.label}
+              </span>
+            </div>
+            <div class="text-[11px] text-[#64748B] font-mono">{item.tip} ({s.sub})</div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  <!-- Part 2: Streaming Section -->
+  <div>
+    <div class="flex items-center space-x-2 mb-3">
+      <span class="text-xs font-mono font-semibold uppercase tracking-wider text-[#10B981]">
+        [全球流媒体平台]
+      </span>
+      <span class="text-[11px] text-[#A7B6CC]">高吞吐、区域版权解锁</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      {streamingItems.map((item) => {
+        const s = getStatus(item.key);
+        return (
+          <div class="p-3 rounded border border-[#26354D] bg-[#0B1220]/70 flex flex-col justify-between space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-[#E6EDF6]">{item.name}</span>
+              <span class={`text-[10px] font-mono px-1.5 py-0.5 rounded border flex items-center space-x-1 ${s.badge}`}>
+                <span class="text-[8px] mr-1">{s.icon}</span>
+                {s.label}
+              </span>
+            </div>
+            <div class="text-[11px] text-[#64748B] font-mono">{item.tip} ({s.sub})</div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  <!-- Legend & Context Note -->
+  <div class="mt-4 pt-3 border-t border-[#26354D]/60 flex flex-wrap items-center justify-between text-[11px] text-[#A7B6CC] gap-2">
+    <div class="flex items-center space-x-3 font-mono">
+      <span class="flex items-center"><span class="text-[#10B981] mr-1">●</span> 原生支持</span>
+      <span class="flex items-center"><span class="text-[#F59E0B] mr-1">▲</span> 视节点而定</span>
+      <span class="flex items-center"><span class="text-[#EF4444] mr-1">✕</span> 区域受限</span>
+      <span class="flex items-center"><span class="text-[#64748B] mr-1">—</span> 暂未实测</span>
+    </div>
+    <div class="font-mono text-[#64748B] text-[10px]">
+      注：流媒体与AI平台风控动态变化，不构成长期永久支持承诺
+    </div>
+  </div>
+
+  <!-- Watermark -->
+  <div class="absolute right-3 bottom-2 pointer-events-none text-[10px] font-mono text-white/15 select-none">
+    jichangwending.world
+  </div>
+</div>

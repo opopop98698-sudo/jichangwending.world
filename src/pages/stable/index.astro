@@ -1,0 +1,291 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MetricCalculator from '../../components/tools/MetricCalculator.astro';
+import brandsData from '../../data/brands.json';
+
+const pageTitle = '稳定机场标准与晚高峰核验规范：低丢包、专线冗余与长连接保活';
+const pageDescription = '什么是真正意义上的“稳定机场”？稳定机场指南拒绝伪造的99.9%在线率，从晚高峰骨干网拥塞机制、TCP丢包重传模型、物理IEPL专线冗余与长连接保活四大维度，建立严谨的稳定性评估框架。';
+
+// Brands claiming IEPL or IPLC
+const ieplBrands = brandsData.filter(b => 
+  b.lineType.includes('IEPL') || b.lineType.includes('IPLC') || b.lineType.includes('专线')
+);
+
+
+const stableFaqs = [
+  {
+    q: '为什么白天的测速成绩对判定“晚高峰稳定性”几乎没有任何参考价值？',
+    a: '中国公网国际出口总带宽在白天工作时段整体利用率通常低于 60%，无论普通 163 骨干网还是普通中转，跨境链路丢包率通常可以维持在 1% 以下，测速软件能在几秒内迅速把 TCP 拥塞窗口拉满，展现出 500M 甚至 1000M 的虚高带宽。然而一旦进入晚间 20:00 至 23:30 的家庭互联网晚高峰，国际出口流量急剧饱和，运营商局端设备会自动启动主动队列管理（AQM）和激进的 QoS 丢包策略。非专线线路的丢包率可能从 0.5% 暴涨至 25% 以上。因此，没有经过晚高峰连续采样验证的测速数据，无法作为稳定性判定的技术证据。'
+  },
+  {
+    q: '丢包率从 0% 变成 5%，为什么会导致视频从 4K 秒开直接变成持续缓冲？',
+    a: '现代网络传输协议大多基于 TCP。在标准 TCP 拥塞控制算法（如 Cubic）中，一旦检测到单个数据包丢弃，发送端就会强制将拥塞窗口（CWND）削减一半，并进入慢启动或拥塞避免状态。在 5% 的持续丢包率下，TCP 窗口几乎永远无法扩张到足以支撑 4K 码率（通常需要稳定的 25-40Mbps 吞吐）的水平。即使采用针对丢包优化的 BBR 算法，频繁的乱序与重传也会导致接收端缓冲区迅速枯竭，体现在用户端就是不断转圈卡顿与画质骤降。'
+  },
+  {
+    q: '市面上宣称的“99.99% SLA 在线率保证”是真的吗？',
+    a: '在消费级翻墙与民用机场领域，绝大部分声称的“99.99% SLA”都只是营销话术，既无第三方独立监控存证，也无实际可执行的按分钟赔付机制。真正的 99.99% 在线率意味着一年内的累计不可用时间不得超过 52.6 分钟。考虑到国内入口机房 IP 被墙替换、境外机房维护、海底光缆地震故障以及客户端协议迭代，民用机场根本无法在单线架构下实现该指标。真正的高可用必须依赖于全国多地多线 BGP 自动故障转移（Anycast / DNS 轮询）与双重物理专线冷备。'
+  },
+  {
+    q: '为什么 SSH、远程桌面或 ChatGPT 对“长连接保活”的要求远高于看网页？',
+    a: '浏览普通网页采用短时 HTTP/HTTPS 请求，即便发生一次重试，用户感受只是延迟稍微增加几百毫秒。而 SSH 终端、游戏 TCP/UDP 隧道、以及 ChatGPT / Claude 的 Server-Sent Events (SSE) 流式传输属于持续的长连接。如果中转节点的 NAT 网关内存超载频繁清理连接状态，或者链路发生毫秒级震荡导致 TCP Reset (RST)，用户的 SSH 会话就会直接冻结报错“Connection reset by peer”，ChatGPT 的打字回答就会中断报错“Network error”。'
+  },
+  {
+    q: '用户在本地应该如何科学测试自己节点的晚高峰丢包与抖动？',
+    a: '不要使用瞬时 Speedtest 测速！请在晚间 21:00 左右，使用 MTR（如 WinMTR 或 BestTrace）或连续 Ping 命令（如 ping -n 100），持续向节点的落地 IP 或目标境外服务器发送至少 100 个探测包。统计最终的三个核心指标：丢包率（Packet Loss 应 < 1%）、平均延迟（Latency）与延迟抖动（Jitter，最大延迟与最小延迟之差应 < 10ms）。'
+  }
+];
+
+const stableSchema = {
+  '@type': 'Article',
+  headline: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/stable/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  },
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: 'https://jichangwending.world/' },
+      { '@type': 'ListItem', position: 2, name: '稳定机场', item: 'https://jichangwending.world/stable/' }
+    ]
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/stable/"
+  schema={stableSchema}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-emerald-400">稳定机场标准</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-xs font-mono text-emerald-400">
+        <span>● 晚高峰核验规范 · 端到端可用性模型 · 杜绝虚构SLA</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        稳定机场判定体系：晚高峰多样本核验、专线物理支撑与抗封锁模型
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted max-w-4xl leading-relaxed">
+        在跨境网络通信中，“稳定”从来不是一个模糊的主观词汇，而是一组由<strong>丢包率（Packet Loss）、往返延迟抖动（Jitter）、传输控制协议拥塞窗口恢复能力与节点服务可用度</strong>共同构成的严密物理指标。
+        本页为用户拆解晚高峰骨干网拥塞的底层机理，公布本站对“稳定性”的可验证核验标准，并提供可交互的观测成功率与覆盖率计算器。
+      </p>
+    </div>
+
+    <!-- Section 1: The Anatomy of Evening Peak Congestion -->
+    <section class="space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">一、为什么晚高峰（20:00 - 23:30）是机场的唯一“试金石”？</h2>
+        <p class="text-xs text-obs-muted">深入骨干网交换层，剖析 163 拥塞、QoS 限速与专线抗拥塞原理</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-5 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-rose-400 font-bold">LEVEL 1</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">公网直连 (163)</span>
+          </div>
+          <h3 class="text-sm font-bold text-obs-text">公网出口拥塞与主动丢包</h3>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            普通电信 163（AS4134）公网国际出口在晚高峰带宽负载常年超过 95%。路由器触发主动队列管理（RED/WRED）开始随机丢弃数据包。公网直连节点在白天尚可正常浏览，晚上则出现 20%~40% 的严重丢包，根本无法建立稳定的 TCP 握手。
+          </p>
+        </div>
+
+        <div class="p-5 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-amber-400 font-bold">LEVEL 2</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">普通公网隧道中转</span>
+          </div>
+          <h3 class="text-sm font-bold text-obs-text">国内入口优化但跨境公网承压</h3>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            用户连接到国内 BGP 入口，再通过国内服务器经由公网加密隧道（如 WS/TLS 隧道）向境外落地机转发。虽然解决了用户到入口的延迟，但国内入口到境外落地之间仍走公网海缆，晚高峰同样受到跨境骨干网拥塞与防火墙阻断影响。
+          </p>
+        </div>
+
+        <div class="p-5 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-emerald-400 font-bold">LEVEL 3</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">物理内网专线 (IEPL/IPLC)</span>
+          </div>
+          <h3 class="text-sm font-bold text-obs-text">点对点物理光纤与零公网干扰</h3>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            数据从国内入口机房直接进入电信运营商的物理专网（二层以太网专线或三层 MPLS VPN），全程在物理光纤闭环内传输至境外机房。完全绕过公网国际海缆出口与防火墙检测，晚高峰丢包率通常低于 0.1%，抖动在 1-2ms 内。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Mathematical Reliability Model -->
+    <section class="space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">二、稳定性评测数学模型：成功率与覆盖率计算公式</h2>
+        <p class="text-xs text-obs-muted">本站坚持执行的度量规范，拒绝凭空制造“100%稳定”的谎言</p>
+      </div>
+
+      <div class="p-6 rounded-xl border border-obs-border bg-obs-panel space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="p-4 rounded-lg bg-obs-bg border border-obs-border space-y-2">
+            <div class="text-xs font-mono text-sky-400 font-bold">公式 1：观测周期有效成功率 (Success Rate)</div>
+            <div class="text-base font-mono font-bold text-obs-text py-2">
+              Success Rate = S / (S + F) &times; 100%
+            </div>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              其中 <code class="text-sky-300">S</code> 为成功返回预期 HTTP 状态码（如 200/204）且往返延迟小于 3000ms 的测试次数；<code class="text-rose-300">F</code> 为超时（Timeout）、握手重置（RST）或 DNS 解析失败的测试次数。该指标严禁统计“未执行测试的假设时段”。
+            </p>
+          </div>
+
+          <div class="p-4 rounded-lg bg-obs-bg border border-obs-border space-y-2">
+            <div class="text-xs font-mono text-emerald-400 font-bold">公式 2：观测样本覆盖率 (Coverage Rate)</div>
+            <div class="text-base font-mono font-bold text-obs-text py-2">
+              Coverage Rate = (S + F) / E &times; 100%
+            </div>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              其中 <code class="text-emerald-300">E</code> 为理论评估周期内按计划应执行的总测试批次。如果覆盖率低于 80%，任何声称的“全天稳定”在统计学上均属无效抽样，必须在报告中标注“样本不完备，仅作参考”。
+            </p>
+          </div>
+        </div>
+
+        <!-- Embedded Interactive Metric Calculator -->
+        <div class="pt-4 border-t border-obs-border/60">
+          <MetricCalculator />
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Brands Declaring IEPL/IPLC Lines -->
+    <section class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-obs-border pb-4 gap-2">
+        <div>
+          <h2 class="text-xl font-bold text-obs-text">三、收录品牌中宣称专线（IEPL/IPLC）的实体档案</h2>
+          <p class="text-xs text-obs-muted">从 41 个品牌档案中筛选出宣称具备专线物理支撑的候选品牌，并核对其测速快照</p>
+        </div>
+        <span class="text-xs font-mono text-obs-muted bg-obs-bg px-3 py-1.5 rounded border border-obs-border">
+          共收录 {ieplBrands.length} 个专线宣称品牌
+        </span>
+      </div>
+
+      <div class="overflow-x-auto border border-obs-border rounded-xl">
+        <table class="w-full text-left text-xs text-obs-muted border-collapse">
+          <thead>
+            <tr class="bg-obs-panel border-b border-obs-border text-obs-text font-mono text-[11px]">
+              <th class="py-3 px-4">品牌名称</th>
+              <th class="py-3 px-4">宣称专线类型</th>
+              <th class="py-3 px-4">起步档位</th>
+              <th class="py-3 px-4">来源测速记录</th>
+              <th class="py-3 px-4">资料冲突与核验备注</th>
+              <th class="py-3 px-4 text-right">核验档案</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-obs-border/50 font-mono">
+            {ieplBrands.map(b => {
+              const maxSpeed = b.speedTest?.results?.reduce((max, r) => Math.max(max, r.downloadMbps || 0), 0) || 0;
+              const hasTest = maxSpeed > 0;
+              const startingPriceDisplay = b.pricingStarting.isApproximate 
+                ? `约¥${b.pricingStarting.monthlyEquivalent}/月` 
+                : `¥${b.pricingStarting.amount}/${b.pricingStarting.period}`;
+              return (
+                <tr class="hover:bg-obs-panel/50 transition">
+                  <td class="py-3 px-4 font-sans">
+                    <a href={`/brands/${b.id}/`} class="font-bold text-obs-text hover:text-sky-300">
+                      {b.name}
+                    </a>
+                    <div class="text-[10px] text-obs-muted font-mono">{b.id}</div>
+                  </td>
+                  <td class="py-3 px-4">
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] truncate max-w-[150px] inline-block">
+                      {b.lineType.split('（')[0]}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 text-obs-text font-bold">
+                    {startingPriceDisplay}
+                  </td>
+                  <td class="py-3 px-4">
+                    {hasTest ? (
+                      <span class="text-sky-400 font-bold">
+                        {maxSpeed} Mbps
+                      </span>
+                    ) : (
+                      <span class="text-obs-muted/60 text-[10px]">Not Tested</span>
+                    )}
+                  </td>
+                  <td class="py-3 px-4 text-[11px] font-sans max-w-xs truncate text-obs-muted">
+                    {b.gapsAndConflicts && b.gapsAndConflicts.length > 0 
+                      ? b.gapsAndConflicts[0] 
+                      : '无明显资料冲突记录'}
+                  </td>
+                  <td class="py-3 px-4 text-right font-sans">
+                    <a
+                      href={`/brands/${b.id}/`}
+                      class="px-2.5 py-1 rounded bg-obs-panel border border-obs-border hover:border-sky-400 hover:text-sky-400 transition text-[11px]"
+                    >
+                      查看档案 &rarr;
+                    </a>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div class="p-4 rounded-lg bg-obs-bg border border-obs-border/70 text-xs text-obs-muted space-y-1">
+        <div class="text-obs-text font-bold">重要核验说明：</div>
+        <p>
+          上述表格中列出的“专线宣称”均如实提取自原始入库资料。本站明确标注：部分品牌的资料中存在<strong>线路命名冲突</strong>（如光速云在要点中写 IEPL 与企业内网，但在介绍中写 IPLC 与隧道中转）。对于此类冲突，展示层保留原始说法并标注“多版本并存待核实”，绝不臆造已经独立核实的双专线物理拓扑。
+        </p>
+      </div>
+    </section>
+
+    <!-- Comprehensive FAQ Section -->
+    <section class="rounded-xl border border-obs-border bg-obs-panel p-6 sm:p-8 space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">稳定机场高频技术疑问解答 (FAQ)</h2>
+        <p class="text-xs text-obs-muted">围绕真实物理专线辨识、晚高峰抗干扰机制与丢包恢复</p>
+      </div>
+
+      <div class="divide-y divide-obs-border/60">
+        {stableFaqs.map((faq, idx) => (
+          <div class="py-4 space-y-2">
+            <h3 class="text-sm sm:text-base font-bold text-obs-text flex items-start gap-2">
+              <span class="text-emerald-400 font-mono">Q{idx + 1}:</span>
+              <span>{faq.q}</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-obs-muted leading-relaxed pl-6">
+              {faq.a}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Internal Linking Navigation -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+      <a href="/recommend/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/50 transition">
+        <div class="text-xs font-mono text-sky-400 mb-1">选购决策 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">机场推荐候选总览</div>
+        <div class="text-xs text-obs-muted mt-1">查看编辑推荐前十与四大场景选型</div>
+      </a>
+      <a href="/lines/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-purple-500/50 transition">
+        <div class="text-xs font-mono text-purple-400 mb-1">底层拓扑 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">线路研究与专线架构</div>
+        <div class="text-xs text-obs-muted mt-1">深入理解 IPLC、IEPL 与 BGP 中转链路</div>
+      </a>
+      <a href="/troubleshoot/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-teal-500/50 transition">
+        <div class="text-xs font-mono text-teal-400 mb-1">故障诊断 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">网络排障决策树</div>
+        <div class="text-xs text-obs-muted mt-1">定位晚高峰卡顿、TUN冲突与掉线</div>
+      </a>
+    </section>
+
+  </div>
+</BaseLayout>

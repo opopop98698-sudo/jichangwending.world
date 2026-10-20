@@ -1,0 +1,164 @@
+---
+import { AFFILIATE_LINKS } from '../lib/links';
+
+interface PlanSummary {
+  name: string;
+  billing: string;
+  price: number;
+  trafficGB: number;
+  cycle: string;
+}
+
+interface Props {
+  id: string;
+  name: string;
+  isTop10?: boolean;
+  editorialOrder?: number;
+  isPrimaryRecommended?: boolean;
+  lineType: string;
+  protocols: string[];
+  pricingStarting: {
+    amount: number;
+    period: string;
+    monthlyEquivalent: number;
+    trafficGB: number;
+    isApproximate?: boolean;
+  };
+  clients: {
+    customApp: boolean;
+    thirdParty: boolean;
+    platforms: string[];
+  };
+  nodesSummary: string;
+  verifiedDate: string;
+  pros?: string[];
+  suitableFor?: string[];
+}
+
+const {
+  id,
+  name,
+  isTop10 = false,
+  editorialOrder,
+  isPrimaryRecommended = false,
+  lineType,
+  protocols = [],
+  pricingStarting,
+  clients,
+  nodesSummary,
+  verifiedDate,
+  pros = [],
+  suitableFor = []
+} = Astro.props;
+
+const affData = AFFILIATE_LINKS[id] || { affiliateUrl: null, officialUrl: null, commissionNotice: '' };
+---
+
+<div class="rounded-lg border border-[#26354D] bg-[#111C2E] p-5 text-[#E6EDF6] hover:border-[#38BDF8]/50 transition-all flex flex-col justify-between space-y-4">
+  <!-- Top: Header with Brand Name, Badges & Order -->
+  <div>
+    <div class="flex items-start justify-between gap-2 mb-3">
+      <div class="flex items-center space-x-3">
+        <!-- Monogram Badge -->
+        <div class="w-10 h-10 rounded-md bg-[#17253D] border border-[#26354D] flex items-center justify-center font-bold text-sm text-[#38BDF8] font-mono">
+          {name.slice(0, 2)}
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h3 class="text-base font-bold tracking-tight text-[#E6EDF6]">
+              <a href={`/brands/${id}/`} class="hover:text-[#38BDF8] transition-colors">{name}</a>
+            </h3>
+            {isPrimaryRecommended && (
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#EF4444]/20 border border-[#EF4444]/40 text-[#EF4444]">
+                第一主推
+              </span>
+            )}
+            {isTop10 && !isPrimaryRecommended && (
+              <span class="px-1.5 py-0.2 rounded text-[10px] font-mono bg-[#38BDF8]/15 border border-[#38BDF8]/30 text-[#38BDF8]">
+                编辑推荐 #{editorialOrder}
+              </span>
+            )}
+          </div>
+          <div class="text-[11px] font-mono text-[#A7B6CC] mt-0.5">
+            {lineType.slice(0, 26)}
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing Starting Badge -->
+      <div class="text-right">
+        <div class="text-lg font-bold font-mono text-[#10B981]">
+          {pricingStarting.isApproximate ? '约 ' : ''}¥{pricingStarting.monthlyEquivalent}
+          <span class="text-xs text-[#A7B6CC] font-normal">/月起</span>
+        </div>
+        <div class="text-[10px] font-mono text-[#64748B]">
+          {pricingStarting.period} ¥{pricingStarting.amount} ({pricingStarting.trafficGB > 0 ? `${pricingStarting.trafficGB}GB/月` : '流量待核'})
+        </div>
+      </div>
+    </div>
+
+    <!-- Specs Grid -->
+    <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-[#0B1220] p-2.5 rounded border border-[#26354D] my-3">
+      <div>
+        <span class="text-[#64748B]">协议支持:</span>
+        <span class="text-[#E6EDF6] ml-1">{protocols.length > 0 ? protocols.join('/') : '未注明'}</span>
+      </div>
+      <div>
+        <span class="text-[#64748B]">客户端方式:</span>
+        <span class="text-[#E6EDF6] ml-1">
+          {clients.customApp && clients.thirdParty ? '自研 + 通用订阅' : (clients.customApp ? '专属客户端免配' : '通用订阅导入')}
+        </span>
+      </div>
+      <div class="col-span-2 truncate">
+        <span class="text-[#64748B]">覆盖节点:</span>
+        <span class="text-[#A7B6CC] ml-1">{nodesSummary.slice(0, 30)}</span>
+      </div>
+    </div>
+
+    <!-- Highlight Pros -->
+    {pros.length > 0 && (
+      <div class="space-y-1 mb-2">
+        <div class="text-[11px] text-[#A7B6CC]">
+          {pros.slice(0, 2).map((p) => (
+            <div class="flex items-center text-[11px] text-[#A7B6CC]">
+              <span class="text-[#10B981] mr-1.5">✓</span> {p}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+
+  <!-- Actions & Transparency -->
+  <div class="pt-3 border-t border-[#26354D] space-y-2">
+    <div class="flex items-center space-x-2">
+      <a
+        href={`/brands/${id}/`}
+        class="flex-1 py-1.5 px-3 rounded text-center text-xs font-medium bg-[#17253D] text-[#E6EDF6] hover:bg-[#26354D] border border-[#26354D] transition-colors"
+      >
+        查看事实档案与测速
+      </a>
+      {affData.affiliateUrl ? (
+        <a
+          href={affData.affiliateUrl}
+          target="_blank"
+          rel="nofollow sponsored noopener"
+          class="flex-1 py-1.5 px-3 rounded text-center text-xs font-bold bg-[#38BDF8] text-[#0B1220] hover:bg-[#38BDF8]/90 transition-colors flex items-center justify-center space-x-1"
+        >
+          <span>前往官网</span>
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+        </a>
+      ) : (
+        <span class="flex-1 py-1.5 px-3 rounded text-center text-xs font-mono text-[#64748B] bg-[#0B1220] border border-[#26354D]">
+          无公开独立入口
+        </span>
+      )}
+    </div>
+
+    {affData.affiliateUrl && (
+      <div class="text-[10px] text-[#64748B] leading-tight font-mono text-center">
+        含推广链接，注册可能带来佣金，不影响用户支付价格
+      </div>
+    )}
+  </div>
+</div>

@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MetricCalculator from '../components/tools/MetricCalculator.astro';
+import BandwidthConverter from '../components/tools/BandwidthConverter.astro';
+
+const pageTitle = '测速与稳定性评测方法论：四维状态模型与晚高峰度量标准';
+const pageDescription = '稳定机场指南公开完整的网络性能与稳定性评测方法论。涵盖四维状态度量模型、晚高峰核心观测窗口定义、吞吐量/抖动/丢包率数学公式与固定标尺图表设计规范。';
+
+const methodologySchema = {
+  '@type': 'Article',
+  headline: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/methodology/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/methodology/"
+  schema={methodologySchema}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-indigo-400">评测方法论</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-xs font-mono text-indigo-400">
+        <span>● 严格工程规范 · 算法与公式公开 · 拒绝黑箱</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        评测方法论与度量规范 (Methodology)
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted leading-relaxed">
+        任何不公开测试环境、抽样方法和数学公式的测速榜单，都不具备科学参考价值。
+        稳定机场指南坚持<strong>全透明的技术评测方法论</strong>，向全网公开我们的四维状态模型、时间窗口划分标准、吞吐量折算系数与图表可视化规范。
+      </p>
+    </div>
+
+    <!-- 1. Four Dimension State Model -->
+    <section class="space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <h2 class="text-lg font-bold text-obs-text">一、四维状态度量模型 (4-Dimension State Model)</h2>
+      <p>
+        本站数据库中的每一个测速数据点与服务状态记录，都必须具备以下四个正交维度的精确定义：
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-sky-400 font-mono text-xs">DIMENSION A · 来源属性 (Provenance)</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            区分数据来自于入库资料原始快照（Source Snapshot）、第三方观测网络节点上报、还是本站评测机房直发。严禁将资料原始记录直接混淆成本站独立长期测试结论。
+          </p>
+        </div>
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-emerald-400 font-mono text-xs">DIMENSION B · 核验状态 (Verification)</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            包含“已核验（Verified）”、“多方冲突待核实（Conflict Pending）”与“未测试（Not Tested）”。当且仅当独立抓包校验通过后方可打上 Verified 标签。
+          </p>
+        </div>
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-amber-400 font-mono text-xs">DIMENSION C · 时效鲜度 (Freshness)</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            严格保留测试生成的精确 UTC/CST 时间戳（如 2026-10-19 记录）。超过 90 天未重新抽样的数据自动降级为“历史归档参考”，绝不滥用为当前状态证明。
+          </p>
+        </div>
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-purple-400 font-mono text-xs">DIMENSION D · 结果结构 (Result Structure)</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            单次有效测试必须由四元组构成：[下行吞吐 Mbps, 上行吞吐 Mbps, 首包 RTT 延迟 ms, 持续抖动 Jitter ms, 丢包率 Packet Loss %]。缺失项标记为 Null，不得赋零。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Observation Windows -->
+    <section class="space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <h2 class="text-lg font-bold text-obs-text">二、观测时段划分标准</h2>
+      <p>
+        为了精准捕捉不同公网网络负载下的节点表现，我们将 24 小时划分为三个具有决定性差异的时间窗口：
+      </p>
+      <div class="overflow-x-auto border border-obs-border rounded-xl">
+        <table class="w-full text-left text-xs text-obs-muted border-collapse">
+          <thead>
+            <tr class="bg-obs-panel border-b border-obs-border text-obs-text font-mono text-[11px]">
+              <th class="py-2.5 px-3">时段分类</th>
+              <th class="py-2.5 px-3">时间窗口 (CST)</th>
+              <th class="py-2.5 px-3">公网国际出口负荷</th>
+              <th class="py-2.5 px-3">测试核心意义</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-obs-border/50">
+            <tr class="hover:bg-obs-panel/30">
+              <td class="py-2.5 px-3 font-bold text-sky-400">闲时基准时段</td>
+              <td class="py-2.5 px-3 font-mono">02:00 - 08:00</td>
+              <td class="py-2.5 px-3">&lt; 40% (极度空闲)</td>
+              <td class="py-2.5 px-3">测量节点物理带宽与硬件转发极限性能</td>
+            </tr>
+            <tr class="hover:bg-obs-panel/30">
+              <td class="py-2.5 px-3 font-bold text-emerald-400">日间工作时段</td>
+              <td class="py-2.5 px-3 font-mono">09:00 - 18:00</td>
+              <td class="py-2.5 px-3">50% - 70% (常态平衡)</td>
+              <td class="py-2.5 px-3">评估外贸办公、开发协作与日常多媒体表现</td>
+            </tr>
+            <tr class="hover:bg-obs-panel/30">
+              <td class="py-2.5 px-3 font-bold text-rose-400">晚高峰核心窗口</td>
+              <td class="py-2.5 px-3 font-mono">20:00 - 23:30</td>
+              <td class="py-2.5 px-3">&gt; 95% (高度饱和拥塞)</td>
+              <td class="py-2.5 px-3 font-bold text-rose-300">检验物理专线抗拥塞与真实稳定性的唯一黄金窗口</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. Mathematical Formulas -->
+    <section class="space-y-6">
+      <h2 class="text-lg font-bold text-obs-text">三、度量数学模型与换算公式</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-sky-400 font-mono">成功率 (Success Rate)</div>
+          <div class="font-mono text-sm font-bold text-obs-text bg-obs-bg p-2 rounded border border-obs-border">
+            SR = S / (S + F) &times; 100%
+          </div>
+          <p class="text-obs-muted leading-relaxed">
+            S = 成功请求数（HTTP 200/204 且 RTT &lt; 3000ms），F = 失败数（超时/重置/DNS失败）。不统计未实施探测的假想时间。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-emerald-400 font-mono">样本覆盖率 (Coverage Rate)</div>
+          <div class="font-mono text-sm font-bold text-obs-text bg-obs-bg p-2 rounded border border-obs-border">
+            CR = (S + F) / E &times; 100%
+          </div>
+          <p class="text-obs-muted leading-relaxed">
+            E = 理论应测总轮次。若覆盖率低于 80%，数据在统计学上认定为样本不完备，不得作为全天稳定依据。
+          </p>
+        </div>
+      </div>
+
+      <!-- Embedded Tools -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+        <MetricCalculator />
+        <BandwidthConverter />
+      </div>
+    </section>
+
+    <!-- 4. Visualization Standards -->
+    <section class="p-6 rounded-xl border border-obs-border bg-obs-panel space-y-4 text-xs">
+      <h2 class="text-lg font-bold text-obs-text">四、图表可视化与防误导标准</h2>
+      <ul class="list-disc list-inside space-y-2 text-obs-muted leading-relaxed">
+        <li><strong>统一固定标尺</strong>：所有测速柱状图横坐标严格统一固定为 0 - 1000 Mbps，严禁通过压缩坐标轴将 100Mbps 放大成全屏来制造虚假视觉冲击。</li>
+        <li><strong>强制来源徽章</strong>：图表右上角必须标注明确的来源标签（如“来源资料测速记录”或“独立实测”）。</li>
+        <li><strong>防伪水印与无障碍支持</strong>：图表必须包含 `jichangwending.world` 标识，并在下方并排提供完整的 HTML 无障碍数据表格（`aria-label` 与 `th/td` 结构），保障读屏器与网络爬虫完全可访问。</li>
+      </ul>
+    </section>
+
+  </div>
+</BaseLayout>

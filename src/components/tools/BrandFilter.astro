@@ -1,0 +1,230 @@
+---
+// Embeddable Brand Filter & Table Tool (条件筛选器)
+import brandsData from '../../data/brands.json';
+
+interface Props {
+  initialFilter?: string; // e.g. 'all', 'free', 'budget', 'iepl'
+  title?: string;
+  subtitle?: string;
+}
+
+const {
+  initialFilter = 'all',
+  title = '机场多维度条件筛选器',
+  subtitle = '基于 41 个真实收录档案，按线路类型、价格预算、免费试用政策即时筛选'
+} = Astro.props;
+
+// Determine trial policy helper
+function hasTrialPolicy(b: typeof brandsData[0]) {
+  return (
+    b.plans.some(p => p.price === 0 || p.name.includes('试用') || p.name.includes('体验')) ||
+    b.vendorClaims.some(v => v.includes('试用') || v.includes('免费') || v.includes('体验')) ||
+    ['feimao', 'yuzhou', 'muguang', 'sujie'].includes(b.id)
+  );
+}
+---
+
+<div class="bg-obs-panel border border-obs-border rounded-xl p-6 shadow-xl" id="brand-filter-tool">
+  <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-obs-border/70 mb-5 gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-mono font-bold text-sm">
+        02
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-obs-text">{title}</h3>
+        <p class="text-xs text-obs-muted">{subtitle}</p>
+      </div>
+    </div>
+    <div class="relative w-full md:w-64">
+      <input
+        type="text"
+        id="bf-search-input"
+        placeholder="搜索品牌名、线路或协议..."
+        class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-1.5 text-xs text-obs-text placeholder:text-obs-muted focus:border-sky-400 focus:outline-none"
+      />
+    </div>
+  </div>
+
+  <!-- Filter Pills -->
+  <div class="flex flex-wrap items-center gap-2 mb-4 text-xs">
+    <span class="text-obs-muted text-[11px] font-mono mr-1">快捷筛选:</span>
+    <button type="button" data-filter="all" class="bf-filter-btn px-3 py-1 rounded-md font-mono border transition cursor-pointer bg-sky-500/10 text-sky-400 border-sky-500/40">
+      全部收录 (41)
+    </button>
+    <button type="button" data-filter="top10" class="bf-filter-btn px-3 py-1 rounded-md font-mono border transition cursor-pointer bg-obs-bg text-obs-muted border-obs-border hover:border-obs-border/80">
+      编辑前十推荐 (10)
+    </button>
+    <button type="button" data-filter="iepl" class="bf-filter-btn px-3 py-1 rounded-md font-mono border transition cursor-pointer bg-obs-bg text-obs-muted border-obs-border hover:border-obs-border/80">
+      专线宣称 (IEPL/IPLC)
+    </button>
+    <button type="button" data-filter="budget" class="bf-filter-btn px-3 py-1 rounded-md font-mono border transition cursor-pointer bg-obs-bg text-obs-muted border-obs-border hover:border-obs-border/80">
+      平价档 (&le;15元/月)
+    </button>
+    <button type="button" data-filter="trial" class="bf-filter-btn px-3 py-1 rounded-md font-mono border transition cursor-pointer bg-obs-bg text-obs-muted border-obs-border hover:border-obs-border/80">
+      含试用/体验政策
+    </button>
+    <button type="button" data-filter="tested" class="bf-filter-btn px-3 py-1 rounded-md font-mono border transition cursor-pointer bg-obs-bg text-obs-muted border-obs-border hover:border-obs-border/80">
+      有测速数据记录
+    </button>
+  </div>
+
+  <!-- Interactive Brand Table -->
+  <div class="overflow-x-auto border border-obs-border rounded-lg">
+    <table class="w-full text-left text-xs text-obs-muted border-collapse" id="bf-table">
+      <thead>
+        <tr class="bg-obs-bg/90 border-b border-obs-border text-obs-text font-mono text-[11px]">
+          <th class="py-2.5 px-3">品牌名称</th>
+          <th class="py-2.5 px-3">起步价格</th>
+          <th class="py-2.5 px-3">起始流量</th>
+          <th class="py-2.5 px-3">宣称线路类型</th>
+          <th class="py-2.5 px-3">测速记录</th>
+          <th class="py-2.5 px-3 text-right">档案入口</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-obs-border/50 font-mono" id="bf-tbody">
+        {brandsData.map((b) => {
+          const maxSpeed = b.speedTest?.results?.reduce((max, r) => Math.max(max, r.downloadMbps || 0), 0) || 0;
+          const hasTested = maxSpeed > 0;
+          const isTop10 = b.isTop10;
+          const isBudget = b.pricingStarting.monthlyEquivalent > 0 && b.pricingStarting.monthlyEquivalent <= 15;
+          const isTrial = hasTrialPolicy(b);
+          const isIepl = b.lineType.includes('IEPL') || b.lineType.includes('IPLC') || b.lineType.includes('专线');
+          const startingPriceDisplay = b.pricingStarting.isApproximate 
+            ? `约¥${b.pricingStarting.monthlyEquivalent}/月` 
+            : `¥${b.pricingStarting.amount}/${b.pricingStarting.period}`;
+
+          return (
+            <tr
+              class="bf-row hover:bg-obs-bg/60 transition"
+              data-name={b.name.toLowerCase()}
+              data-slug={b.id}
+              data-top10={isTop10 ? "true" : "false"}
+              data-budget={isBudget ? "true" : "false"}
+              data-trial={isTrial ? "true" : "false"}
+              data-iepl={isIepl ? "true" : "false"}
+              data-tested={hasTested ? "true" : "false"}
+            >
+              <td class="py-2.5 px-3 font-sans">
+                <div class="flex items-center gap-2">
+                  <a href={`/brands/${b.id}/`} class="font-bold text-obs-text hover:text-sky-300">
+                    {b.name}
+                  </a>
+                  {isTop10 && (
+                    <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                      编辑前十
+                    </span>
+                  )}
+                </div>
+                <div class="text-[10px] text-obs-muted font-mono">{b.id}</div>
+              </td>
+              <td class="py-2.5 px-3 font-mono text-obs-text">
+                {startingPriceDisplay}
+              </td>
+              <td class="py-2.5 px-3 font-mono">
+                {b.pricingStarting.trafficGB} GB
+              </td>
+              <td class="py-2.5 px-3">
+                <span class={`inline-block px-1.5 py-0.5 rounded text-[10px] truncate max-w-[140px] ${
+                  isIepl ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-obs-bg text-obs-muted border border-obs-border'
+                }`}>
+                  {b.lineType.split('（')[0]}
+                </span>
+              </td>
+              <td class="py-2.5 px-3">
+                {hasTested ? (
+                  <span class="text-sky-400 font-bold">
+                    {maxSpeed} Mbps
+                  </span>
+                ) : (
+                  <span class="text-obs-muted/60 text-[10px]">Not Tested</span>
+                )}
+              </td>
+              <td class="py-2.5 px-3 text-right">
+                <a
+                  href={`/brands/${b.id}/`}
+                  class="inline-block px-2.5 py-1 rounded bg-obs-bg border border-obs-border text-obs-text hover:border-sky-400 hover:text-sky-400 transition text-[11px]"
+                >
+                  查看档案 &rarr;
+                </a>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+  <div id="bf-empty" class="hidden text-center py-8 text-obs-muted text-xs font-mono">
+    未找到匹配筛选条件的机场实体，请调整搜索关键词或重置筛选。
+  </div>
+</div>
+
+<script>
+  const searchInput = document.getElementById('bf-search-input') as HTMLInputElement | null;
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.bf-filter-btn');
+  const rows = document.querySelectorAll<HTMLTableRowElement>('.bf-row');
+  const emptyState = document.getElementById('bf-empty');
+
+  let currentFilter = 'all';
+  let currentSearch = '';
+
+  function applyFilters() {
+    let matchCount = 0;
+
+    rows.forEach(row => {
+      const name = row.dataset.name || '';
+      const slug = row.dataset.slug || '';
+      const isTop10 = row.dataset.top10 === 'true';
+      const isBudget = row.dataset.budget === 'true';
+      const isTrial = row.dataset.trial === 'true';
+      const isIepl = row.dataset.iepl === 'true';
+      const isTested = row.dataset.tested === 'true';
+
+      // Check text search
+      const matchesSearch = currentSearch === '' || name.includes(currentSearch) || slug.includes(currentSearch);
+
+      // Check tag filter
+      let matchesTag = true;
+      if (currentFilter === 'top10') matchesTag = isTop10;
+      else if (currentFilter === 'budget') matchesTag = isBudget;
+      else if (currentFilter === 'trial') matchesTag = isTrial;
+      else if (currentFilter === 'iepl') matchesTag = isIepl;
+      else if (currentFilter === 'tested') matchesTag = isTested;
+
+      if (matchesSearch && matchesTag) {
+        row.style.display = '';
+        matchCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    if (emptyState) {
+      if (matchCount === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+    }
+  }
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter || 'all';
+      currentFilter = filter;
+
+      filterBtns.forEach(b => {
+        b.classList.remove('bg-sky-500/10', 'text-sky-400', 'border-sky-500/40');
+        b.classList.add('bg-obs-bg', 'text-obs-muted', 'border-obs-border');
+      });
+      btn.classList.remove('bg-obs-bg', 'text-obs-muted', 'border-obs-border');
+      btn.classList.add('bg-sky-500/10', 'text-sky-400', 'border-sky-500/40');
+
+      applyFilters();
+    });
+  });
+
+  searchInput?.addEventListener('input', (e) => {
+    currentSearch = (e.target as HTMLInputElement).value.trim().toLowerCase();
+    applyFilters();
+  });
+</script>

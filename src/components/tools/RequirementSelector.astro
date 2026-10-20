@@ -1,0 +1,137 @@
+---
+// 需求选择器组件 (Requirement Selector)
+---
+
+<div class="rounded-xl border border-[#26354D] bg-[#111C2E] p-5 sm:p-6 text-[#E6EDF6] space-y-4">
+  <div class="flex items-center justify-between pb-3 border-b border-[#26354D]">
+    <div class="flex items-center space-x-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#38BDF8]"></span>
+      <h3 class="text-sm sm:text-base font-bold tracking-tight">选购需求决策树 (Requirement Selector)</h3>
+    </div>
+    <span class="text-xs font-mono text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded border border-[#10B981]/30">交互工具</span>
+  </div>
+
+  <p class="text-xs text-[#A7B6CC] leading-relaxed">
+    你首先要解决什么核心问题？点击下方选项，系统将根据本站 41 个品牌的客观事实，为您匹配匹配路径与证据核验建议：
+  </p>
+
+  <!-- Options Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs font-mono">
+    <button
+      class="req-btn p-3 rounded bg-[#0B1220] border border-[#26354D] text-left hover:border-[#38BDF8] transition-colors focus:border-[#38BDF8] active"
+      data-target="novice"
+    >
+      <div class="font-bold text-[#38BDF8] mb-1">01. 第一次购买 / 小白</div>
+      <div class="text-[11px] text-[#A7B6CC]">看重简单、免配客户端或极低门槛</div>
+    </button>
+
+    <button
+      class="req-btn p-3 rounded bg-[#0B1220] border border-[#26354D] text-left hover:border-[#38BDF8] transition-colors focus:border-[#38BDF8]"
+      data-target="peak"
+    >
+      <div class="font-bold text-[#10B981] mb-1">02. 晚高峰绝对稳定</div>
+      <div class="text-[11px] text-[#A7B6CC]">看重真实专线证据、低丢包与抗拥塞</div>
+    </button>
+
+    <button
+      class="req-btn p-3 rounded bg-[#0B1220] border border-[#26354D] text-left hover:border-[#38BDF8] transition-colors focus:border-[#38BDF8]"
+      data-target="ai-stream"
+    >
+      <div class="font-bold text-[#818CF8] mb-1">03. AI办公与4K追剧</div>
+      <div class="text-[11px] text-[#A7B6CC]">需原生IP解锁ChatGPT/Claude/Netflix</div>
+    </button>
+
+    <button
+      class="req-btn p-3 rounded bg-[#0B1220] border border-[#26354D] text-left hover:border-[#38BDF8] transition-colors focus:border-[#38BDF8]"
+      data-target="budget"
+    >
+      <div class="font-bold text-[#F59E0B] mb-1">04. 极限平价与备用</div>
+      <div class="text-[11px] text-[#A7B6CC]">月均10元以下或不限时不过期流量包</div>
+    </button>
+  </div>
+
+  <!-- Dynamic Result Cards -->
+  <div class="p-4 rounded-lg bg-[#0B1220] border border-[#26354D] text-xs space-y-3">
+    <!-- Result: Novice -->
+    <div id="res-novice" class="req-result space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-sm text-[#38BDF8]">匹配结论：优先选带专属客户端或低试错成本的方案</span>
+        <span class="text-[11px] font-mono text-[#A7B6CC]">推荐路径: /recommend/</span>
+      </div>
+      <p class="text-[#A7B6CC] leading-relaxed">
+        如果您第一次接触机场，建议避免复杂的开源规则配置。可以考虑<strong>飞猫云</strong>（下载APP一键登录即用，免配订阅，年付折合7元/月起）或<strong>光速云</strong>（99元/年起步，支持自研端）。
+      </p>
+      <div class="flex items-center space-x-3 pt-1">
+        <a href="/recommend/" class="text-[#38BDF8] font-bold hover:underline">查看新手选购场景细则 &rarr;</a>
+        <a href="/brands/feimao/" class="text-[#A7B6CC] hover:underline">查看飞猫云档案</a>
+      </div>
+    </div>
+
+    <!-- Result: Peak -->
+    <div id="res-peak" class="req-result hidden space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-sm text-[#10B981]">匹配结论：认准有独立 IEPL / IPLC 专线记录的品牌</span>
+        <span class="text-[11px] font-mono text-[#A7B6CC]">推荐路径: /stable/</span>
+      </div>
+      <p class="text-[#A7B6CC] leading-relaxed">
+        晚高峰稳定性取决于二层专线带宽与冗余度。可重点核验<strong>Firefly</strong>（IPLC专线+原生IP，年付96元起）、<strong>二猫云</strong>（全线IEPL，主打长期稳定20元/月）或<strong>WgetCloud</strong>（高端专线服务，历史测速59节点全通）。
+      </p>
+      <div class="flex items-center space-x-3 pt-1">
+        <a href="/stable/" class="text-[#10B981] font-bold hover:underline">查看晚高峰稳定性核验方法论 &rarr;</a>
+        <a href="/brands/firefly/" class="text-[#A7B6CC] hover:underline">查看Firefly档案</a>
+      </div>
+    </div>
+
+    <!-- Result: AI & Stream -->
+    <div id="res-ai-stream" class="req-result hidden space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-sm text-[#818CF8]">匹配结论：优先选择原生IP节点、AI工具针对优化的品牌</span>
+        <span class="text-[11px] font-mono text-[#A7B6CC]">推荐路径: /brands/</span>
+      </div>
+      <p class="text-[#A7B6CC] leading-relaxed">
+        ChatGPT与流媒体对数据中心IP风控严格。建议参考<strong>速界</strong>（25元档明确主打AI生产力场景）、<strong>一翻云</strong>（搭配原生住宅IP防风控）或<strong>灵动云</strong>（实测OpenAI全解锁）。
+      </p>
+      <div class="flex items-center space-x-3 pt-1">
+        <a href="/brands/sujie/" class="text-[#818CF8] font-bold hover:underline">查看速界AI优化档案 &rarr;</a>
+        <a href="/brands/yifan/" class="text-[#A7B6CC] hover:underline">查看一翻云住宅IP档案</a>
+      </div>
+    </div>
+
+    <!-- Result: Budget -->
+    <div id="res-budget" class="req-result hidden space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-sm text-[#F59E0B]">匹配结论：5.6元极限平价档或一次性不限时流量包</span>
+        <span class="text-[11px] font-mono text-[#A7B6CC]">推荐路径: /free/ 与平价库</span>
+      </div>
+      <p class="text-[#A7B6CC] leading-relaxed">
+        极低预算建议选择<strong>闪电鼠</strong>、<strong>大佬云</strong>或<strong>云界线</strong>（年付约5.6元/月 60GB）；若用量不固定防失联，可选择<strong>二猫云</strong>（99元100GB不限时包）或<strong>光速云</strong>（147元247GB斯诺克永久包）。
+      </p>
+      <div class="flex items-center space-x-3 pt-1">
+        <a href="/free/" class="text-[#F59E0B] font-bold hover:underline">查看免费与平价替代避坑方案 &rarr;</a>
+        <a href="/brands/shandianshu/" class="text-[#A7B6CC] hover:underline">查看闪电鼠档案</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const btns = document.querySelectorAll('.req-btn');
+  const results = document.querySelectorAll('.req-result');
+
+  btns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      btns.forEach((b) => b.classList.remove('border-[#38BDF8]', 'bg-[#17253D]'));
+      const target = e.currentTarget as HTMLElement;
+      target.classList.add('border-[#38BDF8]', 'bg-[#17253D]');
+      const targetId = target.dataset.target;
+
+      results.forEach((r) => {
+        if (r.id === `res-${targetId}`) {
+          r.classList.remove('hidden');
+        } else {
+          r.classList.add('hidden');
+        }
+      });
+    });
+  });
+</script>

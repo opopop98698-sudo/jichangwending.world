@@ -1,0 +1,73 @@
+---
+const currentYear = 2026;
+---
+
+<footer class="border-t border-[#26354D] bg-[#080E18] text-[#A7B6CC] text-xs">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <!-- Col 1: Brand & Mission -->
+      <div class="space-y-3">
+        <div class="flex items-center space-x-2 text-[#E6EDF6]">
+          <span class="font-bold text-sm tracking-tight">稳定机场指南</span>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#17253D] border border-[#26354D] text-[#38BDF8]">可观测性实验室</span>
+        </div>
+        <p class="leading-relaxed text-[#A7B6CC]">
+          基于可追溯的晚高峰样本、丢包率实测、三网对比与客观线路机制，为中文用户提供拒绝虚假排名的机场选购决策依据。
+        </p>
+        <div class="pt-1 font-mono text-[11px] text-[#64748B]">
+          水印标识: jichangwending.world
+        </div>
+      </div>
+
+      <!-- Col 2: Navigation -->
+      <div>
+        <h4 class="text-xs font-semibold uppercase tracking-wider text-[#E6EDF6] mb-3">核心专题</h4>
+        <ul class="space-y-2">
+          <li><a href="/recommend/" class="hover:text-[#38BDF8] transition-colors">机场推荐 (场景与预算选型)</a></li>
+          <li><a href="/stable/" class="hover:text-[#38BDF8] transition-colors">稳定机场 (晚高峰低丢包依据)</a></li>
+          <li><a href="/free/" class="hover:text-[#38BDF8] transition-colors">免费机场 (试用与零付款核验)</a></li>
+          <li><a href="/brands/" class="hover:text-[#38BDF8] transition-colors">全部 41 品牌库名录</a></li>
+          <li><a href="/reviews/" class="hover:text-[#38BDF8] transition-colors">深度评测与同条件横评</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Research & Lab -->
+      <div>
+        <h4 class="text-xs font-semibold uppercase tracking-wider text-[#E6EDF6] mb-3">研究与工具</h4>
+        <ul class="space-y-2">
+          <li><a href="/lab/" class="hover:text-[#38BDF8] transition-colors">测速实验室 (方法论与原始数据)</a></li>
+          <li><a href="/lines/" class="hover:text-[#38BDF8] transition-colors">线路研究 (IPLC/IEPL/BGP原理解析)</a></li>
+          <li><a href="/status/" class="hover:text-[#38BDF8] transition-colors">机场状态 (事件历史与观测覆盖)</a></li>
+          <li><a href="/troubleshoot/" class="hover:text-[#38BDF8] transition-colors">网络排障 (症状诊断决策树)</a></li>
+          <li><a href="/methodology/" class="hover:text-[#38BDF8] transition-colors">数据核验与统计口径说明</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Compliance & Disclosure -->
+      <div>
+        <h4 class="text-xs font-semibold uppercase tracking-wider text-[#E6EDF6] mb-3">站务与透明度</h4>
+        <ul class="space-y-2">
+          <li><a href="/disclosure/" class="hover:text-[#38BDF8] transition-colors">商业合作与推广佣金披露</a></li>
+          <li><a href="/corrections/" class="hover:text-[#38BDF8] transition-colors">数据勘误与争议处理政策</a></li>
+          <li><a href="/about/" class="hover:text-[#38BDF8] transition-colors">关于本站 (独立观测声明)</a></li>
+          <li><a href="/privacy/" class="hover:text-[#38BDF8] transition-colors">隐私政策 (零日志不收集订阅)</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Disclosure Banner -->
+    <div class="border-t border-[#26354D]/60 pt-6 mt-6">
+      <div class="p-3 rounded bg-[#111C2E] border border-[#26354D] text-[11px] leading-relaxed text-[#A7B6CC]">
+        <strong class="text-[#E6EDF6]">推广透明度与法律免责声明：</strong>
+        本站收录的部分品牌包含推广合作注册链接（Affiliate Links）。当您通过本站链接注册或订购时，本站可能会获得推广佣金，但该合作绝对不会增加您的实际支付金额，亦不会影响本站客观性能测速数据与条件化筛选排序。本站所有测速与可用性记录仅反映特定测试环境与时间戳，不构成对任何商家长期运营的商业保证。请根据自身网络环境与预算理性选购。
+      </div>
+      <div class="flex flex-col sm:flex-row items-center justify-between text-[#64748B] text-[11px] mt-4 font-mono">
+        <div>&copy; {currentYear} jichangwending.world 稳定机场指南. 保留所有权利.</div>
+        <div class="mt-2 sm:mt-0 flex space-x-4">
+          <span>部署版本: 2026.10-production</span>
+          <span>纯静态输出 (Zero-JS Readable)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

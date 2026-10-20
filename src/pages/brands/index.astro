@@ -1,0 +1,262 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BrandSnapshot from '../../components/BrandSnapshot.astro';
+import brandsData from '../../data/brands.json';
+
+const pageTitle = '机场品牌库大全：收录41个主流与平价机场真实套餐、线路与测速档案';
+const pageDescription = '稳定机场指南收录全网41个机场品牌，提供实付套餐价格、IEPL/IPLC专线声明、客户端生态及真实测速快照。支持按协议、价格与客户端多维即时筛选。';
+
+// ItemList schema for Brand Directory
+const directorySchema = {
+  '@type': 'ItemList',
+  name: '41 个收录机场品牌大全',
+  description: pageDescription,
+  itemListElement: brandsData.map((b, idx) => ({
+    '@type': 'ListItem',
+    position: idx + 1,
+    name: b.name,
+    url: `https://jichangwending.world/brands/${b.id}/`
+  }))
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/brands/"
+  schema={directorySchema}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-[#A7B6CC]">
+      <a href="/" class="hover:text-white">首页</a>
+      <span>/</span>
+      <span class="text-[#38BDF8]">机场品牌库</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-xl border border-[#26354D] bg-[#111C2E] p-6 sm:p-8">
+      <div class="max-w-3xl space-y-3">
+        <div class="inline-flex items-center space-x-2 text-xs font-mono text-[#38BDF8] bg-[#38BDF8]/10 border border-[#38BDF8]/30 px-2.5 py-1 rounded">
+          <span>● 41 个独立品牌事实建档</span>
+          <span>● 拒绝虚假好评</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#E6EDF6]">
+          机场品牌库大全 (Brand Directory)
+        </h1>
+        <p class="text-sm text-[#A7B6CC] leading-relaxed">
+          收录本站核验的 41 个唯一品牌实体。所有套餐价格均从原始资料提取，分为<strong>编辑推荐梯队（前十固定展示）</strong>与<strong>常规收录梯队</strong>。当用户主动按价格或测速排序时，系统完全基于可比数据真实重排，绝不暗中置顶主推品牌。
+        </p>
+      </div>
+    </div>
+
+    <!-- Interactive Filter & Search Controls Bar -->
+    <div class="rounded-lg border border-[#26354D] bg-[#111C2E] p-4 sm:p-5 space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <!-- Search Input -->
+        <div class="relative flex-1 max-w-md">
+          <input
+            id="brand-search-input"
+            type="text"
+            placeholder="搜索品牌名称或别名 (如 光速云, Firefly, 萤火虫)..."
+            class="w-full pl-9 pr-4 py-2 rounded bg-[#0B1220] border border-[#26354D] text-xs font-mono text-[#E6EDF6] placeholder-[#64748B] focus:outline-none focus:border-[#38BDF8]"
+          />
+          <svg class="w-4 h-4 text-[#64748B] absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+
+        <!-- Sorting Select -->
+        <div class="flex items-center space-x-2 text-xs font-mono text-[#A7B6CC]">
+          <span>排序方式:</span>
+          <select
+            id="sort-select"
+            class="bg-[#0B1220] border border-[#26354D] rounded px-3 py-1.5 text-xs font-mono text-[#E6EDF6] focus:outline-none focus:border-[#38BDF8]"
+          >
+            <option value="editorial">默认编辑推荐顺序 (含推广合作)</option>
+            <option value="price-asc">实付月均价: 从低到高</option>
+            <option value="price-desc">实付月均价: 从高到低</option>
+            <option value="speed-first">具备测速样本优先</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Quick Filter Pills -->
+      <div class="pt-3 border-t border-[#26354D]/60 flex flex-wrap items-center gap-2 text-xs font-mono">
+        <span class="text-[#64748B] mr-1">快捷筛选:</span>
+        <button class="filter-pill px-2.5 py-1 rounded bg-[#17253D] text-[#38BDF8] border border-[#38BDF8]/40" data-filter="all">全部 (41)</button>
+        <button class="filter-pill px-2.5 py-1 rounded bg-[#0B1220] text-[#A7B6CC] border border-[#26354D] hover:text-[#E6EDF6]" data-filter="top10">前十主推 (10)</button>
+        <button class="filter-pill px-2.5 py-1 rounded bg-[#0B1220] text-[#A7B6CC] border border-[#26354D] hover:text-[#E6EDF6]" data-filter="vless">VLESS协议</button>
+        <button class="filter-pill px-2.5 py-1 rounded bg-[#0B1220] text-[#A7B6CC] border border-[#26354D] hover:text-[#E6EDF6]" data-filter="trojan">Trojan协议</button>
+        <button class="filter-pill px-2.5 py-1 rounded bg-[#0B1220] text-[#A7B6CC] border border-[#26354D] hover:text-[#E6EDF6]" data-filter="budget">10元以下平价档</button>
+        <button class="filter-pill px-2.5 py-1 rounded bg-[#0B1220] text-[#A7B6CC] border border-[#26354D] hover:text-[#E6EDF6]" data-filter="tested">已测速样本</button>
+      </div>
+    </div>
+
+    <!-- Brand Cards Grid -->
+    <div id="brands-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {brandsData.map((b) => (
+        <div
+          class="brand-card-item"
+          data-id={b.id}
+          data-name={b.name}
+          data-aliases={(b.aliases || []).join(',')}
+          data-is-top10={b.isTop10 ? 'true' : 'false'}
+          data-editorial-order={b.editorialOrder}
+          data-price={b.pricingStarting.monthlyEquivalent}
+          data-has-speedtest={b.speedTest.results.length > 0 ? 'true' : 'false'}
+          data-protocols={b.protocols.join(',').toLowerCase()}
+        >
+          <BrandSnapshot
+            id={b.id}
+            name={b.name}
+            isTop10={b.isTop10}
+            editorialOrder={b.editorialOrder}
+            isPrimaryRecommended={b.isPrimaryRecommended}
+            lineType={b.lineType}
+            protocols={b.protocols}
+            pricingStarting={b.pricingStarting}
+            clients={b.clients}
+            nodesSummary={b.nodesSummary}
+            verifiedDate={b.verifiedDate}
+            pros={b.pros}
+            suitableFor={b.suitableFor}
+          />
+        </div>
+      ))}
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden rounded-lg border border-dashed border-[#26354D] bg-[#111C2E] p-12 text-center my-8">
+      <svg class="w-12 h-12 text-[#64748B] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="text-base font-bold text-[#E6EDF6]">未匹配到符合条件的机场品牌</h3>
+      <p class="text-xs text-[#A7B6CC] mt-1 max-w-sm mx-auto">
+        请尝试调整关键词或清除筛选条件。本站收录 41 个唯一品牌，支持搜索主名称与确认别名。
+      </p>
+      <button
+        id="reset-filter-btn"
+        class="mt-4 px-4 py-1.5 rounded text-xs font-mono bg-[#17253D] border border-[#26354D] text-[#38BDF8] hover:bg-[#26354D]"
+      >
+        重置所有筛选
+      </button>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Client-side instant filter & sorting script
+  const searchInput = document.getElementById('brand-search-input') as HTMLInputElement;
+  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+  const filterPills = document.querySelectorAll('.filter-pill');
+  const grid = document.getElementById('brands-grid');
+  const emptyState = document.getElementById('empty-state');
+  const resetBtn = document.getElementById('reset-filter-btn');
+
+  let currentFilter = 'all';
+  let searchQuery = '';
+
+  function applyFiltersAndSort() {
+    if (!grid) return;
+    const cards = Array.from(grid.querySelectorAll('.brand-card-item')) as HTMLElement[];
+    let visibleCount = 0;
+
+    cards.forEach((card) => {
+      const name = (card.dataset.name || '').toLowerCase();
+      const aliases = (card.dataset.aliases || '').toLowerCase();
+      const isTop10 = card.dataset.isTop10 === 'true';
+      const price = parseFloat(card.dataset.price || '0');
+      const hasSpeed = card.dataset.hasSpeedtest === 'true';
+      const protocols = card.dataset.protocols || '';
+
+      // Check text search
+      const q = searchQuery.toLowerCase().trim();
+      const matchSearch = !q || name.includes(q) || aliases.includes(q);
+
+      // Check active pill filter
+      let matchPill = true;
+      if (currentFilter === 'top10') matchPill = isTop10;
+      else if (currentFilter === 'vless') matchPill = protocols.includes('vless');
+      else if (currentFilter === 'trojan') matchPill = protocols.includes('trojan');
+      else if (currentFilter === 'budget') matchPill = price > 0 && price <= 10;
+      else if (currentFilter === 'tested') matchPill = hasSpeed;
+
+      if (matchSearch && matchPill) {
+        card.style.display = 'block';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Sorting
+    const sortVal = sortSelect?.value || 'editorial';
+    cards.sort((a, b) => {
+      if (sortVal === 'price-asc') {
+        return parseFloat(a.dataset.price || '0') - parseFloat(b.dataset.price || '0');
+      } else if (sortVal === 'price-desc') {
+        return parseFloat(b.dataset.price || '0') - parseFloat(a.dataset.price || '0');
+      } else if (sortVal === 'speed-first') {
+        const aSpeed = a.dataset.hasSpeedtest === 'true' ? 1 : 0;
+        const bSpeed = b.dataset.hasSpeedtest === 'true' ? 1 : 0;
+        return bSpeed - aSpeed;
+      } else {
+        // default editorial order
+        return parseInt(a.dataset.editorialOrder || '99') - parseInt(b.dataset.editorialOrder || '99');
+      }
+    });
+
+    cards.forEach((c) => grid.appendChild(c));
+
+    // Empty state
+    if (emptyState) {
+      if (visibleCount === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+    }
+  }
+
+  // Event Listeners
+  searchInput?.addEventListener('input', (e) => {
+    searchQuery = (e.target as HTMLInputElement).value;
+    applyFiltersAndSort();
+  });
+
+  sortSelect?.addEventListener('change', () => {
+    applyFiltersAndSort();
+  });
+
+  filterPills.forEach((pill) => {
+    pill.addEventListener('click', (e) => {
+      filterPills.forEach((p) => {
+        p.classList.remove('bg-[#17253D]', 'text-[#38BDF8]', 'border-[#38BDF8]/40');
+        p.classList.add('bg-[#0B1220]', 'text-[#A7B6CC]', 'border-[#26354D]');
+      });
+      const target = e.currentTarget as HTMLElement;
+      target.classList.remove('bg-[#0B1220]', 'text-[#A7B6CC]', 'border-[#26354D]');
+      target.classList.add('bg-[#17253D]', 'text-[#38BDF8]', 'border-[#38BDF8]/40');
+      currentFilter = target.dataset.filter || 'all';
+      applyFiltersAndSort();
+    });
+  });
+
+  resetBtn?.addEventListener('click', () => {
+    if (searchInput) searchInput.value = '';
+    searchQuery = '';
+    currentFilter = 'all';
+    filterPills.forEach((p, idx) => {
+      if (idx === 0) {
+        p.classList.add('bg-[#17253D]', 'text-[#38BDF8]', 'border-[#38BDF8]/40');
+        p.classList.remove('bg-[#0B1220]', 'text-[#A7B6CC]', 'border-[#26354D]');
+      } else {
+        p.classList.remove('bg-[#17253D]', 'text-[#38BDF8]', 'border-[#38BDF8]/40');
+        p.classList.add('bg-[#0B1220]', 'text-[#A7B6CC]', 'border-[#26354D]');
+      }
+    });
+    if (sortSelect) sortSelect.value = 'editorial';
+    applyFiltersAndSort();
+  });
+</script>

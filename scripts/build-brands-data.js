@@ -1,0 +1,2202 @@
+const fs = require('fs');
+const path = require('path');
+
+const brands = [
+  // 1. 光速云
+  {
+    id: 'lightspeed',
+    name: '光速云',
+    aliases: ['光速云加速', 'GSY Cloud'],
+    editorialOrder: 1,
+    isTop10: true,
+    isPrimaryRecommended: true,
+    source: 'Source A',
+    officialUrl: 'https://sahude.gsyvipaff.com/#/?code=keqgvT5Y',
+    affiliateUrl: 'https://sahude.gsyvipaff.com/#/?code=keqgvT5Y',
+    affiliateCode: 'keqgvT5Y',
+    couponCodes: [
+      { code: 'AMM', discount: '最低入门价格约8元/月', notes: '用于轻量版等入门方案' }
+    ],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + 企业级内网专线（双线路架构；正文提及IPLC与隧道中转）',
+    clients: { customApp: true, thirdParty: true, platforms: ['Windows', 'macOS', 'Android', 'iOS', 'Clash', 'Shadowrocket'] },
+    nodesSummary: '香港×20、台湾×5、日本×10、新加坡×10、美国×10、马来西亚×2、英国、法国、德国、土耳其、泰国、巴西等',
+    regions: ['香港', '台湾', '日本', '新加坡', '美国', '马来西亚', '英国', '法国', '德国', '土耳其', '泰国', '巴西'],
+    pricingStarting: { amount: 99, period: '年付', monthlyEquivalent: 8.25, trafficGB: 69, isApproximate: false },
+    plans: [
+      { name: '光速云·轻量版', billing: '年付', price: 99, trafficGB: 69, cycle: '每月' },
+      { name: '光速云·极速版', billing: '月付', price: 25, trafficGB: 168, cycle: '每月' },
+      { name: '光速云·流光版', billing: '月付', price: 34, trafficGB: 238, cycle: '每月' },
+      { name: '光速云·量子版', billing: '月付', price: 68, trafficGB: 500, cycle: '每月' },
+      { name: '光速云·无界版', billing: '月付', price: 138, trafficGB: 900, cycle: '每月' },
+      { name: '光速云·致敬斯诺克147永久套餐', billing: '一次性付费', price: 147, trafficGB: 247, cycle: '一次性（不过期）' },
+      { name: '光速云·定制套餐', billing: '月付', price: 680, trafficGB: 500, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰，未说明完整运营商与基准，作为来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 22, downloadMbps: 529, status: 'success' },
+        { region: '台湾', latencyMs: 41, downloadMbps: 114, status: 'success' },
+        { region: '新加坡', latencyMs: 46, downloadMbps: 387, status: 'success' },
+        { region: '日本', latencyMs: 57, downloadMbps: 135, status: 'success' },
+        { region: '美国', latencyMs: 143, downloadMbps: 18, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'partial', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['IEPL专线+企业内网双专线', '自研客户端一键配置', '特殊商品不支持退款'],
+    pros: ['价格门槛低（99元/年起）', '节点覆盖广包含巴西土耳其', '提供一次性不过期流量包'],
+    cons: ['ChatGPT/Gemini需视节点手动切换', '特殊商品明确不支持退款', '线路宣传存在IEPL/IPLC多重说法'],
+    risks: ['未提供公开晚高峰压力测试样本', '无退款通道，建议优先按月测试'],
+    suitableFor: ['预算敏感型轻度用户', '日常流媒体追剧用户', '需要不限时应急流量包用户'],
+    notSuitableFor: ['高风控全自动AI重度调用任务', '要求明确无条件退款承诺的用户'],
+    comparisonSummary: '在百元以内年付梯队中节点规模最大，但AI解锁需挑节点，优于同价位纯公网中转。',
+    gapsAndConflicts: ['原文“3档/4档套餐”与实际列出的7行套餐并存', '线路在要点中称IEPL而正文中称IPLC加隧道中转'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 2. 飞猫云
+  {
+    id: 'feimao',
+    name: '飞猫云',
+    aliases: ['feimao', 'FlyCat'],
+    editorialOrder: 2,
+    isTop10: true,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.flycataff.com/#/?code=6uq0Xe9y',
+    affiliateUrl: 'https://guangs.flycataff.com/#/?code=6uq0Xe9y',
+    affiliateCode: '6uq0Xe9y',
+    couponCodes: [{ code: 'flycat888', discount: '年付优惠', notes: '基础数据提供' }],
+    protocols: ['未注明（自研客户端登录即用）'],
+    lineType: '专线/中转网络（主打轻快连接）',
+    clients: { customApp: true, thirdParty: false, platforms: ['专属客户端下载即用'] },
+    nodesSummary: '亚太、欧美热门地区（香港、台湾、新加坡、日本、美国等）',
+    regions: ['香港', '台湾', '新加坡', '日本', '美国'],
+    pricingStarting: { amount: 84, period: '年付', monthlyEquivalent: 7, trafficGB: 50, isApproximate: false },
+    plans: [
+      { name: '飞猫·学生版', billing: '年付', price: 84, trafficGB: 50, cycle: '每月' },
+      { name: '飞猫·星耀版', billing: '月付', price: 25, trafficGB: 150, cycle: '每月' },
+      { name: '飞猫·星环版', billing: '月付', price: 45, trafficGB: 300, cycle: '每月' },
+      { name: '飞猫·银河版', billing: '月付', price: 85, trafficGB: 600, cycle: '每月' },
+      { name: '飞猫·宇宙版', billing: '月付', price: 150, trafficGB: 1000, cycle: '每月' },
+      { name: '飞猫·不限时套餐', billing: '一次性付费', price: 680, trafficGB: 1000, cycle: '一次性' },
+      { name: '飞猫·定制套餐', billing: '月付', price: 550, trafficGB: 500, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 21, downloadMbps: 526, status: 'success' },
+        { region: '台湾', latencyMs: 41, downloadMbps: 116, status: 'success' },
+        { region: '新加坡', latencyMs: 45, downloadMbps: 413, status: 'success' },
+        { region: '日本', latencyMs: 54, downloadMbps: 138, status: 'success' },
+        { region: '美国', latencyMs: 178, downloadMbps: 14, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['不用配订阅下载登录即用', '新手快速上手', '轻量日常足够'],
+    pros: ['零配置门槛，下载登录即可使用', '年付月均7元极低支出', 'ChatGPT与Claude均支持'],
+    cons: ['无法导出通用订阅供Clash使用', '非顶级专线定位，高峰存在波动可能'],
+    risks: ['强绑定官方专属客户端，软路由与特殊系统无法使用'],
+    suitableFor: ['纯小白新手用户', '不想折腾任何订阅规则的手机用户'],
+    notSuitableFor: ['软路由用户', '需要自定义分流规则的高级玩家'],
+    comparisonSummary: '主打极简上手，操作门槛显著低于传统订阅制机场，适合新手入门。',
+    gapsAndConflicts: ['未提供底层代理协议细节'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 3. 微风网络
+  {
+    id: 'weifeng',
+    name: '微风网络',
+    aliases: ['weifeng', 'BreezeNet'],
+    editorialOrder: 3,
+    isTop10: true,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://edp01.breezenetaff.com/#/?code=t3huofyI',
+    affiliateUrl: 'https://edp01.breezenetaff.com/#/?code=t3huofyI',
+    affiliateCode: 't3huofyI',
+    couponCodes: [{ code: 'flat888', discount: '9折优惠', notes: '基础数据与汇总表均列出' }],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + VLESS协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['通用订阅导入', '各主流平台'] },
+    nodesSummary: '香港、新加坡、日本、美国等多地原生IP节点',
+    regions: ['香港', '新加坡', '日本', '美国', '台湾'],
+    pricingStarting: { amount: 137, period: '年付', monthlyEquivalent: 11.42, trafficGB: 100, isApproximate: false },
+    plans: [
+      { name: '清风 (Breeze)', billing: '年付', price: 137, trafficGB: 100, cycle: '每月' },
+      { name: '乘风 (Riding)', billing: '月付', price: 27, trafficGB: 200, cycle: '每月' },
+      { name: '破风 (Breaking)', billing: '月付', price: 57, trafficGB: 500, cycle: '每月' },
+      { name: '御风 (Mastery)', billing: '月付', price: 127, trafficGB: 1200, cycle: '每月' },
+      { name: '信风·不限时', billing: '一次性付费', price: 200, trafficGB: 270, cycle: '一次性' },
+      { name: '长风·不限时', billing: '一次性付费', price: 370, trafficGB: 570, cycle: '一次性' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 25, downloadMbps: 546, status: 'success' },
+        { region: '台湾', latencyMs: 40, downloadMbps: 115, status: 'success' },
+        { region: '新加坡', latencyMs: 43, downloadMbps: 384, status: 'success' },
+        { region: '日本', latencyMs: 54, downloadMbps: 131, status: 'success' },
+        { region: '美国', latencyMs: 167, downloadMbps: 17, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['IEPL专线+VLESS', '7x24在线客服（夜间AI值守）', '原生IP节点'],
+    pros: ['IEPL专线门槛较低（11.42元/月）', '原生IP覆盖香港、日本、美国', '夜间客服响应有兜底'],
+    cons: ['基础数据声称7元/月50G与实际套餐表137元100G冲突', '重度下载用户100G配额略紧'],
+    risks: ['基础描述与实际套餐表价格口径不一致，以实际结账137元为准'],
+    suitableFor: ['学生党与日常网页浏览', '轻度ChatGPT与流媒体用户'],
+    notSuitableFor: ['全天候4K直播与BT下载'],
+    comparisonSummary: '相比同价位纯中转，微风走IEPL专线稳定度略优，客服口碑较好。',
+    gapsAndConflicts: ['基础数据“年付约7元/月、50GB”与套餐表“137元/年、100GB/月”冲突'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 4. 暮光加速
+  {
+    id: 'muguang',
+    name: '暮光加速',
+    aliases: ['muguang', 'Twilight'],
+    editorialOrder: 4,
+    isTop10: true,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://varnexa.twilightaff.com/#/?code=D1LHglg3',
+    affiliateUrl: 'https://varnexa.twilightaff.com/#/?code=D1LHglg3',
+    affiliateCode: 'D1LHglg3',
+    couponCodes: [{ code: 'muguang5555', discount: '待核验', notes: '正文介绍称未查到公开优惠码，存在冲突', isConflicting: true }],
+    protocols: ['未注明（全平台客户端）'],
+    lineType: 'BGP智能调度 + 专线级出口',
+    clients: { customApp: true, thirdParty: true, platforms: ['Windows', 'macOS', 'iOS', 'Android', 'Linux'] },
+    nodesSummary: '覆盖Windows、macOS、iOS、Android、Linux全平台，多设备同时在线',
+    regions: ['香港', '台湾', '新加坡', '日本', '美国'],
+    pricingStarting: { amount: 20, period: '月付', monthlyEquivalent: 20, trafficGB: 120, isApproximate: false },
+    plans: [
+      { name: '【暮光·基础版】', billing: '月付', price: 20, trafficGB: 120, cycle: '每月' },
+      { name: '【暮光·标准版】', billing: '月付', price: 40, trafficGB: 240, cycle: '每月' },
+      { name: '【暮光·旗舰版】', billing: '月付', price: 100, trafficGB: 700, cycle: '每月' },
+      { name: '【暮光·至尊版】', billing: '月付', price: 180, trafficGB: 1500, cycle: '每月' },
+      { name: '【暮光·年付轻量版】', billing: '年付', price: 109, trafficGB: 70, cycle: '每月' },
+      { name: '【暮光·不限时轻量包】', billing: '一次性付费', price: 219, trafficGB: 150, cycle: '一次性' },
+      { name: '【暮光·不限时标准包】', billing: '一次性付费', price: 529, trafficGB: 400, cycle: '一次性' },
+      { name: '【暮光·不限时大容量包】', billing: '一次性付费', price: 959, trafficGB: 800, cycle: '一次性' },
+      { name: '独享私人定制节点', billing: '月付', price: 600, trafficGB: 500, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 26, downloadMbps: 509, status: 'success' },
+        { region: '台湾', latencyMs: 40, downloadMbps: 107, status: 'success' },
+        { region: '新加坡', latencyMs: 43, downloadMbps: 419, status: 'success' },
+        { region: '日本', latencyMs: 53, downloadMbps: 150, status: 'success' },
+        { region: '美国', latencyMs: 160, downloadMbps: 19, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['BGP智能调度', '专线级出口', '7x24小时真人客服'],
+    pros: ['Linux在内的五大平台全面支持', '支持多设备同时在线', '流量梯度丰富从120G至1500G'],
+    cons: ['优惠码信息自相矛盾', '月付20元门槛高于入门5.6元档'],
+    risks: ['优惠码可用性待核验，禁用自动折扣计算'],
+    suitableFor: ['多设备团队与个人跨端使用', '需要Linux支持的开发者'],
+    notSuitableFor: ['追求极限平价预算（低于10元）的用户'],
+    comparisonSummary: '主打全平台多设备同时在线，适合跨设备协同的办公人群。',
+    gapsAndConflicts: ['基础数据给出muguang5555，介绍却称没有优惠码'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 5. 大佬云
+  {
+    id: 'dalaoyun',
+    name: '大佬云',
+    aliases: ['dalaoyun'],
+    editorialOrder: 5,
+    isTop10: true,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://qwerty.dalaoyunaff.com/#/?code=jCPLmoWN',
+    affiliateUrl: 'https://qwerty.dalaoyunaff.com/#/?code=jCPLmoWN',
+    affiliateCode: 'jCPLmoWN',
+    couponCodes: [{ code: 'dly888', discount: '季付及以上7折', notes: '基础数据与汇总表均记录' }],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + VLESS协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研客户端', '第三方订阅导入'] },
+    nodesSummary: 'IEPL专线节点标准配置',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 67.2, period: '年付(约)', monthlyEquivalent: 5.6, trafficGB: 60, isApproximate: true },
+    plans: [
+      { name: '大佬云·年付基础版', billing: '年付', price: 67.2, trafficGB: 60, cycle: '每月', notes: '原文仅给“年付约5.6元/月”，精确扣款以官网结算单为准' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供可比单节点测速详情',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'partial', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'partial', disney: 'not_tested', youtube: 'partial', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['IEPL专线', '季付及以上7折', '年付约5.6元/月60GB'],
+    pros: ['5.6元档极限平价', '提供VLESS协议且支持第三方导入'],
+    cons: ['与闪电鼠、云界线等规格几乎雷同，缺乏差异化卖点', '无详细单节点测速'],
+    risks: ['约数年费不能反推精确实付，以官网实际结账为准'],
+    suitableFor: ['极低预算备用', '轻度查资料用户'],
+    notSuitableFor: ['高可靠性主力办公', '重度流媒体4K追剧'],
+    comparisonSummary: '5.6元档标准方案代表，适合控制成本的备用机场选择。',
+    gapsAndConflicts: ['年付约5.6元/月只有约数，不能反推精确年费67.2元'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 6. 星岛梦
+  {
+    id: 'xingdaomeng',
+    name: '星岛梦',
+    aliases: ['xingdaomeng'],
+    editorialOrder: 6,
+    isTop10: true,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.xingdaomeng.com/#/?code=1TynBYnR',
+    affiliateUrl: 'https://guangs.xingdaomeng.com/#/?code=1TynBYnR',
+    affiliateCode: '1TynBYnR',
+    couponCodes: [{ code: 'nmw888', discount: '基础优惠', notes: '汇总表记录' }],
+    protocols: ['Trojan'],
+    lineType: 'IEPL专线 + Trojan协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['全平台兼容', '第三方客户端导入'] },
+    nodesSummary: '香港、台湾、日本、美国、新加坡及韩国、东南亚等地区',
+    regions: ['香港', '台湾', '日本', '新加坡', '美国', '韩国', '东南亚'],
+    pricingStarting: { amount: 96, period: '年付', monthlyEquivalent: 8, trafficGB: 60, isApproximate: false },
+    plans: [
+      { name: '星岛梦·贴心小包', billing: '年付', price: 96, trafficGB: 60, cycle: '每月' },
+      { name: '星岛梦·超量150G', billing: '月付', price: 25, trafficGB: 150, cycle: '每月' },
+      { name: '星岛梦·进阶300G', billing: '月付', price: 50, trafficGB: 300, cycle: '每月' },
+      { name: '星岛梦·闪光500G', billing: '月付', price: 70, trafficGB: 500, cycle: '每月' },
+      { name: '星岛梦·旗舰1T版', billing: '月付', price: 130, trafficGB: 1000, cycle: '每月' },
+      { name: '星岛梦·永久不限时100', billing: '一次性付费', price: 100, trafficGB: 100, cycle: '一次性' },
+      { name: '星岛梦·永久不限时300', billing: '一次性付费', price: 300, trafficGB: 300, cycle: '一次性' },
+      { name: '星岛梦·永久不限时1TB', billing: '一次性付费', price: 600, trafficGB: 1000, cycle: '一次性' },
+      { name: '星岛梦·定制套餐', billing: '月付', price: 680, trafficGB: 500, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 27, downloadMbps: 504, status: 'success' },
+        { region: '台湾', latencyMs: 41, downloadMbps: 103, status: 'success' },
+        { region: '新加坡', latencyMs: 44, downloadMbps: 411, status: 'success' },
+        { region: '日本', latencyMs: 57, downloadMbps: 136, status: 'success' },
+        { region: '美国', latencyMs: 177, downloadMbps: 18, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['2020年起运营', '1倍流量不限设备', '海外技术团队'],
+    pros: ['运营年限较长（2020起）', '节点延伸至韩国及东南亚', '不限设备同时使用'],
+    cons: ['起步年付档月均流量仅60GB', '月付从25元起门槛适中'],
+    risks: ['永久不限时包存在长期运营承诺依赖'],
+    suitableFor: ['多设备家庭共享', '需要韩国及东南亚节点的用户'],
+    notSuitableFor: ['单人单设备追求极致低价用户'],
+    comparisonSummary: '2020年老牌运营背景，节点覆盖面较广，多设备友好。',
+    gapsAndConflicts: [],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 7. 二猫云
+  {
+    id: 'ermao',
+    name: '二猫云',
+    aliases: ['ermao', '2maoyun'],
+    editorialOrder: 7,
+    isTop10: true,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.2maoyunaff.cc/#/?code=7mjvgGbW',
+    affiliateUrl: 'https://guangs.2maoyunaff.cc/#/?code=7mjvgGbW',
+    affiliateCode: '7mjvgGbW',
+    couponCodes: [{ code: 'ermao5555', discount: '基础优惠', notes: '汇总表记录' }],
+    protocols: ['VLESS'],
+    lineType: '全线 IEPL 专线',
+    clients: { customApp: true, thirdParty: true, platforms: ['独家定制客户端', '不限设备连接数'] },
+    nodesSummary: '香港、日本、美国核心节点（资料未列新加坡）',
+    regions: ['香港', '日本', '美国', '台湾'],
+    pricingStarting: { amount: 89, period: '年付', monthlyEquivalent: 7.42, trafficGB: 60, isApproximate: false },
+    plans: [
+      { name: '二猫云·白猫套餐', billing: '月付', price: 20, trafficGB: 130, cycle: '每月' },
+      { name: '二猫年付小包', billing: '年付', price: 89, trafficGB: 60, cycle: '每月' },
+      { name: '二猫云·橘猫畅玩版', billing: '月付', price: 40, trafficGB: 230, cycle: '每月' },
+      { name: '二猫云·牛奶猫尊享版', billing: '月付', price: 80, trafficGB: 430, cycle: '每月' },
+      { name: '二猫云·黑猫重度用户版', billing: '月付', price: 160, trafficGB: 850, cycle: '每月' },
+      { name: '二猫云·不限时套餐', billing: '一次性付费', price: 99, trafficGB: 100, cycle: '一次性' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 22, downloadMbps: 481, status: 'success' },
+        { region: '台湾', latencyMs: 41, downloadMbps: 118, status: 'success' },
+        { region: '新加坡', latencyMs: 46, downloadMbps: 407, status: 'success' },
+        { region: '日本', latencyMs: 53, downloadMbps: 143, status: 'success' },
+        { region: '美国', latencyMs: 134, downloadMbps: 17, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'partial', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['不做低价跑路盘', '主打长期稳定', '账号不限设备连接数'],
+    pros: ['20元月付给到130GB较为均衡', '全线IEPL专线接入', '不限设备在线'],
+    cons: ['Claude和Gemini解锁官方未做确定保证', '节点覆盖偏向核心三地较保守'],
+    risks: ['需自行验证Claude/Gemini节点可用性'],
+    suitableFor: ['看重长期稳定性而非低价走量的月付用户'],
+    notSuitableFor: ['必须有大量小众冷门节点的用户'],
+    comparisonSummary: '定位清晰，主打稳健长期用户，月付20元档的经典均衡型方案。',
+    gapsAndConflicts: [],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 8. 无忧链接
+  {
+    id: 'wuyou',
+    name: '无忧链接',
+    aliases: ['wuyou', 'WorryFree'],
+    editorialOrder: 8,
+    isTop10: true,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://wep01.worryfreeaff.com/#/?code=4ZoSbLdL',
+    affiliateUrl: 'https://wep01.worryfreeaff.com/#/?code=4ZoSbLdL',
+    affiliateCode: '4ZoSbLdL',
+    couponCodes: [{ code: 'wuyou666', discount: '基础优惠', notes: '汇总表记录' }],
+    protocols: ['未注明（专属客户端）'],
+    lineType: '中转直连（跨境电商与轻量日常定位）',
+    clients: { customApp: true, thirdParty: false, platforms: ['官方专属客户端下载即用'] },
+    nodesSummary: '香港、新加坡、日本、美国，支持TikTok跨区直连',
+    regions: ['香港', '新加坡', '日本', '美国', '台湾'],
+    pricingStarting: { amount: 79, period: '年付', monthlyEquivalent: 6.58, trafficGB: 40, isApproximate: false },
+    plans: [
+      { name: 'MINI链接', billing: '年付', price: 79, trafficGB: 40, cycle: '每月' },
+      { name: '舒心链接', billing: '月付', price: 19, trafficGB: 100, cycle: '每月' },
+      { name: '省心链接', billing: '月付', price: 33, trafficGB: 200, cycle: '每月' },
+      { name: '随心链接', billing: '月付', price: 77, trafficGB: 500, cycle: '每月' },
+      { name: '忘忧链接', billing: '月付', price: 117, trafficGB: 1000, cycle: '每月' },
+      { name: '100G永久不限时 无忧链接', billing: '一次性付费', price: 108, trafficGB: 100, cycle: '一次性' },
+      { name: '300G永久不限时 无忧链接', billing: '一次性付费', price: 298, trafficGB: 300, cycle: '一次性' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 23, downloadMbps: 531, status: 'success' },
+        { region: '台湾', latencyMs: 41, downloadMbps: 107, status: 'success' },
+        { region: '新加坡', latencyMs: 42, downloadMbps: 418, status: 'success' },
+        { region: '日本', latencyMs: 55, downloadMbps: 147, status: 'success' },
+        { region: '美国', latencyMs: 145, downloadMbps: 17, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['2026年10月起直接用官方专属客户端', '全线无倍率不限速', '支持TikTok跨区直连'],
+    pros: ['年付79元折合6.58元/月极低门槛', '突出TikTok跨区电商直播支持', '全线节点无倍率'],
+    cons: ['入门档流量仅40GB较小', '仅支持专属客户端，缺乏通用订阅'],
+    risks: ['重度办公可能流量不足，仅适合轻量辅助'],
+    suitableFor: ['跨境电商轻度运营', 'TikTok日常短视频浏览', '低成本备用'],
+    notSuitableFor: ['重度多设备家庭共享', '海量数据下载与流媒体狂热者'],
+    comparisonSummary: '主打跨境电商和轻量短视频场景，门槛极低但流量配额偏紧凑。',
+    gapsAndConflicts: [],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 9. 唯兔云
+  {
+    id: 'weitu',
+    name: '唯兔云',
+    aliases: ['weitu', 'V2Yun'],
+    editorialOrder: 9,
+    isTop10: true,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.v2yunvipaff.com/#/?code=xIutqOBA',
+    affiliateUrl: 'https://guangs.v2yunvipaff.com/#/?code=xIutqOBA',
+    affiliateCode: 'xIutqOBA',
+    couponCodes: [{ code: 'weitu666', discount: '基础优惠', notes: '汇总表记录' }],
+    protocols: ['Trojan'],
+    lineType: 'IPLC专线 + Trojan协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['通用订阅', '全客户端兼容'] },
+    nodesSummary: '60+节点，三网优化，智能负载均衡',
+    regions: ['香港', '台湾', '新加坡', '日本', '美国'],
+    pricingStarting: { amount: 14.9, period: '月付', monthlyEquivalent: 14.9, trafficGB: 100, isApproximate: false },
+    plans: [
+      { name: '唯兔云·节假日限时开启（14.9元）', billing: '月付', price: 14.9, trafficGB: 100, cycle: '每月' },
+      { name: '唯兔云·年付版限量款', billing: '年付', price: 79.9, trafficGB: 45, cycle: '每月' },
+      { name: '唯兔云·年付加强专线', billing: '年付', price: 120, trafficGB: 75, cycle: '每月' },
+      { name: '唯兔云·普通版', billing: '月付', price: 19.9, trafficGB: 150, cycle: '每月' },
+      { name: '唯兔云·进阶版', billing: '月付', price: 29.9, trafficGB: 200, cycle: '每月' },
+      { name: '唯兔云·专业版', billing: '月付', price: 59.9, trafficGB: 500, cycle: '每月' },
+      { name: '唯兔云·至尊版', billing: '月付', price: 119.9, trafficGB: 1000, cycle: '每月' },
+      { name: '唯兔云·永久不限时100', billing: '一次性付费', price: 100, trafficGB: 100, cycle: '一次性' },
+      { name: '唯兔云·永久不限时200', billing: '一次性付费', price: 160, trafficGB: 200, cycle: '一次性' },
+      { name: '唯兔云·永久不限时500', billing: '一次性付费', price: 340, trafficGB: 500, cycle: '一次性' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 27, downloadMbps: 500, status: 'success' },
+        { region: '台湾', latencyMs: 37, downloadMbps: 100, status: 'success' },
+        { region: '新加坡', latencyMs: 44, downloadMbps: 414, status: 'success' },
+        { region: '日本', latencyMs: 56, downloadMbps: 147, status: 'success' },
+        { region: '美国', latencyMs: 179, downloadMbps: 17, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['IPLC专线', '1倍流量不限速不限设备', '60+节点三网优化'],
+    pros: ['14.9元月付IPLC专线起步价具吸引力', 'Trojan协议与主流客户端兼容好', 'AI工具三家均有支持记录'],
+    cons: ['节假日14.9元档存在限时开启规则', '年付限量版月均45G较紧'],
+    risks: ['限时套餐价格可能随时调整，以官网当前显示为准'],
+    suitableFor: ['追求IPLC专线体验但预算在15元左右的个人用户'],
+    notSuitableFor: ['需超大流量不限量下载的用户'],
+    comparisonSummary: '中间档位的IPLC专线选择，比入门中转更稳，比顶级专线便宜。',
+    gapsAndConflicts: [],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 10. Firefly (合并 Source B 萤火虫)
+  {
+    id: 'firefly',
+    name: 'Firefly',
+    aliases: ['萤火虫', 'Firefly Cloud'],
+    editorialOrder: 10,
+    isTop10: true,
+    isPrimaryRecommended: false,
+    source: 'Source A+B',
+    officialUrl: 'https://vip02.fireflyaff.com/#/?code=2n7VURre',
+    affiliateUrl: 'https://vip02.fireflyaff.com/#/?code=2n7VURre',
+    affiliateCode: '2n7VURre',
+    couponCodes: [
+      { code: 'firefly', discount: '8折', notes: '限制年付版不适用（Source A记录）' },
+      { code: 'firefly(历史)', discount: '新用户8折/季9/半85/年8', notes: 'Source B萤火虫历史记录' }
+    ],
+    protocols: ['VLESS'],
+    lineType: 'IPLC专线接入 + VLESS协议',
+    clients: { customApp: true, thirdParty: false, platforms: ['官方专属客户端（下载登录即用，不提供订阅链接）'] },
+    nodesSummary: '原生IP节点，覆盖香港、新加坡、日本、美国',
+    regions: ['香港', '台湾', '新加坡', '日本', '美国'],
+    pricingStarting: { amount: 96, period: '年付', monthlyEquivalent: 8, trafficGB: 60, isApproximate: false },
+    plans: [
+      { name: 'Firefly 年付版', billing: '年付', price: 96, trafficGB: 60, cycle: '每月' },
+      { name: 'Firefly Lite', billing: '月付', price: 25, trafficGB: 150, cycle: '每月' },
+      { name: 'Firefly Plus', billing: '月付', price: 45, trafficGB: 300, cycle: '每月' },
+      { name: 'Firefly Blaze', billing: '月付', price: 85, trafficGB: 600, cycle: '每月' },
+      { name: 'Firefly Nova', billing: '月付', price: 150, trafficGB: 1000, cycle: '每月' },
+      { name: 'Firefly 不限时', billing: '一次性付费', price: 100, trafficGB: 100, cycle: '一次性' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 27, downloadMbps: 547, status: 'success' },
+        { region: '台湾', latencyMs: 39, downloadMbps: 135, status: 'success' },
+        { region: '新加坡', latencyMs: 42, downloadMbps: 445, status: 'success' },
+        { region: '日本', latencyMs: 57, downloadMbps: 147, status: 'success' },
+        { region: '美国', latencyMs: 143, downloadMbps: 30, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['IPLC专线接入', '原生IP节点覆盖', '8年技术团队维护', '免翻墙访问官网'],
+    pros: ['年付月均8元即可享IPLC专线', '不限客户端与设备数量', '原生IP支持主流流媒体'],
+    cons: ['2026年10月起仅提供专属客户端，不提供通用订阅链接'],
+    risks: ['历史版本与当前版本推广码存在差异，以Source A现行码为准'],
+    suitableFor: ['需要IPLC晚高峰稳定性的日常办公追剧人群', '家里多台设备共享'],
+    notSuitableFor: ['必须使用第三方Clash/软路由的用户'],
+    comparisonSummary: '合并Source B萤火虫实体，现行采用Source A专属客户端模式，高性价比IPLC代表。',
+    gapsAndConflicts: ['Source B中曾作为“萤火虫”记录，服务域名一致，归并为同一实体保留双版本历史'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 11. 宇宙云
+  {
+    id: 'yuzhou',
+    name: '宇宙云',
+    aliases: ['yuzhou', '宇宙云加速'],
+    editorialOrder: 11,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://wzjc.yuzoucloud.cc/#/?code=yrThwMP1',
+    affiliateUrl: 'https://wzjc.yuzoucloud.cc/#/?code=yrThwMP1',
+    affiliateCode: 'yrThwMP1',
+    couponCodes: [{ code: 'YUZHOU553', discount: '历史8折', notes: '历史资料称新用户8折' }],
+    protocols: ['VLESS（较早期资料）'],
+    lineType: 'IEPL专线 + 三网优化 + 智能负载均衡（历史资料）',
+    clients: { customApp: true, thirdParty: true, platforms: ['使用方式待核实'] },
+    nodesSummary: '60+ 节点（历史品牌资料）',
+    regions: ['待核实'],
+    pricingStarting: { amount: 96, period: '年付', monthlyEquivalent: 8, trafficGB: 0, isApproximate: true },
+    plans: [],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '暂无可核实实测数据',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['60+ 节点', '三网优化', '智能负载均衡'],
+    pros: ['历史记载年付门槛约96元'],
+    cons: ['当前资料严重残缺，套餐表与测速全为空白'],
+    risks: ['现有资料不足以列出全部套餐，严禁盲目大额年付'],
+    suitableFor: ['已有该品牌兑换码的存量用户参考'],
+    notSuitableFor: ['需要完整数据透明度的新购用户'],
+    comparisonSummary: '数据缺口较大，作为有限资料卡片展示，等待最新官方截图补充。',
+    gapsAndConflicts: ['现有资料不足以列出该品牌全部套餐；历史起价不得直接充当当前完整套餐表'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 12. U1S1
+  {
+    id: 'u1s1',
+    name: 'U1S1',
+    aliases: ['u1s1'],
+    editorialOrder: 12,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.vipaff.cc/#/?code=xhX5X22f',
+    affiliateUrl: 'https://guangs.vipaff.cc/#/?code=xhX5X22f',
+    affiliateCode: 'xhX5X22f',
+    couponCodes: [{ code: 'akaka', discount: '基础优惠', notes: '基础数据提供' }],
+    protocols: ['未注明'],
+    lineType: '2025年新开业 IPLC 专线',
+    clients: { customApp: true, thirdParty: true, platforms: ['不限设备同时连接'] },
+    nodesSummary: '亚太及欧美核心枢纽',
+    regions: ['香港', '台湾', '新加坡', '日本', '美国'],
+    pricingStarting: { amount: 20, period: '月付', monthlyEquivalent: 20, trafficGB: 120, isApproximate: false },
+    plans: [
+      { name: 'u1s1·就是好用包', billing: '年付', price: 96, trafficGB: 60, cycle: '每月' },
+      { name: 'u1s1·普通人真够了包', billing: '月付', price: 20, trafficGB: 120, cycle: '每月' },
+      { name: 'u1s1·你以为用不到包', billing: '月付', price: 40, trafficGB: 300, cycle: '每月' },
+      { name: 'u1s1·瘾大就拉满包', billing: '月付', price: 100, trafficGB: 700, cycle: '每月' },
+      { name: 'u1s1·我全都要包', billing: '月付', price: 180, trafficGB: 1500, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 24, downloadMbps: 538, status: 'success' },
+        { region: '台湾', latencyMs: 39, downloadMbps: 107, status: 'success' },
+        { region: '新加坡', latencyMs: 46, downloadMbps: 414, status: 'success' },
+        { region: '日本', latencyMs: 57, downloadMbps: 133, status: 'success' },
+        { region: '美国', latencyMs: 134, downloadMbps: 20, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['2000Mbps高速带宽', '晚高峰不限速', '不限设备同时连接'],
+    pros: ['20元120G性价比良好', '不限设备连接数', '测速香港延迟24ms表现较好'],
+    cons: ['2025年新开业，长期运营稳定性有待时间检验', '介绍提到的1000G一次性包未进套餐表'],
+    risks: ['新机场存在跑路与服务中断不确定性，建议小额月付尝鲜'],
+    suitableFor: ['愿意尝试新开业高带宽专线的尝鲜用户'],
+    notSuitableFor: ['要求3年以上长期稳定背书的保守型用户'],
+    comparisonSummary: '2025新锐专线，敢于标称2Gbps带宽，适合短期测试。',
+    gapsAndConflicts: ['介绍提到1000GB一次性大流量包，但套餐表无对应价格条目'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 13. 灵猫网络
+  {
+    id: 'lingmao',
+    name: '灵猫网络',
+    aliases: ['lingmao', 'CivetNet'],
+    editorialOrder: 13,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://vip01.civetnet.com/#/?code=8MIAyxak',
+    affiliateUrl: 'https://vip01.civetnet.com/#/?code=8MIAyxak',
+    affiliateCode: '8MIAyxak',
+    couponCodes: [
+      { code: 'lmao888', discount: '基础优惠', notes: '基础数据提供' },
+      { code: 'lingmao', discount: '8折', notes: '年付小包不适用，基础信息提供', isConflicting: true }
+    ],
+    protocols: ['未标注'],
+    lineType: '中转优化线路',
+    clients: { customApp: true, thirdParty: false, platforms: ['官方专属客户端（2026年10月起）'] },
+    nodesSummary: '覆盖香港、台湾、日本、美国、新加坡等亚洲及欧美节点',
+    regions: ['香港', '台湾', '新加坡', '日本', '美国'],
+    pricingStarting: { amount: 85, period: '年付', monthlyEquivalent: 7.08, trafficGB: 45, isApproximate: false },
+    plans: [
+      { name: '灵猫·年付小包', billing: '年付', price: 85, trafficGB: 45, cycle: '每月' },
+      { name: '灵猫·年付Small', billing: '年付', price: 195, trafficGB: 150, cycle: '每月' },
+      { name: '灵猫·年付Big', billing: '年付', price: 295, trafficGB: 300, cycle: '每月' },
+      { name: '灵猫·季付Big', billing: '季付', price: 125, trafficGB: 300, cycle: '每月' },
+      { name: '灵猫·月付Small', billing: '月付', price: 25, trafficGB: 150, cycle: '每月' },
+      { name: '灵猫·月付Big', billing: '月付', price: 45, trafficGB: 300, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 22, downloadMbps: 492, status: 'success' },
+        { region: '台湾', latencyMs: 40, downloadMbps: 109, status: 'success' },
+        { region: '新加坡', latencyMs: 46, downloadMbps: 409, status: 'success' },
+        { region: '日本', latencyMs: 57, downloadMbps: 147, status: 'success' },
+        { region: '美国', latencyMs: 164, downloadMbps: 19, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['1倍流量不限速不限设备', '专属客户端免导入', '支持主流流媒体与ChatGPT'],
+    pros: ['年付折合约7.1元/月', '不限设备连接数', '专属客户端免配置'],
+    cons: ['价格与优惠码存在多处矛盾', '不提供通用订阅'],
+    risks: ['基础数据19元与套餐表25元冲突，以套餐表25元为准'],
+    suitableFor: ['多设备轻度使用的家庭用户'],
+    notSuitableFor: ['需要配合Clash规则分流的高阶用户'],
+    comparisonSummary: '7.1元起步的中转优化方案，多设备使用较为划算。',
+    gapsAndConflicts: ['基础数据19元/150GB与表内25元/150GB冲突；lmao888和lingmao双优惠码并存'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 14. 极连云
+  {
+    id: 'jilian',
+    name: '极连云',
+    aliases: ['jilian', 'JLY Cloud'],
+    editorialOrder: 14,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.jlyvipaff.com/#/?code=VM1rKGUu',
+    affiliateUrl: 'https://guangs.jlyvipaff.com/#/?code=VM1rKGUu',
+    affiliateCode: 'VM1rKGUu',
+    couponCodes: [{ code: 'ji8888', discount: '基础优惠', notes: '基础数据提供' }],
+    protocols: ['未注明'],
+    lineType: 'IEPL专线',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研客户端 + 支持第三方客户端'] },
+    nodesSummary: 'IEPL专线节点标准配置',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 18, period: '月付', monthlyEquivalent: 18, trafficGB: 100, isApproximate: false },
+    plans: [
+      { name: '极连云·基础月付', billing: '月付', price: 18, trafficGB: 100, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供详细测速分节点数据',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'partial', gemini: 'partial' },
+      streaming: { netflix: 'partial', disney: 'not_tested', youtube: 'success', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['IEPL专线', '覆盖常见AI工具使用场景', '自研+第三方双支持'],
+    pros: ['18元档同时支持自研与第三方客户端', '明确强调AI工具适配'],
+    cons: ['比同价位光年梯少10GB流量（100G vs 110G）'],
+    risks: ['2024运营，缺乏大跨度长期抗风险记录'],
+    suitableFor: ['主要用于AI工具与日常网页访问的用户'],
+    notSuitableFor: ['追求极致流量性价比的大下载量用户'],
+    comparisonSummary: '18元IEPL方案，与光年梯同台竞争，自研客户端是其便利项。',
+    gapsAndConflicts: [],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 15. 光年梯
+  {
+    id: 'guangnian',
+    name: '光年梯',
+    aliases: ['guangnian', 'GNT'],
+    editorialOrder: 15,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.gntaff.com/#/?code=X1FoxjGE',
+    affiliateUrl: 'https://guangs.gntaff.com/#/?code=X1FoxjGE',
+    affiliateCode: 'X1FoxjGE',
+    couponCodes: [{ code: 'gnt6666', discount: '基础优惠', notes: '基础数据提供' }],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + VLESS协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研客户端 + 第三方订阅导入'] },
+    nodesSummary: 'IEPL专线标准覆盖',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 18, period: '月付', monthlyEquivalent: 18, trafficGB: 110, isApproximate: false },
+    plans: [
+      { name: '光年梯·标准月付', billing: '月付', price: 18, trafficGB: 110, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供详细测速分节点数据',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'partial', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'partial', youtube: 'success', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['IEPL专线', '支持常见AI与主流流媒体', '介于低价与综合型专线之间'],
+    pros: ['18元档给到110GB（比极连云多10G）', '走标准VLESS协议'],
+    cons: ['2025年新成立品牌，长期稳定性待观察'],
+    risks: ['新品牌抗封锁与机房维护能力需长期追踪'],
+    suitableFor: ['18元预算希望多要10GB流量的专线用户'],
+    notSuitableFor: ['要求运营3年以上的保守用户'],
+    comparisonSummary: '18元档中性价比稍胜极连云一筹，介于低价与综合专线之间。',
+    gapsAndConflicts: [],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 16. 一翻云
+  {
+    id: 'yifan',
+    name: '一翻云',
+    aliases: ['yifan', '1FlyYun'],
+    editorialOrder: 16,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.1flyunaff.cc/#/register?code=Yr7FhB7r',
+    affiliateUrl: 'https://guangs.1flyunaff.cc/#/register?code=Yr7FhB7r',
+    affiliateCode: 'Yr7FhB7r',
+    couponCodes: [
+      { code: 'yfy6666', discount: '基础优惠', notes: '基础数据与数据表' },
+      { code: '1FLYYUN', discount: '9折优惠', notes: '介绍说明中明确提供', isConflicting: true }
+    ],
+    protocols: ['Hysteria 2', 'VLESS-Reality', 'Shadowsocks'],
+    lineType: '全节点 IEPL 物理专线 + 原生住宅 IP',
+    clients: { customApp: true, thirdParty: true, platforms: ['全平台不限设备数量'] },
+    nodesSummary: '香港、日本、美国、新加坡、台湾五地核心节点',
+    regions: ['香港', '日本', '美国', '新加坡', '台湾'],
+    pricingStarting: { amount: 20, period: '月付', monthlyEquivalent: 20, trafficGB: 150, isApproximate: false },
+    plans: [
+      { name: '轻享版', billing: '月付', price: 20, trafficGB: 150, cycle: '每月' },
+      { name: '舒享版', billing: '月付', price: 35, trafficGB: 350, cycle: '每月' },
+      { name: '尊享版', billing: '月付', price: 55, trafficGB: 600, cycle: '每月' },
+      { name: '极致版', billing: '月付', price: 95, trafficGB: 1200, cycle: '每月' },
+      { name: '98¥·年付小包', billing: '年付', price: 98, trafficGB: 60, cycle: '每月' },
+      { name: '轻享版·不限时包', billing: '一次性付费', price: 100, trafficGB: 100, cycle: '一次性' },
+      { name: '舒享版·不限时包', billing: '一次性付费', price: 200, trafficGB: 250, cycle: '一次性' },
+      { name: '尊享版·不限时包', billing: '一次性付费', price: 400, trafficGB: 500, cycle: '一次性' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 23, downloadMbps: 477, status: 'success' },
+        { region: '台湾', latencyMs: 40, downloadMbps: 117, status: 'success' },
+        { region: '新加坡', latencyMs: 42, downloadMbps: 390, status: 'success' },
+        { region: '日本', latencyMs: 53, downloadMbps: 136, status: 'success' },
+        { region: '美国', latencyMs: 180, downloadMbps: 20, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['晚高峰0丢包', '单节点2Gbps大带宽', '原生住宅IP', 'Hysteria 2/VLESS/SS三协议'],
+    pros: ['原生住宅IP有助于防风控', '支持Hysteria 2抗弱网丢包', '20元150G性价比突出'],
+    cons: ['晚高峰0丢包属商家宣传未独立验证', '官方没有提供试用'],
+    risks: ['优惠码yfy6666与1FLYYUN并存待实机测试'],
+    suitableFor: ['跨境电商防关联', '对住宅IP与高协议灵活性有要求的用户'],
+    notSuitableFor: ['零试用即要求无条件退款的用户'],
+    comparisonSummary: 'IEPL专线搭配住宅IP与Hysteria 2协议，配置在20元档非常亮眼。',
+    gapsAndConflicts: ['优惠码yfy6666与介绍中的1FLYYUN并存'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 17. SOGO云
+  {
+    id: 'sogo',
+    name: 'SOGO云',
+    aliases: ['sogo', 'SOGO Cloud'],
+    editorialOrder: 17,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.sogoyunaff.cc/#/?code=327Vs0w7',
+    affiliateUrl: 'https://guangs.sogoyunaff.cc/#/?code=327Vs0w7',
+    affiliateCode: '327Vs0w7',
+    couponCodes: [
+      { code: 'SOGO10000', discount: '9折', notes: '正文基础信息提供' },
+      { code: 'sss777', discount: '基础优惠', notes: '末尾汇总表提供', isConflicting: true }
+    ],
+    protocols: ['VLESS'],
+    lineType: '全线 IEPL 专线 + 三网 BGP 优化',
+    clients: { customApp: true, thirdParty: false, platforms: ['自研客户端（Win/mac/iOS/Android/主流软路由，不提供订阅链接）'] },
+    nodesSummary: '节点覆盖15个国家和地区（本站收录里覆盖面最广）',
+    regions: ['香港', '台湾', '日本', '新加坡', '美国', '韩国', '英国', '德国', '法国', '土耳其', '巴西', '阿联酋', '加拿大', '澳大利亚', '泰国'],
+    pricingStarting: { amount: 98, period: '年付', monthlyEquivalent: 8.17, trafficGB: 60, isApproximate: false },
+    plans: [
+      { name: '小包-年付版', billing: '年付', price: 98, trafficGB: 60, cycle: '每月' },
+      { name: '基础版', billing: '月付', price: 25, trafficGB: 150, cycle: '每月' },
+      { name: '优选版', billing: '月付', price: 45, trafficGB: 350, cycle: '每月' },
+      { name: '强化版', billing: '月付', price: 80, trafficGB: 550, cycle: '每月' },
+      { name: '顶配版', billing: '月付', price: 150, trafficGB: 1100, cycle: '每月' },
+      { name: 'SOGO基础餐不限时版', billing: '一次性付费', price: 120, trafficGB: 120, cycle: '一次性' },
+      { name: 'SOGO优选餐不限时版', billing: '一次性付费', price: 220, trafficGB: 250, cycle: '一次性' },
+      { name: 'SOGO强化餐不限时版', billing: '一次性付费', price: 450, trafficGB: 500, cycle: '一次性' },
+      { name: 'SOGO至尊餐不限时版', billing: '一次性付费', price: 850, trafficGB: 1000, cycle: '一次性' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 26, downloadMbps: 488, status: 'success' },
+        { region: '台湾', latencyMs: 39, downloadMbps: 118, status: 'success' },
+        { region: '新加坡', latencyMs: 43, downloadMbps: 401, status: 'success' },
+        { region: '日本', latencyMs: 57, downloadMbps: 137, status: 'success' },
+        { region: '美国', latencyMs: 140, downloadMbps: 17, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'partial', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'partial', tiktok: 'success', spotify: 'partial' }
+    },
+    vendorClaims: ['2026年新品牌', '节点覆盖15个国家', '三网BGP优化'],
+    pros: ['15个国家和地区覆盖极为全面', '自研客户端支持主流软路由', '全线IEPL接入'],
+    cons: ['不提供第三方订阅链接', '双优惠码冲突待核验'],
+    risks: ['2026年新品牌运营周期短，依赖自研客户端更新'],
+    suitableFor: ['需要频繁访问多个不同国家冷门节点的差旅用户'],
+    notSuitableFor: ['坚持使用Clash/Shadowrocket第三方软件的用户'],
+    comparisonSummary: '收录品牌中节点覆盖面最广，但必须使用自研客户端。',
+    gapsAndConflicts: ['正文SOGO10000与汇总表sss777双优惠码冲突'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 18. 可信云
+  {
+    id: 'kexin',
+    name: '可信云',
+    aliases: ['kexin', 'Kosing'],
+    editorialOrder: 18,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.kosingaff.com/#/register?code=UYDtNlCY',
+    affiliateUrl: 'https://guangs.kosingaff.com/#/register?code=UYDtNlCY',
+    affiliateCode: 'UYDtNlCY',
+    couponCodes: [{ code: 'kkk333', discount: '基础优惠', notes: '基础数据提供' }],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + VLESS协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['支持第三方客户端'] },
+    nodesSummary: 'IEPL专线节点标准配置',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 25, period: '月付', monthlyEquivalent: 25, trafficGB: 150, isApproximate: false },
+    plans: [
+      { name: '可信云·标准月付', billing: '月付', price: 25, trafficGB: 150, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供详细分节点测速',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['品牌资料明确说AI与流媒体缺乏统一实测数据，保持中性描述'],
+    pros: ['品牌透明度极高，不虚标AI和流媒体承诺', '标准IEPL专线+VLESS支持第三方'],
+    cons: ['缺少公开测速样本', '25元月付档选择众多'],
+    risks: ['缺乏实测佐证其高峰带宽表现'],
+    suitableFor: ['看重品牌方诚实与透明度的务实用户'],
+    notSuitableFor: ['必须看到现成流媒体实测截图才购买的用户'],
+    comparisonSummary: '25元档中罕见的主动说明数据缺口的品牌，诚实度加分。',
+    gapsAndConflicts: [],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 19. 速界
+  {
+    id: 'sujie',
+    name: '速界',
+    aliases: ['sujie', 'SpeedWorld'],
+    editorialOrder: 19,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.speedworldaff.cc/#/register?code=xgXzEfZB',
+    affiliateUrl: 'https://guangs.speedworldaff.cc/#/register?code=xgXzEfZB',
+    affiliateCode: 'xgXzEfZB',
+    couponCodes: [{ code: 'sss1111', discount: '基础优惠', notes: '基础数据提供' }],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + VLESS协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研客户端 + 第三方订阅导入'] },
+    nodesSummary: '突出ChatGPT、Claude、Gemini使用场景',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 25, period: '月付', monthlyEquivalent: 25, trafficGB: 150, isApproximate: false },
+    plans: [
+      { name: '速界·AI专享月付', billing: '月付', price: 25, trafficGB: 150, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供详细分节点测速',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'success' },
+      streaming: { netflix: 'partial', disney: 'partial', youtube: 'success', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['25元档唯一明确主打AI工具', '强调ChatGPT/Claude/Gemini', '说明AI受规则影响不承诺永久稳定'],
+    pros: ['针对AI生产力平台优化', '客观提醒AI可用性受平台规则影响', '双客户端模式'],
+    cons: ['缺少按地区细化的测速日志'],
+    risks: ['AI平台风控动态变化，需依赖商家日常换IP能力'],
+    suitableFor: ['重度使用ChatGPT与Claude的AI从业者'],
+    notSuitableFor: ['单纯用于大带宽游戏加速的用户'],
+    comparisonSummary: '25元档明确主打AI生产力的针对型品牌，风控应对较针对。',
+    gapsAndConflicts: [],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 20. 闪跃
+  {
+    id: 'shanyue',
+    name: '闪跃',
+    aliases: ['shanyue', 'FlashLeap'],
+    editorialOrder: 20,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://vip02.flashleapaff.com/#/?code=3lgzm9mm',
+    affiliateUrl: 'https://vip02.flashleapaff.com/#/?code=3lgzm9mm',
+    affiliateCode: '3lgzm9mm',
+    couponCodes: [{ code: 'shanyue', discount: '8折', notes: '限制仅限闪动/飞跃/瞬移/跃迁，年付版不适用' }],
+    protocols: ['未标注'],
+    lineType: '顶级 IPLC 纯专线 + 骨干网接入',
+    clients: { customApp: true, thirdParty: false, platforms: ['官方专属客户端（不提供订阅链接）'] },
+    nodesSummary: '原生IP全解锁，覆盖香港、日本、美国等核心地区',
+    regions: ['香港', '台湾', '新加坡', '日本', '美国'],
+    pricingStarting: { amount: 96, period: '年付', monthlyEquivalent: 8, trafficGB: 60, isApproximate: false },
+    plans: [
+      { name: '闪跃年付版', billing: '年付', price: 96, trafficGB: 60, cycle: '每月' },
+      { name: '闪动 (Flicker)', billing: '月付', price: 24, trafficGB: 150, cycle: '每月' },
+      { name: '飞跃 (Leap)', billing: '月付', price: 44, trafficGB: 300, cycle: '每月' },
+      { name: '瞬移 (Teleport)', billing: '月付', price: 84, trafficGB: 600, cycle: '每月' },
+      { name: '跃迁 (Warp)', billing: '月付', price: 134, trafficGB: 1000, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 23, downloadMbps: 548, status: 'success' },
+        { region: '台湾', latencyMs: 38, downloadMbps: 110, status: 'success' },
+        { region: '新加坡', latencyMs: 44, downloadMbps: 383, status: 'success' },
+        { region: '日本', latencyMs: 53, downloadMbps: 144, status: 'success' },
+        { region: '美国', latencyMs: 143, downloadMbps: 18, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['纯IPLC专线主打极致低延迟', '晚高峰不掉速', '原生IP全解锁'],
+    pros: ['纯IPLC骨干网接入低延迟', '月付24元给150GB规格高', '测速香港548Mbps'],
+    cons: ['仅支持专属客户端，第三方软件无法使用'],
+    risks: ['专属客户端对软路由和Linux支持欠缺'],
+    suitableFor: ['高频在线、对晚高峰低延迟有苛刻要求的办公用户'],
+    notSuitableFor: ['预算敏感只偶尔查资料的用户'],
+    comparisonSummary: '定位偏高端纯IPLC专线，强调骨干网晚高峰不掉速。',
+    gapsAndConflicts: [],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 21. 全球云
+  {
+    id: 'quanqiu',
+    name: '全球云',
+    aliases: ['quanqiu', 'GCVIP'],
+    editorialOrder: 21,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://guangs.gcvipaff.com/#/?code=Ov2nvU9C',
+    affiliateUrl: 'https://guangs.gcvipaff.com/#/?code=Ov2nvU9C',
+    affiliateCode: 'Ov2nvU9C',
+    couponCodes: [
+      { code: 'qq88', discount: '8折', notes: '正文基础信息提供' },
+      { code: 'qqy7777', discount: '基础优惠', notes: '汇总表记录', isConflicting: true }
+    ],
+    protocols: ['Trojan', 'Shadowsocks'],
+    lineType: 'IPLC/IEPL 专线中转 + 2Gbps+ 带宽',
+    clients: { customApp: true, thirdParty: false, platforms: ['专属客户端下载即用，不用配订阅'] },
+    nodesSummary: '覆盖全球 60+ 节点，Trojan与Shadowsocks协议',
+    regions: ['香港', '台湾', '新加坡', '日本', '美国'],
+    pricingStarting: { amount: 20, period: '月付', monthlyEquivalent: 20, trafficGB: 120, isApproximate: false },
+    plans: [
+      { name: '轻量版', billing: '年付', price: 99, trafficGB: 59, cycle: '每月' },
+      { name: 'BGP 智能优化·入门方案', billing: '月付', price: 20, trafficGB: 120, cycle: '每月' },
+      { name: 'BGP 智能优化·进阶方案', billing: '月付', price: 40, trafficGB: 300, cycle: '每月' },
+      { name: 'BGP 智能优化·高端方案', billing: '月付', price: 100, trafficGB: 700, cycle: '每月' },
+      { name: 'BGP 智能优化·商业方案', billing: '月付', price: 180, trafficGB: 1500, cycle: '每月' },
+      { name: 'BGP 智能优化·不限时轻量包', billing: '一次性付费', price: 100, trafficGB: 100, cycle: '一次性' },
+      { name: 'BGP 智能优化·不限时标准包', billing: '一次性付费', price: 360, trafficGB: 400, cycle: '一次性' },
+      { name: 'BGP 智能优化·不限时大容量包', billing: '一次性付费', price: 700, trafficGB: 800, cycle: '一次性' },
+      { name: '独享私人专线节点', billing: '月付', price: 680, trafficGB: 500, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文标注非晚高峰来源记录',
+      provenance: 'supplied_record',
+      results: [
+        { region: '香港', latencyMs: 25, downloadMbps: 489, status: 'success' },
+        { region: '台湾', latencyMs: 37, downloadMbps: 117, status: 'success' },
+        { region: '新加坡', latencyMs: 45, downloadMbps: 430, status: 'success' },
+        { region: '日本', latencyMs: 55, downloadMbps: 133, status: 'success' },
+        { region: '美国', latencyMs: 138, downloadMbps: 18, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'success' }
+    },
+    vendorClaims: ['2026年新品牌', '全球60+节点', '2Gbps+带宽'],
+    pros: ['60+节点规模较大', '支持Trojan/SS双协议', '流媒体与TikTok解锁较全'],
+    cons: ['双优惠码冲突', '仅支持专属客户端免订阅模式'],
+    risks: ['2026新品牌，宣传的2Gbps带宽在大用户量下的稀释需关注'],
+    suitableFor: ['看重多地区节点规模和流媒体解锁的用户'],
+    notSuitableFor: ['需要通用订阅导入软路由的用户'],
+    comparisonSummary: '节点规模较大，专线中转搭配多协议，适合流媒体重度用户。',
+    gapsAndConflicts: ['正文qq88与汇总表qqy7777双优惠码冲突'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 22. 闪电鼠
+  {
+    id: 'shandianshu',
+    name: '闪电鼠',
+    aliases: ['shandianshu'],
+    editorialOrder: 22,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://qwerty.shandianshuaff.com/#/?code=rUE75iYh',
+    affiliateUrl: 'https://qwerty.shandianshuaff.com/#/?code=rUE75iYh',
+    affiliateCode: 'rUE75iYh',
+    couponCodes: [{ code: 'sd88', discount: '季付及以上7折', notes: '基础数据与汇总表均记录' }],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + VLESS协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研客户端 + 第三方订阅导入'] },
+    nodesSummary: '极限平价5.6元档',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 67.2, period: '年付(约)', monthlyEquivalent: 5.6, trafficGB: 60, isApproximate: true },
+    plans: [
+      { name: '闪电鼠·年付基础包', billing: '年付', price: 67.2, trafficGB: 60, cycle: '每月', notes: '原文仅给“年付约5.6元/月”，精确扣款以官网结算单为准' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供详细分节点测速',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'partial', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'partial', disney: 'not_tested', youtube: 'partial', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['IEPL专线', 'VLESS协议', '季付及以上7折', '极限平价5.6元档'],
+    pros: ['5.6元/月门槛极低', 'IEPL+VLESS标准配置'],
+    cons: ['与同档品牌规格高度同质化', '年付总额为约数'],
+    risks: ['低价方案高峰带宽可能受到严格限速'],
+    suitableFor: ['预算极其紧张的学生党或防失联备用'],
+    notSuitableFor: ['需要稳定超大流量输出的职业用户'],
+    comparisonSummary: '28个品牌中门槛最低的代表之一，适合极端预算控制。',
+    gapsAndConflicts: ['年付约5.6元/月只有约数，不能反推精确年费67.2元'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 23. 云界线
+  {
+    id: 'yunjiexian',
+    name: '云界线',
+    aliases: ['yunjiexian'],
+    editorialOrder: 23,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://qwerty.yunjiexianaff.com/?code=HBaZ91c6',
+    affiliateUrl: 'https://qwerty.yunjiexianaff.com/?code=HBaZ91c6',
+    affiliateCode: 'HBaZ91c6',
+    couponCodes: [{ code: 'yjx888', discount: '季付及以上7折', notes: '基础数据与汇总表均记录' }],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + VLESS协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研客户端 + 第三方订阅导入'] },
+    nodesSummary: '极限平价5.6元档',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 67.2, period: '年付(约)', monthlyEquivalent: 5.6, trafficGB: 60, isApproximate: true },
+    plans: [
+      { name: '云界线·年付基础包', billing: '年付', price: 67.2, trafficGB: 60, cycle: '每月', notes: '原文仅给“年付约5.6元/月”，精确扣款以官网结算单为准' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供详细分节点测速',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'partial', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'partial', disney: 'not_tested', youtube: 'partial', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['IEPL专线', 'VLESS协议', '季付及以上7折'],
+    pros: ['5.6元极限低门槛', '支持通用第三方订阅导入'],
+    cons: ['推广链接缺少#字符，格式特殊需注意', '无公开实测日志'],
+    risks: ['推广链接格式特殊，注册前需确认能否正常唤起'],
+    suitableFor: ['超低成本备用'],
+    notSuitableFor: ['主生产力环境使用'],
+    comparisonSummary: '5.6元档同质化方案，注意其注册链接缺少#但仍为有效地址。',
+    gapsAndConflicts: ['联盟链接格式与其他品牌不同（缺少#）', '年付约5.6元/月只有约数'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 24. 榴莲云
+  {
+    id: 'liulianyun',
+    name: '榴莲云',
+    aliases: ['liulianyun'],
+    editorialOrder: 24,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://qwerty.liulianyunaff.com#/?code=hS5pvbfE',
+    affiliateUrl: 'https://qwerty.liulianyunaff.com#/?code=hS5pvbfE',
+    affiliateCode: 'hS5pvbfE',
+    couponCodes: [{ code: 'll88', discount: '季付及以上7折', notes: '基础数据与汇总表均记录' }],
+    protocols: ['未明确（品牌资料未统一提供）'],
+    lineType: 'IEPL专线（协议未明）',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研客户端 + 第三方订阅导入'] },
+    nodesSummary: '极限平价5.6元档',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 67.2, period: '年付(约)', monthlyEquivalent: 5.6, trafficGB: 60, isApproximate: true },
+    plans: [
+      { name: '榴莲云·年付基础包', billing: '年付', price: 67.2, trafficGB: 60, cycle: '每月', notes: '原文仅给“年付约5.6元/月”，精确扣款以官网结算单为准' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供详细分节点测速',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['IEPL专线', '季付及以上7折', '年付约5.6元/月60GB'],
+    pros: ['5.6元极限低门槛'],
+    cons: ['5.6元档中唯一未明确标注协议类型的品牌', '推广链接无斜杠直接接#'],
+    risks: ['协议类型不透明对第三方客户端配置带来不确定性'],
+    suitableFor: ['只在乎最低价格且不关心协议细节的用户'],
+    notSuitableFor: ['必须指定VLESS等现代协议的技术用户'],
+    comparisonSummary: '5.6元档中协议类型未明确的品牌，若需要明确VLESS建议选闪电鼠。',
+    gapsAndConflicts: ['协议类型品牌资料未统一提供', '联盟链接格式异常（#直接接域名）', '年付约5.6元/月只有约数'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 25. 神行加速
+  {
+    id: 'shenxing',
+    name: '神行加速',
+    aliases: ['shenxing'],
+    editorialOrder: 25,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://qwerty.shenxingaff.com/#/?code=gawDQqVE',
+    affiliateUrl: 'https://qwerty.shenxingaff.com/#/?code=gawDQqVE',
+    affiliateCode: 'gawDQqVE',
+    couponCodes: [{ code: 'xs0077', discount: '新用户7折', notes: '基础数据与汇总表均记录' }],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + VLESS协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研客户端 + 第三方订阅导入'] },
+    nodesSummary: '14元/月 120GB 中间档位',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 168, period: '年付(约)', monthlyEquivalent: 14, trafficGB: 120, isApproximate: true },
+    plans: [
+      { name: '神行加速·年付方案', billing: '年付', price: 168, trafficGB: 120, cycle: '每月', notes: '原文仅给“年付约14元/月”，精确扣款以官网结算单为准' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供详细分节点测速',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'partial', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'partial', disney: 'not_tested', youtube: 'partial', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['IEPL专线', 'VLESS协议', '新用户7折', '年付约14元/月120GB'],
+    pros: ['提供120GB流量，是5.6元档（60GB）的两倍', '新用户7折优惠力度清晰'],
+    cons: ['缺少具体单节点测速详情', '年付总额为约数'],
+    risks: ['需一次性付清年费享受14元/月价格'],
+    suitableFor: ['年付且每月流量需求在100GB左右的中等用量用户'],
+    notSuitableFor: ['只想按月试水的轻度用户'],
+    comparisonSummary: '比5.6元多一档、比20元少一档的折中选择，流量翻倍至120GB。',
+    gapsAndConflicts: ['年付约14元/月只有约数，不能反推精确年费'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 26. 环球梯
+  {
+    id: 'huanqiuti',
+    name: '环球梯',
+    aliases: ['huanqiuti'],
+    editorialOrder: 26,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://qwerty.huanqiutiaff.com/?code=9I4KRNPH',
+    affiliateUrl: 'https://qwerty.huanqiutiaff.com/?code=9I4KRNPH',
+    affiliateCode: '9I4KRNPH',
+    couponCodes: [{ code: 'HQ66', discount: '季付及以上7折', notes: '基础数据与汇总表均记录' }],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + VLESS协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研客户端 + 第三方订阅导入'] },
+    nodesSummary: '极限平价5.6元档',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 67.2, period: '年付(约)', monthlyEquivalent: 5.6, trafficGB: 60, isApproximate: true },
+    plans: [
+      { name: '环球梯·年付基础包', billing: '年付', price: 67.2, trafficGB: 60, cycle: '每月', notes: '原文仅给“年付约5.6元/月”，精确扣款以官网结算单为准' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供详细分节点测速',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'partial', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'partial', disney: 'not_tested', youtube: 'partial', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['IEPL专线', 'VLESS协议', '季付及以上7折'],
+    pros: ['5.6元极限平价', '提供VLESS协议'],
+    cons: ['联盟链接缺少#格式特殊', '同质化严重'],
+    risks: ['链接格式特殊，注册前请核查可否正常打开'],
+    suitableFor: ['低成本极限平价备用'],
+    notSuitableFor: ['高可靠性连续办公'],
+    comparisonSummary: '与云界线、闪电鼠规格雷同的5.6元平价方案，注意推广链接缺少#。',
+    gapsAndConflicts: ['联盟链接格式与其他品牌不同（缺少#）', '年付约5.6元/月只有约数'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 27. 隐形人
+  {
+    id: 'yinxingren',
+    name: '隐形人',
+    aliases: ['yinxingren', 'Invisible'],
+    editorialOrder: 27,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://yinxingren1.invisibleaff.com/#/?code=kcyEeoJT',
+    affiliateUrl: 'https://yinxingren1.invisibleaff.com/#/?code=kcyEeoJT',
+    affiliateCode: 'kcyEeoJT',
+    couponCodes: [
+      { code: 'yxr888', discount: '基础优惠', notes: '基础数据与汇总表记录' },
+      { code: 'moon80', discount: '8折', notes: '正文基础信息提供', isConflicting: true }
+    ],
+    protocols: ['未标注'],
+    lineType: '企业级 IPLC 专线直连',
+    clients: { customApp: true, thirdParty: false, platforms: ['自带客户端（不提供订阅链接，Clash等无法使用）'] },
+    nodesSummary: '香港、日本、美国、新加坡、台湾',
+    regions: ['香港', '日本', '美国', '新加坡', '台湾'],
+    pricingStarting: { amount: 109, period: '年付', monthlyEquivalent: 9.08, trafficGB: 80, isApproximate: false },
+    plans: [
+      { name: '隐形人 白银纪元', billing: '月付', price: 24, trafficGB: 144, cycle: '每月' },
+      { name: '隐形人 黄金序列', billing: '月付', price: 48, trafficGB: 360, cycle: '每月' },
+      { name: '隐形人 铂金至臻', billing: '月付', price: 105, trafficGB: 750, cycle: '每月' },
+      { name: '隐形人 钻石穹顶', billing: '月付', price: 185, trafficGB: 1600, cycle: '每月' },
+      { name: '王者定制版', billing: '月付', price: 680, trafficGB: 500, cycle: '每月' },
+      { name: '星耀风暴 365天不熄', billing: '年付', price: 109, trafficGB: 80, cycle: '每月' },
+      { name: '一次性小流量', billing: '一次性付费', price: 229, trafficGB: 160, cycle: '一次性' },
+      { name: '一次性标准流量包', billing: '一次性付费', price: 549, trafficGB: 420, cycle: '一次性' },
+      { name: '一次性精英流量包', billing: '一次性付费', price: 1199, trafficGB: 1000, cycle: '一次性' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '原文测速栏全部为空（—），严格标记为未测试(Not Tested)',
+      provenance: 'not_tested',
+      results: [
+        { region: '香港', latencyMs: null, downloadMbps: null, status: 'not_tested' },
+        { region: '日本', latencyMs: null, downloadMbps: null, status: 'not_tested' },
+        { region: '美国', latencyMs: null, downloadMbps: null, status: 'not_tested' },
+        { region: '新加坡', latencyMs: null, downloadMbps: null, status: 'not_tested' },
+        { region: '台湾', latencyMs: null, downloadMbps: null, status: 'not_tested' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'partial', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'partial', spotify: 'success' }
+    },
+    vendorClaims: ['企业级IPLC专线直连', '晚高峰零卡顿', '1小时修复承诺', '自带客户端不提供订阅链接'],
+    pros: ['套餐梯次非常完整从白银到钻石', '标称企业级IPLC与1小时修复承诺'],
+    cons: ['测速数据全部为空白，完全缺乏实测证据', '基础数据与套餐表流量冲突（100G vs 144G）', '不提供第三方订阅链接'],
+    risks: ['月付24元偏高且完全缺乏实测，必须警惕宣传泡沫'],
+    suitableFor: ['认可其自带客户端且愿意短期小额验证的用户'],
+    notSuitableFor: ['依靠第三方测速客观数据决策的理性用户', 'Clash/Shadowrocket重度用户'],
+    comparisonSummary: '高调宣传企业级IPLC与1小时修复，但测速数据全空，不可盲信宣传。',
+    gapsAndConflicts: ['基础数据100GB与白银纪元表内144GB冲突；测速栏全部为空；yxr888与moon80双优惠码冲突'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 28. 梯子云
+  {
+    id: 'tiziyun',
+    name: '梯子云',
+    aliases: ['tiziyun', 'Ladder Cloud'],
+    editorialOrder: 28,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source A',
+    officialUrl: 'https://tiziyun3.ladderaff.com/#/?code=7EmnpHs0',
+    affiliateUrl: 'https://tiziyun3.ladderaff.com/#/?code=7EmnpHs0',
+    affiliateCode: '7EmnpHs0',
+    couponCodes: [{ code: 'tiziyun', discount: '基础优惠', notes: '基础数据提供' }],
+    protocols: ['VLESS'],
+    lineType: 'IEPL专线 + VLESS协议',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研全平台客户端（小白一键登录）+ 支持通用订阅'] },
+    nodesSummary: '60+节点，2Gbps+独立带宽（含500Mbps高峰冗余），覆盖香港、日本、新加坡、美国、台湾',
+    regions: ['香港', '日本', '新加坡', '美国', '台湾'],
+    pricingStarting: { amount: 88.8, period: '年付(约)', monthlyEquivalent: 7.4, trafficGB: 60, isApproximate: true },
+    plans: [
+      { name: '梯子云·年付方案', billing: '年付', price: 88.8, trafficGB: 60, cycle: '每月', notes: '原文仅给“年付约7.4元/月”，精确扣款以官网结算单为准' }
+    ],
+    speedTest: {
+      date: '2026-10-19',
+      environmentNote: '未提供详细分节点测速',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'partial' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'not_tested', tiktok: 'success', spotify: 'not_tested' }
+    },
+    vendorClaims: ['自研全平台客户端+通用订阅双支持', '60+节点', '2Gbps+独立带宽含500M冗余', '完美解锁流媒体与AI'],
+    pros: ['同时提供自研客户端与通用订阅导入，兼顾新手与老手', '60+节点规模较大', '折合7.4元/月性价比高'],
+    cons: ['缺少具体单节点测速详情', '品牌资料“完美解锁”属口头承诺'],
+    risks: ['2025年新开业，需长期跟踪其高峰冗余承诺兑现情况'],
+    suitableFor: ['既想小白一键登录又想保留Clash灵活性的新手及进阶用户'],
+    notSuitableFor: ['要求完全开源客户端与公开透明机房ASN的用户'],
+    comparisonSummary: '相比隐形人强制绑定专属APP，梯子云自研客户端+通用订阅双支持更为灵活。',
+    gapsAndConflicts: ['年付约7.4元/月只有约数，不能反推精确年费'],
+    verifiedDate: '2026-10-19',
+    updatedDate: '2026-10-21'
+  },
+
+  // 29. WgetCloud (Source B)
+  {
+    id: 'wgetcloud',
+    name: 'WgetCloud',
+    aliases: ['WgetCloud', 'Wget'],
+    editorialOrder: 29,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: 'https://invite.wgetcloud.ltd/auth/register?code=VLG2xb',
+    affiliateUrl: 'https://invite.wgetcloud.ltd/auth/register?code=VLG2xb',
+    affiliateCode: 'VLG2xb',
+    couponCodes: [],
+    protocols: ['Trojan'],
+    lineType: '优质/精品专线服务',
+    clients: { customApp: true, thirdParty: true, platforms: ['通用客户端导入'] },
+    nodesSummary: '覆盖15个国家/地区：香港、台湾、新加坡、日本、美国、韩国、马来西亚、泰国、菲律宾、印尼、印度、澳大利亚、加拿大、巴西、英国',
+    regions: ['香港', '台湾', '新加坡', '日本', '美国', '韩国', '印度', '印尼', '澳大利亚', '英国'],
+    pricingStarting: { amount: 297, period: '季付', monthlyEquivalent: 99, trafficGB: 230, isApproximate: false },
+    plans: [
+      { name: '基础专线服务', billing: '季付', price: 297, trafficGB: 230, cycle: '每月', notes: '历史资料报价，未有可直接月付记录' },
+      { name: '优质专线服务', billing: '季付', price: 327, trafficGB: 250, cycle: '每月' },
+      { name: '精品专线服务', billing: '季付', price: 357, trafficGB: 270, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-05-02',
+      environmentNote: '历史项目记录地区统计均值（非单节点、非2026-10-19新测），覆盖59个节点全部非零',
+      provenance: 'historical_aggregate',
+      results: [
+        { region: '日本', latencyMs: 69.4, downloadMbps: 462.04, rawDownload: '57.75 MB/s', status: 'success' },
+        { region: '美国', latencyMs: 170.2, downloadMbps: 440.04, rawDownload: '55.00 MB/s', status: 'success' },
+        { region: '香港', latencyMs: 25.9, downloadMbps: 431.24, rawDownload: '53.90 MB/s', status: 'success' },
+        { region: '新加坡', latencyMs: 55.6, downloadMbps: 422.97, rawDownload: '52.87 MB/s', status: 'success' },
+        { region: '台湾', latencyMs: 41.3, downloadMbps: 407.66, rawDownload: '50.96 MB/s', status: 'success' },
+        { region: '印度', latencyMs: 95.0, downloadMbps: 341.92, status: 'success' },
+        { region: '印尼', latencyMs: 88.0, downloadMbps: 318.64, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'partial', claude: 'not_tested', gemini: 'partial' },
+      streaming: { netflix: 'partial', disney: 'partial', youtube: 'partial', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['优质专线服务', '多地区覆盖'],
+    pros: ['2026-05-02测速59节点全部非零', '五个主流地区平均下行均超50MB/s', '香港近端TLS RTT低至25.9ms'],
+    cons: ['起步需季付297元（折合99元/月）门槛极高', '无直接月付小额套餐'],
+    risks: ['历史测速与当前实时体验不可直接画等号，季付试错成本大'],
+    suitableFor: ['预算充裕、看重高端专线稳定性的专业用户与企业外贸'],
+    notSuitableFor: ['追求平价月付试水的普通学生和轻度用户'],
+    comparisonSummary: '定位高端专线，历史测速表现极其坚挺，但季付297元门槛把绝大多数轻度用户挡在门外。',
+    gapsAndConflicts: ['未有可直接月付报价；核心特色MB/s与测速表Mbps存在单位换算口径差异'],
+    verifiedDate: '2026-08-24',
+    updatedDate: '2026-10-21'
+  },
+
+  // 30. 白月光 (Source B)
+  {
+    id: 'baiyueguang',
+    name: '白月光',
+    aliases: ['白月光', 'Sibker'],
+    editorialOrder: 30,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: 'https://www.sibker.com/register?invite_code=gg6puAId',
+    affiliateUrl: 'https://www.sibker.com/register?invite_code=gg6puAId',
+    affiliateCode: 'gg6puAId',
+    couponCodes: [],
+    protocols: ['Shadowsocks'],
+    lineType: 'Shadowsocks 多节点中转',
+    clients: { customApp: true, thirdParty: true, platforms: ['SS兼容客户端'] },
+    nodesSummary: '覆盖79个地区名目，108个节点，涵盖大量亚洲冷门节点',
+    regions: ['香港', '美国', '日本', '台湾', '新加坡', '加拿大', '韩国', '越南', '泰国', '马来西亚'],
+    pricingStarting: { amount: 66, period: '季付', monthlyEquivalent: 22, trafficGB: 100, isApproximate: false },
+    plans: [
+      { name: '小包', billing: '季付', price: 66, trafficGB: 100, cycle: '每月' },
+      { name: '中包', billing: '季付', price: 126, trafficGB: 250, cycle: '每月' },
+      { name: '大包', billing: '季付', price: 156, trafficGB: 400, cycle: '每月' },
+      { name: '超大包', billing: '季付', price: 216, trafficGB: 750, cycle: '每月' },
+      { name: '不差钱', billing: '季付', price: 231, trafficGB: 900, cycle: '每月' },
+      { name: '旗舰包', billing: '年付', price: 2500, trafficGB: 2500, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-07-17',
+      environmentNote: '历史项目记录地区统计均值（非单节点），测试覆盖108个节点',
+      provenance: 'historical_aggregate',
+      results: [
+        { region: '香港', latencyMs: 160.7, downloadMbps: 114.94, rawDownload: '14.37 MB/s', status: 'success' },
+        { region: '日本', latencyMs: 202.4, downloadMbps: 77.65, status: 'success' },
+        { region: '美国', latencyMs: 302.6, downloadMbps: 70.53, status: 'success' },
+        { region: '新加坡', latencyMs: 186.8, downloadMbps: 85.22, status: 'success' },
+        { region: '加拿大', latencyMs: 344.0, downloadMbps: 62.00, status: 'success' },
+        { region: '韩国', latencyMs: 358.0, downloadMbps: 31.28, status: 'success' },
+        { region: '台湾', latencyMs: null, downloadMbps: 0.03, status: 'failure' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'partial', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'partial', disney: 'partial', youtube: 'partial', hbo: 'partial', tiktok: 'partial', spotify: 'failure' }
+    },
+    vendorClaims: ['79个地区海量名目', '季付小包66元'],
+    pros: ['季付66元一次性支出门槛相对不高', '节点地区名目极其丰富涵盖小众国家'],
+    cons: ['台湾历史测速仅0.03Mbps近乎失效', 'Spotify测试明确失败', '整体延迟偏高（香港160ms）'],
+    risks: ['历史测速显示部分节点性能严重掉队，不可当作全绿机场'],
+    suitableFor: ['需要孟加拉、尼泊尔等小众冷门地区IP测试的极客用户'],
+    notSuitableFor: ['追求极致低延迟游戏与稳定4K流媒体的用户'],
+    comparisonSummary: '节点覆盖地区数量惊人，但速度与延迟中规中矩，历史测试中台湾节点近乎失活。',
+    gapsAndConflicts: ['未有可直接月付报价；台湾节点历史速度近乎为零'],
+    verifiedDate: '2026-08-24',
+    updatedDate: '2026-10-21'
+  },
+
+  // 31. FlyingBird (Source B - 无独立入口)
+  {
+    id: 'flyingbird',
+    name: 'FlyingBird',
+    aliases: ['飞鸟机场', 'FlyingBird'],
+    editorialOrder: 31,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: null,
+    affiliateUrl: null,
+    affiliateCode: null,
+    couponCodes: [
+      { code: 'theo', discount: '9折', notes: '每用户一次（历史资料）' },
+      { code: 'year85', discount: '年付85折', notes: '可用5次（历史资料）' }
+    ],
+    protocols: ['Shadowsocks'],
+    lineType: '全专线 IPLC / SS 机场',
+    clients: { customApp: true, thirdParty: true, platforms: ['SS兼容客户端'] },
+    nodesSummary: '多个老牌机场融合衍生，无倍率不限速',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 15, period: '月付', monthlyEquivalent: 15, trafficGB: 100, isApproximate: false },
+    plans: [
+      { name: '青铜套餐', billing: '月付', price: 15, trafficGB: 100, cycle: '每月' },
+      { name: '青铜套餐', billing: '年付', price: 144, trafficGB: 100, cycle: '每月' },
+      { name: '白银套餐', billing: '月付', price: 30, trafficGB: 200, cycle: '每月' },
+      { name: '白银套餐', billing: '年付', price: 288, trafficGB: 200, cycle: '每月' },
+      { name: '黄金套餐', billing: '月付', price: 75, trafficGB: 500, cycle: '每月' },
+      { name: '黄金套餐', billing: '年付', price: 720, trafficGB: 500, cycle: '每月' },
+      { name: '钻石套餐', billing: '月付', price: 150, trafficGB: 1000, cycle: '每月' },
+      { name: '钻石套餐', billing: '年付', price: 1440, trafficGB: 1000, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-08-09',
+      environmentNote: '历史品牌库记录，未提供可比逐地区测速数据',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['全专线IPLC', '无倍率不限速', '一云梯/飞鸟同源站群核心'],
+    pros: ['套餐档位与周期覆盖极全', '无倍率定位清晰', '支持USDT支付'],
+    cons: ['本批资料未提供独立品牌入口（注册链接为null）', '无逐地区测速数据'],
+    risks: ['无独立注册入口，仅提供历史档案呈现，不冒用他人链接'],
+    suitableFor: ['历史飞鸟站群的老用户档案查阅'],
+    notSuitableFor: ['正在寻找直接可跳转购买链接的新用户'],
+    comparisonSummary: '飞鸟站群核心品牌，全专线IPLC定位，当前无独立入口，仅展示站内事实档案。',
+    gapsAndConflicts: ['未提供独立品牌入口；未提供可比逐地区测速；折扣表述“最高约64折”'],
+    verifiedDate: '2026-08-09',
+    updatedDate: '2026-10-21'
+  },
+
+  // 32. CyberGuard (Source B)
+  {
+    id: 'cyberguard',
+    name: 'CyberGuard',
+    aliases: ['CyberGuard', 'CG'],
+    editorialOrder: 32,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: 'https://cyberguard.best/#/register?code=AxXNNYng',
+    affiliateUrl: 'https://cyberguard.best/#/register?code=AxXNNYng',
+    affiliateCode: 'AxXNNYng',
+    couponCodes: [],
+    protocols: ['Trojan', 'VLESS'],
+    lineType: '多地区专线中转',
+    clients: { customApp: true, thirdParty: true, platforms: ['通用订阅客户端'] },
+    nodesSummary: '覆盖12个地区29个节点：日本、美国、澳大利亚、韩国、德国、法国、阿联酋、英国等',
+    regions: ['日本', '美国', '澳大利亚', '韩国', '德国', '法国', '阿联酋'],
+    pricingStarting: { amount: 32, period: '月付', monthlyEquivalent: 32, trafficGB: 350, isApproximate: false },
+    plans: [
+      { name: '150G｜轻量套餐', billing: '半年付', price: 95, trafficGB: 150, cycle: '每月' },
+      { name: '350G｜标准套餐', billing: '月付', price: 32, trafficGB: 350, cycle: '每月' },
+      { name: '650G｜高速套餐', billing: '月付', price: 55, trafficGB: 650, cycle: '每月' },
+      { name: '220G流量包｜不限时', billing: '一次性付费', price: 79, trafficGB: 220, cycle: '一次性' },
+      { name: '840G流量包｜不限时', billing: '一次性付费', price: 188, trafficGB: 840, cycle: '一次性' },
+      { name: '2050G｜企业套餐', billing: '月付', price: 200, trafficGB: 2050, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2025-06-21',
+      environmentNote: '历史项目记录地区统计值（非单节点，测试时间较早为2025年）',
+      provenance: 'historical_aggregate',
+      results: [
+        { region: '日本', latencyMs: 123.8, downloadMbps: 488.83, status: 'success' },
+        { region: '韩国', latencyMs: 6000.0, downloadMbps: 552.80, status: 'partial' },
+        { region: '阿联酋', latencyMs: 345.0, downloadMbps: 342.76, status: 'success' },
+        { region: '澳大利亚', latencyMs: 277.0, downloadMbps: 279.64, status: 'success' },
+        { region: '美国', latencyMs: 614.0, downloadMbps: 245.60, status: 'success' },
+        { region: '法国', latencyMs: 384.0, downloadMbps: 204.08, status: 'success' },
+        { region: '德国', latencyMs: 390.5, downloadMbps: 159.96, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'success' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'success', hbo: 'success', tiktok: 'success', spotify: 'not_tested' }
+    },
+    vendorClaims: ['月付32元含350GB大流量', '一次性流量包可选'],
+    pros: ['32元月付给到350GB流量极为充沛', 'AI三大工具当次测试均可用', '节点涉及阿联酋等特别地区'],
+    cons: ['韩国节点历史记录出现6000ms极端延迟（标记异常）', '美国延迟614ms偏高'],
+    risks: ['历史测速日期为2025-06-21，距今时间跨度大，韩国6000ms异常待官网复核'],
+    suitableFor: ['需要大流量且有阿联酋/法国/德国等跨国需求的用户'],
+    notSuitableFor: ['对日韩有极低延迟游戏要求的用户'],
+    comparisonSummary: '流量单价性价比很高，涵盖中东阿联酋节点，但历史数据中韩国6000ms延迟保留为异常待核实。',
+    gapsAndConflicts: ['韩国6000ms延迟保留原值并标记异常待核实，不得自行篡改为60ms'],
+    verifiedDate: '2026-08-23',
+    updatedDate: '2026-10-21'
+  },
+
+  // 33. 龙猫云 (Source B - 无独立入口)
+  {
+    id: 'longmao',
+    name: '龙猫云',
+    aliases: ['龙猫云', 'LongMao'],
+    editorialOrder: 33,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: null,
+    affiliateUrl: null,
+    affiliateCode: null,
+    couponCodes: [],
+    protocols: ['Shadowsocks'],
+    lineType: 'SS + IPLC 全专线（最高2000Mbps宣称）',
+    clients: { customApp: true, thirdParty: true, platforms: ['SS兼容客户端'] },
+    nodesSummary: 'SS + IPLC 全专线定位',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 15, period: '月付', monthlyEquivalent: 15, trafficGB: 100, isApproximate: false },
+    plans: [
+      { name: 'VIP1', billing: '月付', price: 15, trafficGB: 100, cycle: '每月' },
+      { name: 'VIP1', billing: '年付', price: 144, trafficGB: 100, cycle: '每月' },
+      { name: 'VIP2', billing: '月付', price: 30, trafficGB: 200, cycle: '每月' },
+      { name: 'VIP2', billing: '年付', price: 288, trafficGB: 200, cycle: '每月' },
+      { name: 'VIP3', billing: '月付', price: 60, trafficGB: 400, cycle: '每月' },
+      { name: 'VIP3', billing: '年付', price: 576, trafficGB: 400, cycle: '每月' },
+      { name: 'VIP4', billing: '月付', price: 120, trafficGB: 1000, cycle: '每月' },
+      { name: 'VIP4', billing: '年付', price: 1152, trafficGB: 1000, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-08-09',
+      environmentNote: '未提供可比逐地区测速数据',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['最高2000Mbps', 'SS + IPLC全专线', '技术背景已移民海外', '一云梯同源站群成员'],
+    pros: ['套餐梯级清晰', '教程相对完善', '全专线定位'],
+    cons: ['无独立品牌注册入口', '无逐地区实测数据'],
+    risks: ['已被核实为一云梯/飞鸟同源站群成员，基础设施存在高度重叠'],
+    suitableFor: ['站群老用户与背景资料核查'],
+    notSuitableFor: ['正在物色新采购入口的用户'],
+    comparisonSummary: '飞鸟站群同系成员，SS+IPLC全专线定位，当前无独立推广链接。',
+    gapsAndConflicts: ['未提供独立品牌入口；未提供可比测速；最高约48折历史表述'],
+    verifiedDate: '2026-08-09',
+    updatedDate: '2026-10-21'
+  },
+
+  // 34. FATCAT (Source B - 无独立入口)
+  {
+    id: 'fatcat',
+    name: 'FATCAT',
+    aliases: ['肥猫云', 'FATCAT'],
+    editorialOrder: 34,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: null,
+    affiliateUrl: null,
+    affiliateCode: null,
+    couponCodes: [],
+    protocols: ['未注明'],
+    lineType: '企业级 IEPL / IPLC 内网专线',
+    clients: { customApp: true, thirdParty: true, platforms: ['全平台客户端导入'] },
+    nodesSummary: '强调抗干扰抗封锁',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 20, period: '月付', monthlyEquivalent: 20, trafficGB: 120, isApproximate: false },
+    plans: [
+      { name: '年付加强版', billing: '年付', price: 96, trafficGB: 60, cycle: '每月' },
+      { name: '基础套餐', billing: '月付', price: 20, trafficGB: 120, cycle: '每月' },
+      { name: '基础套餐', billing: '年付', price: 192, trafficGB: 120, cycle: '每月' },
+      { name: '标准套餐', billing: '月付', price: 40, trafficGB: 300, cycle: '每月' },
+      { name: '标准套餐', billing: '年付', price: 384, trafficGB: 300, cycle: '每月' },
+      { name: '旗舰套餐', billing: '月付', price: 100, trafficGB: 700, cycle: '每月' },
+      { name: '旗舰套餐', billing: '年付', price: 960, trafficGB: 700, cycle: '每月' },
+      { name: '企业套餐', billing: '月付', price: 180, trafficGB: 1500, cycle: '每月' },
+      { name: '企业套餐', billing: '年付', price: 1728, trafficGB: 1500, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-08-09',
+      environmentNote: '未提供可比逐地区测速数据',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['企业级IEPL/IPLC内网专线', '抗干扰抗封锁'],
+    pros: ['套餐覆盖年付加强版到企业1500G', '支持支付宝/微信/USDT'],
+    cons: ['无独立注册入口', '缺乏实测数据佐证抗干扰效果'],
+    risks: ['无独立入口，仅供资料库档案查询'],
+    suitableFor: ['历史资料查证与品牌背景了解'],
+    notSuitableFor: ['寻找即刻下单入口的用户'],
+    comparisonSummary: '定位企业级专线抗干扰，多档位多周期，无独立入口。',
+    gapsAndConflicts: ['未提供独立品牌入口；未提供可比测速；最高约48折历史表述'],
+    verifiedDate: '2026-08-09',
+    updatedDate: '2026-10-21'
+  },
+
+  // 35. TNTCloud (Source B - 无独立入口)
+  {
+    id: 'tntcloud',
+    name: 'TNTCloud',
+    aliases: ['TNT Cloud', '3A加速器', 'AAA Speed'],
+    editorialOrder: 35,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: null,
+    affiliateUrl: null,
+    affiliateCode: null,
+    couponCodes: [{ code: 'TNT85', discount: '85折', notes: '限量包不支持（历史资料）' }],
+    protocols: ['未注明'],
+    lineType: 'IPLC 内网专线（最高2000Mbps宣称）',
+    clients: { customApp: true, thirdParty: true, platforms: ['全平台兼容'] },
+    nodesSummary: '老牌分站团队，特色季付限量包，跨境电商/TikTok直播定制',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 30, period: '季付', monthlyEquivalent: 10, trafficGB: 60, isApproximate: false },
+    plans: [
+      { name: '轻量包', billing: '季付', price: 30, trafficGB: 60, cycle: '每月' },
+      { name: '轻量包', billing: '年付', price: 98, trafficGB: 60, cycle: '每月' },
+      { name: 'VIP1', billing: '月付', price: 20, trafficGB: 110, cycle: '每月' },
+      { name: 'VIP1', billing: '年付', price: 192, trafficGB: 110, cycle: '每月' },
+      { name: 'VIP2', billing: '月付', price: 40, trafficGB: 220, cycle: '每月' },
+      { name: 'VIP2', billing: '年付', price: 336, trafficGB: 220, cycle: '每月' },
+      { name: 'VIP3', billing: '月付', price: 80, trafficGB: 460, cycle: '每月' },
+      { name: 'VIP3', billing: '年付', price: 768, trafficGB: 460, cycle: '每月' },
+      { name: 'VIP4', billing: '月付', price: 160, trafficGB: 1100, cycle: '每月' },
+      { name: 'VIP4', billing: '年付', price: 1536, trafficGB: 1100, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-08-09',
+      environmentNote: '未提供可比逐地区测速数据',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['曾用名3A加速器', '2000Mbps', '季付限量包', 'TikTok直播定制'],
+    pros: ['季付30元轻量包门槛极低（10元/月）', '支持跨境电商与直播定制需求'],
+    cons: ['无独立注册入口', '改名历史较多（3A/AAA Speed/TNTCloud）'],
+    risks: ['频繁更换品牌名称通常伴随运营团队重组风险'],
+    suitableFor: ['需要了解老牌3A加速器历史沿革的用户'],
+    notSuitableFor: ['寻找稳定直接注册入口的新用户'],
+    comparisonSummary: '曾用名3A加速器，IPLC内网专线定位，提供特色季付限量包，当前无独立入口。',
+    gapsAndConflicts: ['未提供独立品牌入口；未提供可比测速；最高约48折历史表述'],
+    verifiedDate: '2026-08-09',
+    updatedDate: '2026-10-21'
+  },
+
+  // 36. 青云梯 (Source B - 无独立入口)
+  {
+    id: 'qingyunti',
+    name: '青云梯',
+    aliases: ['青云梯', 'V4Speed'],
+    editorialOrder: 36,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: null,
+    affiliateUrl: null,
+    affiliateCode: null,
+    couponCodes: [
+      { code: 'qyt85', discount: '85折', notes: '年付小包不支持（历史资料）' },
+      { code: 'qyt80', discount: '8折', notes: '年付小包不支持（历史资料）' }
+    ],
+    protocols: ['Shadowsocks'],
+    lineType: 'SS + 企业级 IPLC 专线',
+    clients: { customApp: true, thirdParty: true, platforms: ['SS全平台兼容'] },
+    nodesSummary: '运营6年以上老牌（曾用名V4Speed），最高6Gbps，10+地区80+节点',
+    regions: ['香港', '日本', '新加坡', '美国', '台湾'],
+    pricingStarting: { amount: 25, period: '月付', monthlyEquivalent: 25, trafficGB: 150, isApproximate: false },
+    plans: [
+      { name: '年付小包', billing: '年付', price: 96, trafficGB: 60, cycle: '每月' },
+      { name: 'VIP1', billing: '月付', price: 25, trafficGB: 150, cycle: '每月' },
+      { name: 'VIP1', billing: '年付', price: 240, trafficGB: 150, cycle: '每月' },
+      { name: 'VIP2', billing: '月付', price: 45, trafficGB: 300, cycle: '每月' },
+      { name: 'VIP2', billing: '年付', price: 432, trafficGB: 300, cycle: '每月' },
+      { name: 'VIP3', billing: '月付', price: 85, trafficGB: 600, cycle: '每月' },
+      { name: 'VIP3', billing: '年付', price: 816, trafficGB: 600, cycle: '每月' },
+      { name: 'VIP4', billing: '月付', price: 150, trafficGB: 1000, cycle: '每月' },
+      { name: 'VIP4', billing: '年付', price: 1360, trafficGB: 1000, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-08-09',
+      environmentNote: '未提供可比逐地区测速数据',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['运营6年以上老牌', '曾用名V4Speed', '最高6Gbps', '10+地区80+节点', '企业定制'],
+    pros: ['运营时间超6年相对资深', '三网优化与多节点覆盖规模大', '企业定制支持完备'],
+    cons: ['无独立注册入口', '无最新30日实测'],
+    risks: ['无独立入口，仅作为老牌历史档案记录'],
+    suitableFor: ['了解成熟老牌机场历史沿革'],
+    notSuitableFor: ['寻找即时有效购买通道的用户'],
+    comparisonSummary: '运营六年以上的成熟品牌，曾用名V4Speed，全专线配置，当前无独立入口。',
+    gapsAndConflicts: ['未提供独立品牌入口；未提供可比测速；最高约48折历史表述'],
+    verifiedDate: '2026-08-09',
+    updatedDate: '2026-10-21'
+  },
+
+  // 37. 山水云 (Source B)
+  {
+    id: 'shanshui',
+    name: '山水云',
+    aliases: ['山水云', 'SSYYLF'],
+    editorialOrder: 37,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: 'https://sldm1.ssyylf.com/#/register?code=YD5iQ888',
+    affiliateUrl: 'https://sldm1.ssyylf.com/#/register?code=YD5iQ888',
+    affiliateCode: 'YD5iQ888',
+    couponCodes: [],
+    protocols: ['尚未核实'],
+    lineType: '多地区网络中转代理',
+    clients: { customApp: true, thirdParty: true, platforms: ['通用订阅客户端'] },
+    nodesSummary: '涉及12个地区：香港、日本、新加坡、美国、台湾、越南、泰国、英国、印尼、法国、德国、加拿大',
+    regions: ['美国', '日本', '香港', '新加坡', '越南', '泰国', '英国'],
+    pricingStarting: { amount: 15, period: '月付', monthlyEquivalent: 15, trafficGB: 100, isApproximate: false },
+    plans: [
+      { name: '100G/月-琴', billing: '月付', price: 15, trafficGB: 100, cycle: '每月' },
+      { name: '200G/月-棋', billing: '月付', price: 25, trafficGB: 200, cycle: '每月' },
+      { name: '500G/月-书', billing: '月付', price: 50, trafficGB: 500, cycle: '每月' },
+      { name: '64G/轻量套餐', billing: '年付', price: 88, trafficGB: 64, cycle: '每月' },
+      { name: '128G/轻量套餐', billing: '半年付', price: 88, trafficGB: 128, cycle: '每月' },
+      { name: '256G/轻量套餐', billing: '季付', price: 75, trafficGB: 256, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-06-29',
+      environmentNote: '历史项目记录地区统计值（非单节点），测试覆盖27个节点22个非零',
+      provenance: 'historical_aggregate',
+      results: [
+        { region: '美国', latencyMs: 349.3, downloadMbps: 180.29, rawDownload: '22.54 MB/s', status: 'success' },
+        { region: '日本', latencyMs: 229.8, downloadMbps: 160.51, status: 'success' },
+        { region: '香港', latencyMs: 151.4, downloadMbps: 152.86, status: 'success' },
+        { region: '新加坡', latencyMs: 179.8, downloadMbps: 142.98, status: 'success' },
+        { region: '越南', latencyMs: 232.0, downloadMbps: 87.68, status: 'success' },
+        { region: '泰国', latencyMs: 217.0, downloadMbps: 82.00, status: 'success' },
+        { region: '英国', latencyMs: 328.0, downloadMbps: 65.20, status: 'success' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'success', gemini: 'success' },
+      streaming: { netflix: 'success', disney: 'success', youtube: 'not_tested', hbo: 'success', tiktok: 'success', spotify: 'not_tested' }
+    },
+    vendorClaims: ['琴棋书画文化主题命名', '月付15元100G起步'],
+    pros: ['月付15元100G门槛低梯度清晰', '2026-06-29实测主流AI三家均可用', '长周期年付88元单价较低'],
+    cons: ['历史测速延迟普遍偏高（香港151ms，美国349ms）', '底层协议尚未核实'],
+    risks: ['历史测速显示非专线架构，延迟偏高，高峰可能出现拥堵'],
+    suitableFor: ['对延迟不敏感、重在AI工具可用性与低月付的用户'],
+    notSuitableFor: ['外服网游联机与极端低延迟要求的操作'],
+    comparisonSummary: '琴棋书画命名很有特色，15元月付档AI解锁当次表现好，但延迟普遍偏高。',
+    gapsAndConflicts: ['协议记录尚未核实'],
+    verifiedDate: '2026-08-24',
+    updatedDate: '2026-10-21'
+  },
+
+  // 38. 灵动云 (Source B)
+  {
+    id: 'lingdong',
+    name: '灵动云',
+    aliases: ['灵动云', 'LingDong'],
+    editorialOrder: 38,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: 'https://varnexa.lingdongaff.com/#/?code=wZvEhEoI',
+    affiliateUrl: 'https://varnexa.lingdongaff.com/#/?code=wZvEhEoI',
+    affiliateCode: 'wZvEhEoI',
+    couponCodes: [],
+    protocols: ['VLESS', 'Trojan（文案混提）'],
+    lineType: '2025年开业 IEPL 专线',
+    clients: { customApp: true, thirdParty: true, platforms: ['不限速不限设备'] },
+    nodesSummary: '覆盖70G年付、100G-1.5T周期流量、单次流量包和私人定制',
+    regions: ['香港', '日本', '新加坡', '美国', '台湾'],
+    pricingStarting: { amount: 20, period: '月付', monthlyEquivalent: 20, trafficGB: 100, isApproximate: false },
+    plans: [
+      { name: '灵动·拂风', billing: '月付', price: 20, trafficGB: 100, cycle: '每月' },
+      { name: '灵动·拂风', billing: '年付', price: 204, trafficGB: 100, cycle: '每月' },
+      { name: '灵动·驭浪', billing: '月付', price: 50, trafficGB: 300, cycle: '每月' },
+      { name: '灵动·驭浪', billing: '年付', price: 510, trafficGB: 300, cycle: '每月' },
+      { name: '灵动·破晓', billing: '月付', price: 100, trafficGB: 700, cycle: '每月' },
+      { name: '灵动·破晓', billing: '年付', price: 1020, trafficGB: 700, cycle: '每月' },
+      { name: '灵动·凌霄', billing: '月付', price: 180, trafficGB: 1500, cycle: '每月' },
+      { name: '灵动·凌霄', billing: '年付', price: 1836, trafficGB: 1500, cycle: '每月' },
+      { name: '灵动·穿云', billing: '年付', price: 99, trafficGB: 70, cycle: '每月' },
+      { name: '灵动·闲云（小流量包）', billing: '一次性付费', price: 199, trafficGB: 150, cycle: '一次性' },
+      { name: '灵动·惊云（标准流量包）', billing: '一次性付费', price: 499, trafficGB: 400, cycle: '一次性' },
+      { name: '灵动·飞云（精英流量包）', billing: '一次性付费', price: 899, trafficGB: 800, cycle: '一次性' },
+      { name: '灵动云·至尊私人定制', billing: '月付', price: 620, trafficGB: 0, cycle: '每月', notes: '原文流量“截图遮挡”保留原貌' }
+    ],
+    speedTest: {
+      date: '2026-07-21',
+      environmentNote: '珠海联通9Gbps实测记录，60测速/60解锁样本，HTTPS延迟偏高，速度20-80MB/s',
+      provenance: 'historical_aggregate',
+      results: [
+        { region: '香港', latencyMs: 80, downloadMbps: 320, status: 'success' },
+        { region: '日本', latencyMs: 95, downloadMbps: 280, status: 'success' },
+        { region: '新加坡', latencyMs: 110, downloadMbps: 240, status: 'success' },
+        { region: '美国', latencyMs: 210, downloadMbps: 160, status: 'partial' }
+      ]
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'success', claude: 'partial', gemini: 'partial' },
+      streaming: { netflix: 'partial', disney: 'partial', youtube: 'partial', hbo: 'not_tested', tiktok: 'failure', spotify: 'not_tested' }
+    },
+    vendorClaims: ['2025年开业专线', 'IEPL/VLESS', '不限速不限设备'],
+    pros: ['OpenAI各地区测试基本全解锁（亮点）', '大容量套餐最高给到1.5TB', '珠海联通实测速度够用'],
+    cons: ['TikTok实测多失败', '新/台YouTube送中', '台湾落地识别偏欧（NF/D+识别ES）', '美国01节点曾整节点失败'],
+    risks: ['节点识别与流媒体分流存在异常，以实测报告为准'],
+    suitableFor: ['主要需要解锁OpenAI/ChatGPT并需要大容量流量包的用户'],
+    notSuitableFor: ['重度TikTok创作者与海外版抖音运营用户'],
+    comparisonSummary: '2025新开业专线，OpenAI解锁是亮点，但TikTok与流媒体区域识别存在多项翻车记录。',
+    gapsAndConflicts: ['私人定制流量原文为“截图遮挡”，保留原样不脑补；VLESS/Trojan文案混提'],
+    verifiedDate: '2026-08-09',
+    updatedDate: '2026-10-21'
+  },
+
+  // 39. 浪网 (Source B)
+  {
+    id: 'wavenet',
+    name: '浪网',
+    aliases: ['浪网', 'WaveNet'],
+    editorialOrder: 39,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: 'https://varnexa.wavenetaff.com/#/?code=xwAM4tTd',
+    affiliateUrl: 'https://varnexa.wavenetaff.com/#/?code=xwAM4tTd',
+    affiliateCode: 'xwAM4tTd',
+    couponCodes: [],
+    protocols: ['未注明'],
+    lineType: '截图标注 IEPL 专线',
+    clients: { customApp: true, thirdParty: true, platforms: ['通用订阅客户端'] },
+    nodesSummary: '入门到商业多价格层级，流量包和定制线路',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 30, period: '月付', monthlyEquivalent: 30, trafficGB: 150, isApproximate: false },
+    plans: [
+      { name: '浪网 入门', billing: '月付', price: 30, trafficGB: 150, cycle: '每月', notes: '原文流量“截150G”保留原貌' },
+      { name: '浪网 进阶', billing: '月付', price: 70, trafficGB: 450, cycle: '每月' },
+      { name: '浪网 高端', billing: '月付', price: 120, trafficGB: 800, cycle: '每月' },
+      { name: '浪网 商业', billing: '月付', price: 200, trafficGB: 2000, cycle: '每月' },
+      { name: '浪网 年付标准', billing: '年付', price: 119, trafficGB: 80, cycle: '每月' },
+      { name: '浪网 小流量包', billing: '一次性付费', price: 239, trafficGB: 180, cycle: '一次性' },
+      { name: '浪网 标准流量包', billing: '一次性付费', price: 569, trafficGB: 450, cycle: '一次性' },
+      { name: '浪网 精英流量包', billing: '一次性付费', price: 1099, trafficGB: 900, cycle: '一次性' },
+      { name: '浪网 定制线路包', billing: '月付', price: 640, trafficGB: 500, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-08-09',
+      environmentNote: '原资料标注未实测，无法给出逐地区速度或延迟',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['IEPL专线定位', '入门到商业多层级', '定制线路'],
+    pros: ['商业档最高给到2000GB月流量', '档位划分细密可选周期多'],
+    cons: ['未实测，无速度与延迟数据', '部分套餐流量与设备限制被截图遮挡'],
+    risks: ['缺乏实测与解锁数据，当前购买需承担盲盒风险'],
+    suitableFor: ['需要超大商业流量包（2000G）且看重IEPL专线标称的用户'],
+    notSuitableFor: ['要求详尽测速报告后才做决定的谨慎用户'],
+    comparisonSummary: '截图标注IEPL专线，最高支持2000G商业档，但目前暂无实测数据。',
+    gapsAndConflicts: ['入门档流量原文为“截150G”；原资料标注未实测，缺少协议、客户端与解锁字段'],
+    verifiedDate: '2026-08-09',
+    updatedDate: '2026-10-21'
+  },
+
+  // 40. EdgeNova (Source B)
+  {
+    id: 'edgenova',
+    name: 'EdgeNova',
+    aliases: ['EdgeNova', '边缘节点'],
+    editorialOrder: 40,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: 'https://work.edgenovaaff.cc/#/register?code=cl3iB5YG',
+    affiliateUrl: 'https://work.edgenovaaff.cc/#/register?code=cl3iB5YG',
+    affiliateCode: 'cl3iB5YG',
+    couponCodes: [{ code: 'TH888', discount: '8折', notes: '新用户优惠码' }],
+    protocols: ['未注明'],
+    lineType: '高速直连 / IPLC（多线路自动分配）',
+    clients: { customApp: true, thirdParty: true, platforms: ['通用客户端导入'] },
+    nodesSummary: '高速直连与IPLC智能调度',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 15, period: '月付', monthlyEquivalent: 15, trafficGB: 72, isApproximate: false },
+    plans: [
+      { name: '限时月付', billing: '月付', price: 15, trafficGB: 72, cycle: '每月' },
+      { name: '限时年付', billing: '年付', price: 108, trafficGB: 45, cycle: '每月' },
+      { name: '极界·标准', billing: '月付', price: 25, trafficGB: 120, cycle: '每月' },
+      { name: '极界·标准', billing: '年付', price: 270, trafficGB: 120, cycle: '每月' },
+      { name: '极界·进阶', billing: '月付', price: 50, trafficGB: 250, cycle: '每月' },
+      { name: '极界·进阶', billing: '年付', price: 570, trafficGB: 250, cycle: '每月' },
+      { name: '极界·高级', billing: '月付', price: 100, trafficGB: 500, cycle: '每月' },
+      { name: '极界·高级', billing: '年付', price: 1100, trafficGB: 500, cycle: '每月' },
+      { name: '极界·极限', billing: '月付', price: 200, trafficGB: 1000, cycle: '每月' },
+      { name: '极界·极限', billing: '年付', price: 2300, trafficGB: 1000, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-08-09',
+      environmentNote: '未提供可比逐地区测速数据',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['高速直连/IPLC多线路自动分配', '提供新用户优惠码TH888'],
+    pros: ['月付15元低门槛试用', '支持主流国内支付及USDT', '新用户8折码'],
+    cons: ['缺少具体分地区实测数据', '直连与IPLC混合调度效果存疑'],
+    risks: ['自动调度可能导致某些任务中途换IP闪断'],
+    suitableFor: ['预算15元且希望体验多线路自动调度的用户'],
+    notSuitableFor: ['要求固定IP出口防账号风控的AI重度用户'],
+    comparisonSummary: '主打直连与IPLC多线路自动分配，提供新用户8折优惠，月付15元起。',
+    gapsAndConflicts: ['未提供逐地区测速数据'],
+    verifiedDate: '2026-08-09',
+    updatedDate: '2026-10-21'
+  },
+
+  // 41. SSLAR (Source B - 无独立入口)
+  {
+    id: 'sslar',
+    name: 'SSLAR',
+    aliases: ['sslar'],
+    editorialOrder: 41,
+    isTop10: false,
+    isPrimaryRecommended: false,
+    source: 'Source B',
+    officialUrl: null,
+    affiliateUrl: null,
+    affiliateCode: null,
+    couponCodes: [{ code: 'ko3eTt0w', discount: '8折', notes: '历史资料记录' }],
+    protocols: ['Shadowsocks', 'VLESS（自适应）'],
+    lineType: '企业级 IEPL + 多线 BGP',
+    clients: { customApp: true, thirdParty: true, platforms: ['自研客户端（Win/mac/安卓）', '支持远程桌面协助'] },
+    nodesSummary: 'Eons/Akari/DigitalOcean机房，SS/VLESS协议自适应',
+    regions: ['香港', '日本', '新加坡', '美国'],
+    pricingStarting: { amount: 17, period: '月付', monthlyEquivalent: 17, trafficGB: 100, isApproximate: false },
+    plans: [
+      { name: 'Basic', billing: '月付', price: 17, trafficGB: 100, cycle: '每月' },
+      { name: 'Basic', billing: '年付', price: 163, trafficGB: 100, cycle: '每月' },
+      { name: 'Standard', billing: '月付', price: 28, trafficGB: 200, cycle: '每月' },
+      { name: 'Standard', billing: '年付', price: 268, trafficGB: 200, cycle: '每月' },
+      { name: 'Premium', billing: '月付', price: 36, trafficGB: 300, cycle: '每月' },
+      { name: 'Premium', billing: '年付', price: 345, trafficGB: 300, cycle: '每月' }
+    ],
+    speedTest: {
+      date: '2026-08-09',
+      environmentNote: '未提供可比逐地区测速数据',
+      provenance: 'not_tested',
+      results: []
+    },
+    serviceAvailability: {
+      ai: { chatgpt: 'not_tested', claude: 'not_tested', gemini: 'not_tested' },
+      streaming: { netflix: 'not_tested', disney: 'not_tested', youtube: 'not_tested', hbo: 'not_tested', tiktok: 'not_tested', spotify: 'not_tested' }
+    },
+    vendorClaims: ['企业级IEPL+多线BGP', 'SS/VLESS自适应', '支持远程桌面协助'],
+    pros: ['支持远程桌面协助适合非技术商务用户', '多机房落地混合调度', '月付17元相对亲民'],
+    cons: ['无独立注册入口', '无逐地区实测数据'],
+    risks: ['无独立入口，仅供资料库档案查询'],
+    suitableFor: ['需要远程技术协助解决客户端配置的商务人群背景了解'],
+    notSuitableFor: ['寻找即时有效购买通道的用户'],
+    comparisonSummary: '定位企业级IEPL加远程桌面协助，服务特色鲜明，当前无独立入口。',
+    gapsAndConflicts: ['未提供独立品牌入口；未提供可比测速；最高约48折历史表述'],
+    verifiedDate: '2026-08-09',
+    updatedDate: '2026-10-21'
+  }
+];
+
+console.log(`Compiled data for ${brands.length} unique brands.`);
+
+// Ensure output dirs
+const dataDir = path.join(__dirname, '..', 'src', 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+fs.writeFileSync(path.join(dataDir, 'brands.json'), JSON.stringify(brands, null, 2), 'utf8');
+console.log('Saved src/data/brands.json successfully.');
+
+// Also generate src/lib/links.ts so components can import strictly from it
+let linksTs = `// 集中链接注册表：从品牌数据库生成的类型安全链接映射
+export interface AffiliateLink {
+  brandId: string;
+  name: string;
+  affiliateUrl: string | null;
+  officialUrl: string | null;
+  code: string | null;
+  commissionNotice: string;
+}
+
+export const AFFILIATE_LINKS: Record<string, AffiliateLink> = {
+`;
+
+for (const b of brands) {
+  linksTs += `  '${b.id}': {
+    brandId: '${b.id}',
+    name: ${JSON.stringify(b.name)},
+    affiliateUrl: ${JSON.stringify(b.affiliateUrl)},
+    officialUrl: ${JSON.stringify(b.officialUrl)},
+    code: ${JSON.stringify(b.affiliateCode)},
+    commissionNotice: '含推广合作链接，通过链接注册可能为本站带来佣金，不影响用户支付价格'
+  },
+`;
+}
+linksTs += `};\n`;
+
+const libDir = path.join(__dirname, '..', 'src', 'lib');
+if (!fs.existsSync(libDir)) {
+  fs.mkdirSync(libDir, { recursive: true });
+}
+fs.writeFileSync(path.join(libDir, 'links.ts'), linksTs, 'utf8');
+console.log('Saved src/lib/links.ts successfully.');

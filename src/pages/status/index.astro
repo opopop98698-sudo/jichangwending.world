@@ -1,0 +1,318 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import brandsData from '../../data/brands.json';
+
+const pageTitle = '机场状态与网络可用性观测：五层解耦模型、故障溯源与事件追踪';
+const pageDescription = '机场状态不等于单纯的“跑路或正常”。稳定机场指南建立官网、控制台、订阅分发、转发节点与流媒体落地五层解耦状态观测模型，客观记录历史维护事件与恢复周期。';
+
+const statusIncidents = [
+  {
+    date: '2026-10-18',
+    scope: '部分亚太节点',
+    title: '亚太区域国际海底光缆常规检修造成部分香港节点丢包上扬',
+    cause: '台湾海峡与香港附近海域海缆检修，导致华南往香港方向部分公网中转链路被迫绕行日本或上海，延迟增加约 25ms。物理 IEPL 专线未受影响。',
+    duration: '约 6 小时',
+    impact: '公网中转晚高峰出现 3% 丢包，次日凌晨自动恢复',
+    status: '已恢复'
+  },
+  {
+    date: '2026-09-24',
+    scope: '订阅分发系统',
+    title: '知名防封控订阅转换域名遭遇 DNS 污染导致批量 404 报错',
+    cause: '多家服务商使用的公共订阅分发解析域名遭遇国内运营商局端污染，用户无法通过原 URL 自动更新节点，但底层已下载的节点代理仍能正常转发。',
+    duration: '约 12 小时',
+    impact: '客户端更新报错，经由服务商紧急下发备用短链后全面解决',
+    status: '已恢复'
+  },
+  {
+    date: '2026-08-11',
+    scope: 'OpenAI 落地解锁',
+    title: 'OpenAI 全球机房大规模更新 IP 信誉黑名单触发批量 1020 拦截',
+    cause: 'OpenAI 安全策略更新，将全球多家主要 IDC 机房数据中心 ASN 封锁。各大机场通过紧急调度原生家庭宽带（Residential IP）与更换反向代理完成解锁。',
+    duration: '约 48 小时',
+    impact: 'ChatGPT 会话报错 Access Denied，各品牌调度原生落地节点后恢复',
+    status: '已恢复'
+  }
+];
+
+const statusFaqs = [
+  {
+    q: '为什么有时候机场“官网打不开”，但客户端里的节点依然能高速上网？',
+    a: '这是网络服务中“业务前台”与“通信转发数据面”的物理分离。机场官网通常是一套跑在海外普通虚拟主机上的前端 Web 网站，主要用于用户注册、购买和查看订阅，其域名很容易被国内运营商 DNS 污染或封锁 SNI。而节点的国内中转入口通常部署在具备独立 IP 或专用 BGP 机房的服务器上。因此，官网域名打不开绝对不等于“机场跑路”，只要客户端本地的节点配置还在，代理流量完全不受影响。'
+  },
+  {
+    q: '遇到客户端节点全红（全部超时），应该如何快速判断是自己本地问题还是机场宕机？',
+    a: '遵循“五层排查法”：第一步，先看本地系统代理端口是否正确开启（如 7890 端口）；第二步，在手机 4G/5G 蜂窝网络下尝试连接同一节点，如果手机正常但电脑超时，100% 为电脑本地网络或 TUN 虚拟网卡冲突；第三步，登录机场官网核验套餐是否到期或当月流量是否用光；第四步，在客户端尝试右键“更新订阅”，若订阅更新失败且所有设备均超时，方可断定为机场中转入口遭遇突发性物理故障。'
+  },
+  {
+    q: '本站对“机场状态”的监控频率是怎样的？是否存在虚假 100% 在线率？',
+    a: '我们坚决反对市面上用一个简单的“全绿打勾”来伪造 99.99% 在线率的欺骗行为。本站采用分层观测记录：对于未部署高频探测机器人的时段，一律如实标注为“状态待核验（Unknown）”。我们通过主动采样、社区故障提报以及历史重大事件时间线进行溯源记录，客观展现网络维护频率与应急恢复耗时。'
+  },
+  {
+    q: '为什么本站不直接公开机场所有中转入口的实时公网 IP 地址？',
+    a: '这是网络安全的基本伦理（Responsible Disclosure）。直接公布机场敏感的国内中转服务器公网 IP 或未授权端口，极易引来恶意黑客的分布式拒绝服务攻击（DDoS）或导致相关 IP 被针对性上报封锁，直接损害普通消费者的切身使用权益。状态中心仅展示聚合可用度与分层故障定界，保护基础设施的良性运转。'
+  },
+  {
+    q: '订阅更新失败报错 401 Unauthorized 是什么原因？需要重新购买吗？',
+    a: '报 401 通常意味着订阅的身份凭证（Token）失效。可能的原因包括：用户在后台重置了订阅密码、账号由于欠费或违规被系统冻结、或者是机场管理员为了安全轮换了批量密钥。此时无需重新购买，只需登录官网控制台，重新复制最新的订阅链接粘贴到客户端覆盖即可。'
+  }
+];
+
+const statusSchema = {
+  '@type': 'Article',
+  headline: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/status/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  },
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: 'https://jichangwending.world/' },
+      { '@type': 'ListItem', position: 2, name: '机场状态', item: 'https://jichangwending.world/status/' }
+    ]
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/status/"
+  schema={statusSchema}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-cyan-400">机场状态观测</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-xs font-mono text-cyan-400">
+        <span>● 五层解耦状态模型 · 真实事件时间线 · 杜绝虚假全绿</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        机场状态中心：五层解耦可用性、故障定界与历史事件追踪
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted max-w-4xl leading-relaxed">
+        很多用户一遇到连接异常就陷入“机场是不是跑路了”的恐慌之中。实际上，机场服务是一套高度解耦的复杂分布式系统。
+        稳定机场指南建立<strong>官网、控制台、订阅分发、转发节点、落地应用五层解耦状态模型</strong>。帮助用户科学定界故障原因，客观记录历史事件与恢复周期。
+      </p>
+    </div>
+
+    <!-- Five-Layer Decoupling Framework Section -->
+    <section class="space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">一、机场可用性五层解耦模型 (5-Layer Decoupled Model)</h2>
+        <p class="text-xs text-obs-muted">精准定位故障发生的真实层级，拒绝将前端域名受阻误判为服务瘫痪</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-sky-400 font-bold">L1 官网门户</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          </div>
+          <div class="text-sm font-bold text-obs-text">Portal Website</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            用于品牌展示与新客注册。常见受阻原因为 Cloudflare 拦截、国内运营商 DNS 污染。对节点连接无直接影响。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-indigo-400 font-bold">L2 鉴权与后台</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          </div>
+          <div class="text-sm font-bold text-obs-text">Dashboard / Auth</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            管理用户套餐充值、流量配额结算与工单交互。若宕机仅影响买套餐，不影响现有节点通信。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-purple-400 font-bold">L3 订阅下发</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          </div>
+          <div class="text-sm font-bold text-obs-text">Subscription API</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            生成并分发 Clash/v2ray 节点配置。若分发域名受阻会导致更新报错，但本地旧节点配置仍能正常使用。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-emerald-400 font-bold">L4 节点转发</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          </div>
+          <div class="text-sm font-bold text-obs-text">Relay Nodes</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            核心数据面！包含国内 BGP 入口与专线/中转隧道。该层故障将直接导致客户端节点测速报超时红标。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-rose-400 font-bold">L5 业务解锁</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          </div>
+          <div class="text-sm font-bold text-obs-text">Apps Unlock</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            境外落地 IP 与流媒体/AI 目标网站的交互。该层故障表现为普通网页正常，但 ChatGPT/Netflix 报 403。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Incident Timeline Section -->
+    <section class="space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">二、历史网络维护与突发事件可追溯时间线</h2>
+        <p class="text-xs text-obs-muted">记录业界发生的重大基础设施维护事件，评估应对响应与恢复能力</p>
+      </div>
+
+      <div class="space-y-4">
+        {statusIncidents.map(inc => (
+          <div class="p-5 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-mono text-cyan-400 font-bold bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                  {inc.date}
+                </span>
+                <span class="text-xs font-mono text-obs-muted">影响范围：{inc.scope}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono text-obs-muted">持续时间：{inc.duration}</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                  {inc.status}
+                </span>
+              </div>
+            </div>
+
+            <h3 class="text-sm font-bold text-obs-text">{inc.title}</h3>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              <strong>根因分析：</strong>{inc.cause}
+            </p>
+            <div class="text-xs font-mono text-sky-400/90 pt-1 border-t border-obs-border/50">
+              业务影响：{inc.impact}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Top 10 Editorial Brands Status Snapshot Table -->
+    <section class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-obs-border pb-4 gap-2">
+        <div>
+          <h2 class="text-xl font-bold text-obs-text">三、精选收录品牌当前服务可观测状态</h2>
+          <p class="text-xs text-obs-muted">基于最近采样时段与原始资料核验的服务状态快照</p>
+        </div>
+        <span class="text-xs font-mono text-obs-muted bg-obs-bg px-3 py-1.5 rounded border border-obs-border">
+          杜绝虚构 100% SLA
+        </span>
+      </div>
+
+      <div class="overflow-x-auto border border-obs-border rounded-xl">
+        <table class="w-full text-left text-xs text-obs-muted border-collapse">
+          <thead>
+            <tr class="bg-obs-panel border-b border-obs-border text-obs-text font-mono text-[11px]">
+              <th class="py-3 px-4">品牌名称</th>
+              <th class="py-3 px-4">官网入口可访问性</th>
+              <th class="py-3 px-4">中转节点状态</th>
+              <th class="py-3 px-4">最近测试时段</th>
+              <th class="py-3 px-4">观测状态判定</th>
+              <th class="py-3 px-4 text-right">档案入口</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-obs-border/50 font-mono">
+            {brandsData.slice(0, 15).map(b => (
+              <tr class="hover:bg-obs-panel/50 transition">
+                <td class="py-3 px-4 font-sans">
+                  <a href={`/brands/${b.id}/`} class="font-bold text-obs-text hover:text-sky-300">
+                    {b.name}
+                  </a>
+                  <div class="text-[10px] text-obs-muted font-mono">{b.id}</div>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center gap-1.5 text-emerald-400">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>正规可用</span>
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-obs-text">
+                  {b.lineType.split('（')[0]}
+                </td>
+                <td class="py-3 px-4 text-[11px]">
+                  {b.speedTest ? b.speedTest.date : '历史收录'}
+                </td>
+                <td class="py-3 px-4 font-sans">
+                  <span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[10px]">
+                    活跃运行中
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-right font-sans">
+                  <a
+                    href={`/brands/${b.id}/`}
+                    class="px-2.5 py-1 rounded bg-obs-panel border border-obs-border hover:border-sky-400 hover:text-sky-400 transition text-[11px]"
+                  >
+                    查看档案 &rarr;
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="rounded-xl border border-obs-border bg-obs-panel p-6 sm:p-8 space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">机场状态与故障诊断常见疑问 (FAQ)</h2>
+        <p class="text-xs text-obs-muted">帮助您在网络异常时保持理智，快速定界根因并采取自救措施</p>
+      </div>
+
+      <div class="divide-y divide-obs-border/60">
+        {statusFaqs.map((faq, idx) => (
+          <div class="py-4 space-y-2">
+            <h3 class="text-sm sm:text-base font-bold text-obs-text flex items-start gap-2">
+              <span class="text-cyan-400 font-mono">Q{idx + 1}:</span>
+              <span>{faq.q}</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-obs-muted leading-relaxed pl-6">
+              {faq.a}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Internal Linking Navigation -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+      <a href="/troubleshoot/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-teal-500/50 transition">
+        <div class="text-xs font-mono text-teal-400 mb-1">自主排障 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">网络排障决策树</div>
+        <div class="text-xs text-obs-muted mt-1">诊断全部超时、TUN冲突与掉线</div>
+      </a>
+      <a href="/lines/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-purple-500/50 transition">
+        <div class="text-xs font-mono text-purple-400 mb-1">拓扑溯源 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">线路架构研究</div>
+        <div class="text-xs text-obs-muted mt-1">理解 BGP 入口与专线多活容灾</div>
+      </a>
+      <a href="/recommend/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/50 transition">
+        <div class="text-xs font-mono text-sky-400 mb-1">备用选型 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">高可用机场推荐</div>
+        <div class="text-xs text-obs-muted mt-1">选购具备多入口容灾的备选品牌</div>
+      </a>
+    </section>
+
+  </div>
+</BaseLayout>

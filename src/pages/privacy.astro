@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pageTitle = '隐私保护与数据安全说明：零侵入、纯前端交互与最小化日志';
+const pageDescription = '稳定机场指南承诺严格的隐私保护标准。所有7大交互工具均为纯前端浏览器本地运算，不收集个人表单或指纹追踪，保障访客网络探索的安全与私密。';
+
+const privacySchema = {
+  '@type': 'Article',
+  headline: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/privacy/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/privacy/"
+  schema={privacySchema}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-sky-400">隐私与安全</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-sky-500/30 bg-sky-500/10 text-xs font-mono text-sky-400">
+        <span>● 纯前端无状态交互 · 零侵入式追踪</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        隐私权与数据安全政策 (Privacy Policy)
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted leading-relaxed">
+        稳定机场指南深知网络安全与个人隐私对于技术探索者的至高重要性。
+        我们严格遵守“最小必要收集”与“无状态运算”原则，向所有访客公开本站的数据治理实践。
+      </p>
+    </div>
+
+    <!-- 1. Pure Client-side Tools Execution -->
+    <section class="space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <h2 class="text-lg font-bold text-obs-text">一、交互工具纯前端无外呼运行保证</h2>
+      <p>
+        本站提供的全部 7 大专业交互工具（包括需求选择器、条件筛选器、两品牌对比器、带宽换算器、周期比较器、成功率计算器以及网络排障决策树），<strong>全部在您的本地浏览器 JavaScript 沙箱中 100% 本地运算完成</strong>：
+      </p>
+      <ul class="list-disc list-inside space-y-2 pl-2">
+        <li>工具不发起任何向后端的 API 请求或表单数据收集。</li>
+        <li>您的网络症状选择、预算偏好或自定义计算数值，绝不会被回传、存储或上传至任何远程服务器。</li>
+        <li>您可以在完全断网（离线）状态下正常使用全部工具的核心运算逻辑。</li>
+      </ul>
+    </section>
+
+    <!-- 2. Server Logs and Web Analytics -->
+    <section class="space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <h2 class="text-lg font-bold text-obs-text">二、服务器日志与访问统计</h2>
+      <p>
+        作为标准的 Web 服务，当您访问本站时，我们的托管服务器仅记录用于防御恶意 DDoS 攻击与维护基础设施安全的基础访问日志：
+      </p>
+      <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2 font-mono text-xs">
+        <p class="text-obs-text">日志记录范围仅限于：</p>
+        <p class="text-obs-muted">• 访问的请求路径（Request URI）与 HTTP 状态码</p>
+        <p class="text-obs-muted">• 客户端来源 IP 地址（用于速率限制与防刷策略，自动脱敏存储并在 14 天后自动滚动清除）</p>
+        <p class="text-obs-muted">• 浏览器 User-Agent 标头（用于判断桌面/移动设备适配）</p>
+      </div>
+      <p>
+        本站<strong>绝不使用</strong>任何侵犯隐私的跨站广告追踪代码、第三方 Cookie 监听脚本或设备指纹生成工具。
+      </p>
+    </section>
+
+    <!-- 3. External Outbound Links -->
+    <section class="space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <h2 class="text-lg font-bold text-obs-text">三、第三方外部链接安全提醒</h2>
+      <p>
+        本站包含指向机场服务商官网、开源软件仓库（如 GitHub）或官方网络工程知识库的外部链接。当您点击这些链接离开本站后，目标网站的数据收集与隐私实践将受其自身隐私政策管辖。
+      </p>
+      <p>
+        我们强烈建议您在任何第三方网站注册账号或购买服务时：
+      </p>
+      <ul class="list-disc list-inside space-y-1 pl-2">
+        <li>使用独立专用的匿名电子邮箱（如 ProtonMail 或自定义别名）。</li>
+        <li>设置不可预测的高强度独立密码，切勿使用日常重要资产（如个人网银或主邮箱）的相同密码。</li>
+        <li>优先选择具备合规第三方支付担保通道（如支付宝扫码或虚拟货币），避免直接绑定个人信用卡实体信息。</li>
+      </ul>
+    </section>
+
+  </div>
+</BaseLayout>

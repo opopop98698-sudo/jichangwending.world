@@ -1,0 +1,154 @@
+---
+// 付款周期与单G成本比较器 (Billing Cycle Comparator)
+---
+
+<div class="rounded-xl border border-[#26354D] bg-[#111C2E] p-5 sm:p-6 text-[#E6EDF6] space-y-4 my-6">
+  <div class="flex items-center justify-between pb-3 border-b border-[#26354D]">
+    <div class="flex items-center space-x-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#F59E0B]"></span>
+      <h3 class="text-sm sm:text-base font-bold tracking-tight">付款周期与单G成本比较器 (Billing Cycle Comparator)</h3>
+    </div>
+    <span class="text-xs font-mono text-[#A7B6CC]">实付、月均折算与试错沉没成本</span>
+  </div>
+
+  <p class="text-xs text-[#A7B6CC] leading-relaxed">
+    很多机场通过“年付大额折扣”吸引用户一次性交钱。输入您正在考虑的两个套餐（例如月付 25 元 vs 年付 99 元），计算真实月均支出、每GB单价以及<strong>若商家运营异常时的最大沉没损失</strong>：
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <!-- Option A -->
+    <div class="p-4 rounded-lg bg-[#0B1220] border border-[#26354D] space-y-3">
+      <div class="font-bold text-xs text-[#38BDF8] font-mono">[方案 A / 短周期如月付]</div>
+      <div class="space-y-2 text-xs font-mono">
+        <div>
+          <label class="block text-[#A7B6CC] mb-1">支付周期:</label>
+          <select id="cycle-a" class="w-full bg-[#111C2E] border border-[#26354D] rounded px-2.5 py-1.5 text-xs text-[#E6EDF6]">
+            <option value="1" selected>月付 (1个月)</option>
+            <option value="3">季付 (3个月)</option>
+            <option value="12">年付 (12个月)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[#A7B6CC] mb-1">当次实付总金额 (元):</label>
+          <input id="price-a" type="number" value="25" class="w-full bg-[#111C2E] border border-[#26354D] rounded px-2.5 py-1.5 text-xs text-[#E6EDF6]" />
+        </div>
+        <div>
+          <label class="block text-[#A7B6CC] mb-1">每月流量配额 (GB):</label>
+          <input id="traffic-a" type="number" value="150" class="w-full bg-[#111C2E] border border-[#26354D] rounded px-2.5 py-1.5 text-xs text-[#E6EDF6]" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Option B -->
+    <div class="p-4 rounded-lg bg-[#0B1220] border border-[#26354D] space-y-3">
+      <div class="font-bold text-xs text-[#10B981] font-mono">[方案 B / 长周期如年付]</div>
+      <div class="space-y-2 text-xs font-mono">
+        <div>
+          <label class="block text-[#A7B6CC] mb-1">支付周期:</label>
+          <select id="cycle-b" class="w-full bg-[#111C2E] border border-[#26354D] rounded px-2.5 py-1.5 text-xs text-[#E6EDF6]">
+            <option value="1">月付 (1个月)</option>
+            <option value="3">季付 (3个月)</option>
+            <option value="12" selected>年付 (12个月)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[#A7B6CC] mb-1">当次实付总金额 (元):</label>
+          <input id="price-b" type="number" value="99" class="w-full bg-[#111C2E] border border-[#26354D] rounded px-2.5 py-1.5 text-xs text-[#E6EDF6]" />
+        </div>
+        <div>
+          <label class="block text-[#A7B6CC] mb-1">每月流量配额 (GB):</label>
+          <input id="traffic-b" type="number" value="69" class="w-full bg-[#111C2E] border border-[#26354D] rounded px-2.5 py-1.5 text-xs text-[#E6EDF6]" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real-time Comparison Metrics -->
+  <div class="p-4 rounded-lg bg-[#0B1220] border border-[#26354D] grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
+    <div>
+      <div class="text-[#64748B]">方案A 月均折算</div>
+      <div id="res-monthly-a" class="text-base font-bold text-[#38BDF8] mt-1">¥25.0 /月</div>
+      <div id="res-pergb-a" class="text-[11px] text-[#A7B6CC]">0.17 元/GB</div>
+    </div>
+    <div>
+      <div class="text-[#64748B]">方案B 月均折算</div>
+      <div id="res-monthly-b" class="text-base font-bold text-[#10B981] mt-1">¥8.25 /月</div>
+      <div id="res-pergb-b" class="text-[11px] text-[#A7B6CC]">0.12 元/GB</div>
+    </div>
+    <div>
+      <div class="text-[#64748B]">方案B 月度结余</div>
+      <div id="res-save" class="text-base font-bold text-[#10B981] mt-1">省 ¥16.75 /月</div>
+      <div class="text-[11px] text-[#A7B6CC]">长周期单价更优</div>
+    </div>
+    <div>
+      <div class="text-[#64748B]">初始试错敞口风险</div>
+      <div id="res-risk" class="text-base font-bold text-[#F59E0B] mt-1">方案B高出 ¥74</div>
+      <div class="text-[11px] text-[#A7B6CC]">如跑路或断流最大损失</div>
+    </div>
+  </div>
+
+  <div class="p-3 rounded bg-[#0B1220]/60 border border-[#26354D] text-[11px] text-[#A7B6CC] leading-relaxed">
+    <strong class="text-[#E6EDF6]">理性选购建议：</strong>
+    年付虽然把月均拉到极低（如光速云 99 元年付折合 8.25 元/月），但必须承担该商家整年不跑路、不剧烈降速的远期风险；月付 20-25 元虽然单价稍高，但拥有<strong>“随时停止续费”</strong>的主动权。对于未经过长期验证的机场，新手强烈建议先用 1 个月月付测试真实晚高峰。
+  </div>
+</div>
+
+<script>
+  const cycleA = document.getElementById('cycle-a') as HTMLSelectElement;
+  const priceA = document.getElementById('price-a') as HTMLInputElement;
+  const trafficA = document.getElementById('traffic-a') as HTMLInputElement;
+
+  const cycleB = document.getElementById('cycle-b') as HTMLSelectElement;
+  const priceB = document.getElementById('price-b') as HTMLInputElement;
+  const trafficB = document.getElementById('traffic-b') as HTMLInputElement;
+
+  const resMonthlyA = document.getElementById('res-monthly-a');
+  const resPergbA = document.getElementById('res-pergb-a');
+  const resMonthlyB = document.getElementById('res-monthly-b');
+  const resPergbB = document.getElementById('res-pergb-b');
+  const resSave = document.getElementById('res-save');
+  const resRisk = document.getElementById('res-risk');
+
+  function calculate() {
+    const cA = parseInt(cycleA?.value || '1');
+    const pA = parseFloat(priceA?.value || '0');
+    const tA = parseFloat(trafficA?.value || '1');
+
+    const cB = parseInt(cycleB?.value || '12');
+    const pB = parseFloat(priceB?.value || '0');
+    const tB = parseFloat(trafficB?.value || '1');
+
+    const mA = pA / cA;
+    const mB = pB / cB;
+
+    const gbA = pA / (cA * tA);
+    const gbB = pB / (cB * tB);
+
+    if (resMonthlyA) resMonthlyA.textContent = `¥${mA.toFixed(2)} /月`;
+    if (resPergbA) resPergbA.textContent = `${gbA.toFixed(2)} 元/GB`;
+
+    if (resMonthlyB) resMonthlyB.textContent = `¥${mB.toFixed(2)} /月`;
+    if (resPergbB) resPergbB.textContent = `${gbB.toFixed(2)} 元/GB`;
+
+    if (resSave) {
+      const diff = mA - mB;
+      if (diff > 0) {
+        resSave.textContent = `省 ¥${diff.toFixed(2)} /月`;
+        resSave.className = 'text-base font-bold text-[#10B981] mt-1';
+      } else {
+        resSave.textContent = `多花 ¥${(-diff).toFixed(2)} /月`;
+        resSave.className = 'text-base font-bold text-[#F59E0B] mt-1';
+      }
+    }
+
+    if (resRisk) {
+      const upfrontDiff = pB - pA;
+      resRisk.textContent = upfrontDiff > 0 ? `方案B多压 ¥${upfrontDiff.toFixed(0)}` : `方案A多压 ¥${(-upfrontDiff).toFixed(0)}`;
+    }
+  }
+
+  [cycleA, priceA, trafficA, cycleB, priceB, trafficB].forEach((el) => {
+    el?.addEventListener('input', calculate);
+  });
+  calculate();
+</script>

@@ -1,0 +1,160 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pageTitle = '数据纠错与勘误通道：保持客观、可追溯与对事实负责';
+const pageDescription = '稳定机场指南设立公开的数据勘误与纠错通道。欢迎用户与服务商提交公开佐证材料，核实套餐变动、线路更替或异常样本，共同维护真实的中文网络评测知识库。';
+
+const correctionsLog = [
+  {
+    date: '2026-10-20',
+    brand: 'Firefly (萤火虫)',
+    field: '实体归并与别名映射',
+    previous: '原资料 B 中萤火虫与资料 A 中 Firefly 独立存在',
+    current: '核验确认使用相同域名与套餐体系，按别名归并为一个实体（Slug: firefly），保留两份历史记录',
+    status: '已实施'
+  },
+  {
+    date: '2026-10-20',
+    brand: 'CyberGuard',
+    field: '韩国节点延迟 6000ms 异常',
+    previous: '历史记录为 6000ms',
+    current: '维持 6000ms 原始值并增加“异常待核实”警示标签，不擅自修改为 60ms',
+    status: '已实施'
+  },
+  {
+    date: '2026-10-20',
+    brand: '微风网络',
+    field: '套餐起步价与表格差异',
+    previous: '年付7元/月与表内137元/年冲突',
+    current: '正文与档案明确标明双版本并存，起价暂不作为已确认最低价',
+    status: '已实施'
+  }
+];
+
+const correctionsSchema = {
+  '@type': 'Article',
+  headline: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/corrections/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/corrections/"
+  schema={correctionsSchema}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-sky-400">数据纠错通道</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-sky-500/30 bg-sky-500/10 text-xs font-mono text-sky-400">
+        <span>● 开放勘误 · 事实至上 · 永不静默覆盖</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        数据勘误与公开纠错通道 (Corrections Policy)
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted leading-relaxed">
+        任何严谨的知识库都无法完全避免资料滞后或输入偏差。
+        稳定机场指南推行<strong>公开可追溯的勘误机制</strong>：所有数据更正均记录修订历史与佐证依据，严禁有偿删帖、严禁花钱洗白，坚持对客观事实负责。
+      </p>
+    </div>
+
+    <!-- 1. Submission Principles -->
+    <section class="space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <h2 class="text-lg font-bold text-obs-text">一、勘误受理三大原则</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-sky-400 font-mono text-xs">01 · 必须提供客观佐证</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            提报价格变动、线路更替或优惠码失效时，需附带官网公开公告链接、带完整时间戳的控制台截图或公开订单凭证。不接受无证据的口头陈述。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-amber-400 font-mono text-xs">02 · 保留历史修订日志</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            核验通过的修订将在本站对应品牌档案与本页勘误日志中完整公示“原记录值”、“修正值”及“修订理由”，拒绝静默覆盖。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="font-bold text-rose-400 font-mono text-xs">03 · 拒绝有偿删改负面记录</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            对于已发生的真实重大网络中断事故、测速丢包记录或虚假宣传冲突，本站概不接受任何形式的“有偿删帖”或“商业洗白”。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Recent Corrections Log -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-lg font-bold text-obs-text">二、近期已核验勘误记录清单</h2>
+        <p class="text-xs text-obs-muted">公开透明展示已落地的实体映射与资料冲突处理结果</p>
+      </div>
+
+      <div class="overflow-x-auto border border-obs-border rounded-xl">
+        <table class="w-full text-left text-xs text-obs-muted border-collapse">
+          <thead>
+            <tr class="bg-obs-panel border-b border-obs-border text-obs-text font-mono text-[11px]">
+              <th class="py-2.5 px-3">修订日期</th>
+              <th class="py-2.5 px-3">涉及品牌</th>
+              <th class="py-2.5 px-3">修订项目</th>
+              <th class="py-2.5 px-3">原记录状态</th>
+              <th class="py-2.5 px-3">核验后处置</th>
+              <th class="py-2.5 px-3 text-right">状态</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-obs-border/50 font-mono">
+            {correctionsLog.map(log => (
+              <tr class="hover:bg-obs-panel/30">
+                <td class="py-2.5 px-3 text-sky-400 font-bold">{log.date}</td>
+                <td class="py-2.5 px-3 text-obs-text font-sans font-bold">{log.brand}</td>
+                <td class="py-2.5 px-3 font-sans">{log.field}</td>
+                <td class="py-2.5 px-3 font-sans text-rose-300/80">{log.previous}</td>
+                <td class="py-2.5 px-3 font-sans text-emerald-300">{log.current}</td>
+                <td class="py-2.5 px-3 text-right">
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px]">
+                    {log.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. How to Submit -->
+    <section class="p-6 rounded-xl border border-obs-border bg-obs-panel space-y-4 text-xs">
+      <h2 class="text-lg font-bold text-obs-text">三、如何向我们提交勘误提报？</h2>
+      <p class="text-obs-muted leading-relaxed">
+        若您发现任何收录品牌存在套餐价格调整、优惠码过期、线路属性变动或测速证据更新，请整理以下信息后向我们提报：
+      </p>
+      <div class="p-4 rounded-lg bg-obs-bg border border-obs-border font-mono text-xs space-y-1 text-obs-muted">
+        <p><span class="text-sky-400">1. 涉及品牌标识 (Brand ID):</span> 例如 lightspeed / feimao / wgetcloud</p>
+        <p><span class="text-sky-400">2. 勘误具体字段:</span> 例如 基础起步价 / 优惠码适用范围 / 线路类型声明</p>
+        <p><span class="text-sky-400">3. 提报修正内容:</span> 描述准确的当前实际值</p>
+        <p><span class="text-sky-400">4. 公开可查验证据:</span> 官网公告截图、控制台支付记录、或第三方独立测试日志</p>
+        <p><span class="text-sky-400">5. 提报联系方式:</span> 可公开的联系邮箱或社交账号（便于我们进一步核验细节）</p>
+      </div>
+      <p class="text-obs-muted text-[11px]">
+        我们的工程团队将在收到提报后 48 小时内进行双人交叉复核，并在核验通过后第一时间更新全站静态页面与公开勘误日志。
+      </p>
+    </section>
+
+  </div>
+</BaseLayout>

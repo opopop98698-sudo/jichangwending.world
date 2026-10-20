@@ -1,0 +1,276 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PerformanceReport from '../../components/PerformanceReport.astro';
+import BandwidthConverter from '../../components/tools/BandwidthConverter.astro';
+import MetricCalculator from '../../components/tools/MetricCalculator.astro';
+import brandsData from '../../data/brands.json';
+
+const pageTitle = '测速实验室：真实测速快照、换算工具与四维度量模型';
+const pageDescription = '稳定机场指南测速实验室公布41个品牌的真实测速数据快照、Mbps与MB/s换算器及覆盖率计算器。坚守四维状态度量模型，明确标注数据来源与非晚高峰局限，拒绝弄虚作假。';
+
+// Brands with speedtest data
+const testedBrands = brandsData.filter(b => {
+  const max = b.speedTest?.results?.reduce((m, r) => Math.max(m, r.downloadMbps || 0), 0) || 0;
+  return max > 0;
+});
+
+
+const labFaqs = [
+  {
+    q: '为什么本站要明确标注“2026-10-19 测速记录来源于入库资料而非全天实测”？',
+    a: '科学评测的底线是“诚实披露数据来源与测试边界”。入库资料 A 中记录的 2026-10-19 测速数据，虽然具有重要横向参考价值，但由于其原始记录未附带完整的本地测试宽带运营商、测试客户端版本、物理地理位置及多次抽样标准差，我们绝不能将其偷换概念升级为“本站全天候实测”或“晚高峰长效在线率保证”。我们以四维状态模型明确界定数据归属，严禁把离散的非高峰快照伪造成全天候 99.9% 稳定性的证明。'
+  },
+  {
+    q: 'Mbps 与 MB/s 到底有什么区别？为什么 1000Mbps 测速下载只有 100MB/s？',
+    a: '这是网络通信中“比特（bit）”与存储计量中“字节（Byte）”的单位差异：1 字节（Byte）等于 8 比特（bits），即 1 MB/s = 8 Mbps。在理想物理无损环境下，1000 Mbps 的理论最高下载速度为 125 MB/s。而在实际 TCP/IP 网络传输中，还要扣除以太网帧头、IP 报头、TCP 头部、TLS 加密开销以及大约 3%~5% 的协议封装损耗，实际有效载荷下载速率达到 105~115 MB/s 即已属于顶格跑满。本站内嵌的换算工具已预置该损耗折算。'
+  },
+  {
+    q: '为什么隐形人（yinxingren）在测速栏中被标注为“Not Tested”，而不是 0 Mbps？',
+    a: '在数据统计与科学严谨性中，“未测试（Not Tested / Null）”与“测试结果为零（0 Mbps / Failed）”是两个截然不同的概念。原始资料中隐形人的测速记录为空白，说明该批次未执行测速抽样，并非其节点彻底宕机或速率为零。若擅自将其画为 0 速度柱或伪造一个测速数字，既破坏了数据可信度，也误导了消费者的判断。'
+  },
+  {
+    q: 'CyberGuard 历史档案中韩国节点延迟 6000ms 是什么原因？为什么不改成 60ms？',
+    a: '在入库资料 B 的历史测试记录中，CyberGuard 的韩国节点延迟明确记录为 6000ms。根据网络工程常理，6000ms 通常意味着该次测试触发了三次 TCP SYN 重传超时（Timeout）后才勉强建立握手，属于严重的异常样本。我们坚决保留 6000ms 原值并特别打上“异常待核实”标签，绝不擅自揣测修改为 60ms，以此维护原始档案的绝对真实性与不可篡改性。'
+  },
+  {
+    q: '单线程测速与多线程测速哪个更能反映日常使用的真实体验？',
+    a: '单线程测速（Single Connection）更能反映真实的网络抗拥塞能力与延迟敏感型应用体验（如 SSH 打字、网页快速首屏渲染、ChatGPT 流式打字）。多线程测速（Multi Connection）可以通过开启数十条并发 TCP 链接暴力占满带宽，往往能掩盖单条链路的丢包与抖动。高质量的专线节点在单线程下就能跑出极高的稳定吞吐，而劣质中转必须靠多线程并发堆砌速度。'
+  }
+];
+
+const labSchema = {
+  '@type': 'Article',
+  headline: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/lab/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  },
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: 'https://jichangwending.world/' },
+      { '@type': 'ListItem', position: 2, name: '测速实验室', item: 'https://jichangwending.world/lab/' }
+    ]
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/lab/"
+  schema={labSchema}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-indigo-400">测速实验室</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-xs font-mono text-indigo-400">
+        <span>● 严格四维状态度量模型 · 固定 1000Mbps 统一标尺 · 杜绝数据污染</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        测速实验室：可验证的真实测速数据、换算工具与度量方法论
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted max-w-4xl leading-relaxed">
+        绝大多数测速榜单通过动态缩放 Y 轴标尺制造虚假的“满速感”，并隐瞒测试时间点与网络环境。
+        稳定机场指南测速实验室坚持<strong>固定 0-1000 Mbps 统一标尺、严格区分资料快照与本站实测、保留异常样本真实原值</strong>。本页公布 41 个品牌原始测速记录快照，并提供两款专业计算工具。
+      </p>
+    </div>
+
+    <!-- Core Visualization Component: Performance Report -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-xl font-bold text-obs-text">标准化测速报告与统一标尺视图</h2>
+        <p class="text-xs text-obs-muted">遵照设计规范 C：统一 0-1000 Mbps 水平标尺，配备数据来源角标、水印防篡改与无障碍数据表格</p>
+      </div>
+      <PerformanceReport />
+    </section>
+
+    <!-- Interactive Tools Grid: Tool 4 & Tool 6 -->
+    <section class="space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">专业交互分析工具箱</h2>
+        <p class="text-xs text-obs-muted">包含速率单位换算器与样本完备性覆盖率评估器</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <BandwidthConverter />
+        </div>
+        <div>
+          <MetricCalculator />
+        </div>
+      </div>
+    </section>
+
+    <!-- Four-Dimension Measurement Methodology -->
+    <section class="space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">测速实验室方法论：四维状态模型 (4-Dimension State Model)</h2>
+        <p class="text-xs text-obs-muted">每一条公开发布的数据记录，都必须具备不可混淆的四维元数据元描述</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="text-xs font-mono text-sky-400 font-bold">DIMENSION 01</div>
+          <div class="text-sm font-bold text-obs-text">来源属性 (Provenance)</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            明确区分数据是来源于原始资料入库（Source Snapshot）、第三方观测合作、还是本站评测节点独立发起实测。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="text-xs font-mono text-emerald-400 font-bold">DIMENSION 02</div>
+          <div class="text-sm font-bold text-obs-text">核验状态 (Verification)</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            标明该条数据是“已完全核验（Verified）”、“存在多方冲突待核实（Conflict）”还是“尚未执行测试（Not Tested）”。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="text-xs font-mono text-amber-400 font-bold">DIMENSION 03</div>
+          <div class="text-sm font-bold text-obs-text">时效鲜度 (Freshness)</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            完整保留数据采样的精准时间戳（如 2026-10-19 快照或 2025-06-21 历史记录），严禁将一年前的跑分冒充当季表现。
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="text-xs font-mono text-indigo-400 font-bold">DIMENSION 04</div>
+          <div class="text-sm font-bold text-obs-text">结果结构 (Result Metric)</div>
+          <p class="text-xs text-obs-muted leading-relaxed">
+            包含下行/上行带宽（Mbps）、首包往返延迟（RTT ms）、抖动（Jitter ms）与丢包率（Packet Loss %）四维完整数组。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Raw Speedtest Snapshot Table for All Tested Brands -->
+    <section class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-obs-border pb-4 gap-2">
+        <div>
+          <h2 class="text-xl font-bold text-obs-text">收录品牌测速快照全景总表</h2>
+          <p class="text-xs text-obs-muted">客观陈列原始入库中具备数值记录的品牌实体，按来源下行速率降序呈现</p>
+        </div>
+        <span class="text-xs font-mono text-obs-muted bg-obs-bg px-3 py-1.5 rounded border border-obs-border">
+          共收录 {testedBrands.length} 条具备测速数值的实体
+        </span>
+      </div>
+
+      <div class="overflow-x-auto border border-obs-border rounded-xl">
+        <table class="w-full text-left text-xs text-obs-muted border-collapse">
+          <thead>
+            <tr class="bg-obs-panel border-b border-obs-border text-obs-text font-mono text-[11px]">
+              <th class="py-3 px-4">品牌名称</th>
+              <th class="py-3 px-4">来源下行速率 (Mbps)</th>
+              <th class="py-3 px-4">对应折算下载 (MB/s)</th>
+              <th class="py-3 px-4">原始采样时间与时段</th>
+              <th class="py-3 px-4">数据属性与声明</th>
+              <th class="py-3 px-4 text-right">核验档案</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-obs-border/50 font-mono">
+            {testedBrands
+              .slice()
+              .sort((a, b) => {
+                const maxA = a.speedTest?.results?.reduce((m, r) => Math.max(m, r.downloadMbps || 0), 0) || 0;
+                const maxB = b.speedTest?.results?.reduce((m, r) => Math.max(m, r.downloadMbps || 0), 0) || 0;
+                return maxB - maxA;
+              })
+              .map(b => {
+                const mbps = b.speedTest?.results?.reduce((m, r) => Math.max(m, r.downloadMbps || 0), 0) || 0;
+                const mbs = (mbps / 8 * 0.95).toFixed(1);
+                return (
+                  <tr class="hover:bg-obs-panel/50 transition">
+                    <td class="py-3 px-4 font-sans">
+                      <a href={`/brands/${b.id}/`} class="font-bold text-obs-text hover:text-sky-300">
+                        {b.name}
+                      </a>
+                      <div class="text-[10px] text-obs-muted font-mono">{b.id}</div>
+                    </td>
+                    <td class="py-3 px-4 text-sky-400 font-bold text-sm">
+                      {mbps} Mbps
+                    </td>
+                    <td class="py-3 px-4 text-obs-text">
+                      ~{mbs} MB/s
+                    </td>
+                    <td class="py-3 px-4 text-[11px]">
+                      {b.speedTest?.date} · 非晚高峰
+                    </td>
+                    <td class="py-3 px-4 text-[10px] font-sans text-obs-muted truncate max-w-xs">
+                      {b.speedTest?.environmentNote || '来源资料快照记录'}
+                    </td>
+                    <td class="py-3 px-4 text-right font-sans">
+                      <a
+                        href={`/brands/${b.id}/`}
+                        class="px-2.5 py-1 rounded bg-obs-panel border border-obs-border hover:border-sky-400 hover:text-sky-400 transition text-[11px]"
+                      >
+                        档案明细 &rarr;
+                      </a>
+                    </td>
+                  </tr>
+                );
+              })}
+          </tbody>
+        </table>
+      </div>
+      <div class="p-4 rounded-lg bg-obs-bg border border-obs-border/70 text-xs text-obs-muted space-y-1">
+        <div class="text-obs-text font-bold">数据治理提示：</div>
+        <p>
+          以上数据快照标注的时间窗口多为“非晚高峰”，缺少受控的宽带运营商环境对比。测速结果受测试者本地宽带（电信/联通/移动）、局域网 Wi-Fi 衰减、目标测试测速节点（Speedtest Server）距离等多种非受控变量影响。数据主要用于验证该节点具备千兆级转发能力，<strong>不代表任何用户在任意时间均能恒定达到该极限速度</strong>。
+        </p>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="rounded-xl border border-obs-border bg-obs-panel p-6 sm:p-8 space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">测速技术常见问题解答 (FAQ)</h2>
+        <p class="text-xs text-obs-muted">深入解析网络吞吐、测速机制与数据真伪识别技巧</p>
+      </div>
+
+      <div class="divide-y divide-obs-border/60">
+        {labFaqs.map((faq, idx) => (
+          <div class="py-4 space-y-2">
+            <h3 class="text-sm sm:text-base font-bold text-obs-text flex items-start gap-2">
+              <span class="text-indigo-400 font-mono">Q{idx + 1}:</span>
+              <span>{faq.q}</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-obs-muted leading-relaxed pl-6">
+              {faq.a}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Internal Linking Navigation -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+      <a href="/stable/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-emerald-500/50 transition">
+        <div class="text-xs font-mono text-emerald-400 mb-1">稳定性依据 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">晚高峰核验规范</div>
+        <div class="text-xs text-obs-muted mt-1">了解晚高峰丢包与物理专线支撑</div>
+      </a>
+      <a href="/lines/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-purple-500/50 transition">
+        <div class="text-xs font-mono text-purple-400 mb-1">底层线路 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">线路架构拓扑研究</div>
+        <div class="text-xs text-obs-muted mt-1">剖析 IEPL、IPLC 与 BGP 中转原理</div>
+      </a>
+      <a href="/recommend/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/50 transition">
+        <div class="text-xs font-mono text-sky-400 mb-1">综合选购 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">精选机场推荐</div>
+        <div class="text-xs text-obs-muted mt-1">查看编辑推荐前十与场景匹配</div>
+      </a>
+    </section>
+
+  </div>
+</BaseLayout>

@@ -1,0 +1,416 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RequirementSelector from '../components/tools/RequirementSelector.astro';
+import NetworkPathDiagram from '../components/NetworkPathDiagram.astro';
+import brandsData from '../data/brands.json';
+import { getAffiliateLink } from '../lib/links';
+
+// Top 10 editorial brands
+const top10Brands = brandsData.filter(b => b.isTop10);
+
+const pageTitle = '稳定机场指南：真实测速、晚高峰样本、线路拓扑与科学选购';
+const pageDescription = '稳定机场指南（jichangwending.world）坚持基于可追溯测速数据、晚高峰样本与专线拓扑解构，打破虚假测速与营销排名。提供41个品牌档案、7大排障决策工具与实时服务状态监测。';
+
+const indexFaqs = [
+  {
+    q: '为什么绝大多数“测速排行榜”在晚高峰会彻底失灵？',
+    a: '常见的测速截图往往选择在清晨或凌晨公网空闲时段运行，且单次测试时间极短（数秒到数十秒）。在晚间 20:00 至 23:30 的骨干网晚高峰期间，国际出口带宽处于严重超载状态。使用普通公网直连（163骨干网或普通BGP中转）的服务商会遭遇运营商层面的深度包检测（DPI）与严重的 QoS 丢包限速。只有具备独立物理带宽保障的专线（IEPL/IPLC）或高质量精品网入口，才能在晚高峰维持稳定的 TCP 拥塞窗口与低抖动。'
+  },
+  {
+    q: '“专线（IEPL/IPLC）”与普通“中转”到底有什么本质技术差异？',
+    a: '普通中转（Transit/Relay）是指数据先通过国内云服务器，再通过公网隧道发送至境外落地机。其跨境段仍然走公网国际海缆出口，受到国家防火墙干扰和高峰期拥塞影响。而真正的 IEPL（国际以太网私网专线）和 IPLC（国际私有租用线路）是端到端的物理二层或三层点对点专线，数据完全在企业内网光纤中传输，不经过公网国际出口，没有防火墙阻断风险，晚高峰延迟抖动通常小于 2ms，丢包率趋近于 0。'
+  },
+  {
+    q: '本站的“编辑推荐顺序”是如何确定的？会影响数据客观性吗？',
+    a: '本站编辑推荐区前十名为商务与编辑合作展示顺序，首位为主推品牌光速云。我们严格实行“商业展示与性能数据解耦”原则：编辑推荐区明确标注“含推广合作”，而所有测速实验室、延迟排序、丢包率统计和价格横向对比均基于真实数据快照或实测记录独立计算，绝不因商务合作篡改客观数据。'
+  },
+  {
+    q: '新手应该如何根据自己的真实需求选择合适的套餐周期？',
+    a: '我们强烈建议遵循“先小额月付，后长周期续费”的避坑原则。机场服务由于上游机房政策、IP封锁、域名污染等不可控因素，具备天然的波动风险。首次使用建议选择月付或轻量体验档，在本地实际网络环境下测试晚高峰表现，确认满足自身工作、流媒体或AI需求后再考虑季付或年付。'
+  },
+  {
+    q: '为什么有些机场打开普通网页极快，但无法访问 ChatGPT 或 Netflix？',
+    a: '这是“网络连通性”与“出口IP信誉库（IP Risk Score）”的脱节。打开普通网页只需节点具备公网出海能力；而 OpenAI、Netflix 等平台部署了极其严格的数据中心机房 IP 封控机制。如果落地机使用的是廉价 IDC 数据中心段，会被直接拦截。支持此类高级业务需要服务商额外采购住宅 IP（Residential IP）或部署专用的 DNS 解锁反向代理。'
+  }
+];
+
+const homeSchema = {
+  '@type': 'WebSite',
+  name: '稳定机场指南',
+  url: 'https://jichangwending.world',
+  description: pageDescription,
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/"
+  schema={homeSchema}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+    
+    <!-- Hero Section: Observational Positioning -->
+    <section class="relative rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-8 sm:p-12 overflow-hidden shadow-2xl">
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 max-w-4xl space-y-6">
+        <div class="inline-flex items-center gap-2.5 px-3 py-1 rounded-full border border-sky-500/30 bg-sky-500/10 text-xs font-mono text-sky-400">
+          <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+          <span>网络观测系统运行中 · 41 个独立实体建档 · 拒绝盲目排名</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-obs-text leading-tight sm:leading-none">
+          用可追溯的数据与线路拓扑，<br class="hidden sm:inline" />
+          解构真实的<span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">稳定机场与晚高峰连接</span>。
+        </h1>
+        <p class="text-base sm:text-lg text-obs-muted leading-relaxed">
+          市面上 90% 的机场推荐充斥着虚假截图、被遮蔽的测试环境以及夸大的“万兆专线”宣称。本站建立在严格的端到端网络分层观测基础之上，提供可验证的历史样本、真实价格明细、线路类型解剖及 7 大网络排障交互工具，帮助用户建立科学的选购决策路径。
+        </p>
+
+        <!-- Primary CTA Buttons -->
+        <div class="flex flex-wrap items-center gap-4 pt-2">
+          <a
+            href="/recommend/"
+            class="px-6 py-3 rounded-lg bg-sky-500 hover:bg-sky-400 text-obs-bg font-bold text-sm transition shadow-lg shadow-sky-500/20"
+          >
+            查阅编辑推荐 (Top 10) &rarr;
+          </a>
+          <a
+            href="/stable/"
+            class="px-6 py-3 rounded-lg bg-obs-panel border border-obs-border hover:border-sky-400 text-obs-text font-bold text-sm transition"
+          >
+            晚高峰稳定性核验规范
+          </a>
+          <a
+            href="/brands/"
+            class="px-6 py-3 rounded-lg bg-obs-bg border border-obs-border hover:border-obs-muted text-obs-muted hover:text-obs-text font-mono text-xs transition"
+          >
+            检索 41 个品牌档案
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Decision Workflow Guide -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between border-b border-obs-border pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-obs-text">科学选购与决策主流程</h2>
+          <p class="text-xs text-obs-muted">从明确真实场景出发，拒绝盲目被单一测速截图诱导</p>
+        </div>
+        <span class="text-xs font-mono text-sky-400">6 步闭环选购决策</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="text-xs font-mono text-sky-400 font-bold">STEP 01</div>
+          <div class="text-sm font-bold text-obs-text">明确核心需求</div>
+          <p class="text-xs text-obs-muted leading-relaxed">区分是轻量刷网页、晚高峰 4K 追剧，还是高频 ChatGPT 与开发代码同步。</p>
+        </div>
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="text-xs font-mono text-sky-400 font-bold">STEP 02</div>
+          <div class="text-sm font-bold text-obs-text">验证稳定性依据</div>
+          <p class="text-xs text-obs-muted leading-relaxed">查验是否具备真正的 IEPL/IPLC 内网专线，区分是公网隧道还是物理专线。</p>
+        </div>
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="text-xs font-mono text-sky-400 font-bold">STEP 03</div>
+          <div class="text-sm font-bold text-obs-text">查阅测速报告</div>
+          <p class="text-xs text-obs-muted leading-relaxed">重点关注晚高峰抖动与丢包率，而非清晨空闲时段瞬时跑满的虚高带宽。</p>
+        </div>
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="text-xs font-mono text-sky-400 font-bold">STEP 04</div>
+          <div class="text-sm font-bold text-obs-text">查看运行状态</div>
+          <p class="text-xs text-obs-muted leading-relaxed">在状态中心核验官网登录、节点存活、订阅更新及历史故障维护频率。</p>
+        </div>
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="text-xs font-mono text-sky-400 font-bold">STEP 05</div>
+          <div class="text-sm font-bold text-obs-text">核对真实套餐</div>
+          <p class="text-xs text-obs-muted leading-relaxed">对比起步月费、流量折算单价与优惠码真实有效性，认清超长周期风险。</p>
+        </div>
+        <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-2">
+          <div class="text-xs font-mono text-sky-400 font-bold">STEP 06</div>
+          <div class="text-sm font-bold text-obs-text">首选月付试用</div>
+          <p class="text-xs text-obs-muted leading-relaxed">永远优先选择月付周期，在本地宽带实际环境下充分验证后再考虑长期订阅。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Tool Section: Requirement Selector -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between border-b border-obs-border pb-3">
+        <div>
+          <h2 class="text-xl font-bold text-obs-text">交互工具：按使用场景匹配适合的线路与品牌</h2>
+          <p class="text-xs text-obs-muted">回答 3 个关键维度，系统即时计算推荐匹配方案</p>
+        </div>
+        <a href="/recommend/" class="text-xs font-mono text-sky-400 hover:underline">查看完整推荐矩阵 &rarr;</a>
+      </div>
+      <RequirementSelector />
+    </section>
+
+    <!-- Editorial Top 10 Showcase: Fixed Order from Source A -->
+    <section class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-obs-border pb-4 gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-mono text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded mb-1">
+            <span>● 编辑推荐顺序（含推广合作）</span>
+            <span>● 非客观性能跑分排名</span>
+          </div>
+          <h2 class="text-xl font-bold text-obs-text">精选编辑推荐梯队 (Top 10)</h2>
+          <p class="text-xs text-obs-muted">
+            依规范固定推荐前十品牌，光速云为主推第一品牌。所有外链均配备佣金透明披露与规范 rel 属性。
+          </p>
+        </div>
+        <div class="text-xs font-mono text-obs-muted bg-obs-bg px-3 py-1.5 rounded border border-obs-border">
+          商业推广与性能排序严格分离
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {top10Brands.map((brand, idx) => {
+          const aff = getAffiliateLink(brand.id);
+          const maxSpeed = brand.speedTest?.results?.reduce((max, r) => Math.max(max, r.downloadMbps || 0), 0) || 0;
+          const hasSpeedtest = maxSpeed > 0;
+          const startingPriceDisplay = brand.pricingStarting.isApproximate 
+            ? `约¥${brand.pricingStarting.monthlyEquivalent}/月` 
+            : `¥${brand.pricingStarting.amount}/${brand.pricingStarting.period}`;
+          return (
+            <div class={`rounded-xl border p-4 flex flex-col justify-between transition relative ${
+              idx === 0 
+                ? 'border-sky-500/60 bg-sky-500/5 shadow-lg shadow-sky-500/10 ring-1 ring-sky-500/30' 
+                : 'border-obs-border bg-obs-panel hover:border-obs-muted'
+            }`}>
+              {idx === 0 && (
+                <div class="absolute -top-2.5 left-4 bg-sky-500 text-obs-bg font-mono text-[10px] font-bold px-2 py-0.5 rounded shadow">
+                  ★ 第一主推品牌
+                </div>
+              )}
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono text-sky-400 font-bold">#{idx + 1}</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-obs-bg text-obs-muted border border-obs-border truncate max-w-[110px]">
+                    {brand.lineType.split('（')[0]}
+                  </span>
+                </div>
+                <div>
+                  <a href={`/brands/${brand.id}/`} class="text-base font-bold text-obs-text hover:text-sky-400 transition">
+                    {brand.name}
+                  </a>
+                  <div class="text-[11px] text-obs-muted line-clamp-2 mt-1">
+                    {brand.pros?.[0] || brand.vendorClaims?.[0] || brand.comparisonSummary}
+                  </div>
+                </div>
+
+                <div class="pt-2 border-t border-obs-border/60 grid grid-cols-2 gap-2 text-xs font-mono">
+                  <div>
+                    <span class="text-[10px] text-obs-muted block">起步价格</span>
+                    <span class="text-obs-text font-bold">{startingPriceDisplay}</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-obs-muted block">测速快照</span>
+                    <span class={hasSpeedtest ? 'text-sky-400 font-bold' : 'text-obs-muted/60'}>
+                      {hasSpeedtest ? `${maxSpeed}M` : '未实测'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4 pt-3 border-t border-obs-border/40 space-y-2">
+                <div class="flex items-center gap-2">
+                  <a
+                    href={`/brands/${brand.id}/`}
+                    class="flex-1 text-center py-1.5 rounded bg-obs-bg border border-obs-border hover:border-obs-muted text-xs text-obs-text transition"
+                  >
+                    资料档案
+                  </a>
+                  {aff.url ? (
+                    <a
+                      href={aff.url}
+                      target="_blank"
+                      rel="nofollow sponsored noopener"
+                      class="flex-1 text-center py-1.5 rounded bg-sky-500 hover:bg-sky-400 text-obs-bg font-bold text-xs transition"
+                    >
+                      直达官网 &rarr;
+                    </a>
+                  ) : (
+                    <span class="flex-1 text-center py-1.5 rounded bg-obs-bg/50 border border-obs-border/50 text-[11px] text-obs-muted">
+                      暂无独立入口
+                    </span>
+                  )}
+                </div>
+                <div class="text-[9px] text-center text-obs-muted/70 font-mono">
+                  {aff.commissionNote}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- Network Topology & Observable Blindspots Component -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between border-b border-obs-border pb-3">
+        <div>
+          <h2 class="text-xl font-bold text-obs-text">端到端网络路径与分层观测模型</h2>
+          <p class="text-xs text-obs-muted">理解从本地设备到目标网站的 5 层跳数，认清第三方测速工具的观测盲区</p>
+        </div>
+        <a href="/lines/" class="text-xs font-mono text-sky-400 hover:underline">深入线路拓扑研究 &rarr;</a>
+      </div>
+      <NetworkPathDiagram />
+    </section>
+
+    <!-- Primary Navigation Channels Grid (8 Major Channels) -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between border-b border-obs-border pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-obs-text">核心观测频道导览</h2>
+          <p class="text-xs text-obs-muted">覆盖从方案选购、证据核验、技术解构到排障全生命周期的 8 大专业通道</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <a href="/recommend/" class="group p-5 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/60 transition flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-mono font-bold text-sm">
+              01
+            </div>
+            <h3 class="text-base font-bold text-obs-text group-hover:text-sky-300 transition">机场推荐 (Recommend)</h3>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              首屏呈现真实候选、实付价格与证据状态。严禁将商业顺序伪装成跑分，按流媒体、AI与办公精准分流。
+            </p>
+          </div>
+          <span class="text-xs font-mono text-sky-400 mt-4 inline-flex items-center gap-1">查看推荐清单 &rarr;</span>
+        </a>
+
+        <a href="/stable/" class="group p-5 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/60 transition flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono font-bold text-sm">
+              02
+            </div>
+            <h3 class="text-base font-bold text-obs-text group-hover:text-emerald-300 transition">稳定机场 (Stable)</h3>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              建立晚高峰（20:00-23:30）多样本判定规范。解密丢包率、长连接保活与 SLA 承诺背后的真实物理支撑。
+            </p>
+          </div>
+          <span class="text-xs font-mono text-emerald-400 mt-4 inline-flex items-center gap-1">核验稳定性基准 &rarr;</span>
+        </a>
+
+        <a href="/free/" class="group p-5 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/60 transition flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-mono font-bold text-sm">
+              03
+            </div>
+            <h3 class="text-base font-bold text-obs-text group-hover:text-amber-300 transition">免费机场 (Free)</h3>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              揭露纯免费节点的安全隐患与日志截获风险。盘点正规大厂的免费额度与低成本入门避坑指南。
+            </p>
+          </div>
+          <span class="text-xs font-mono text-amber-400 mt-4 inline-flex items-center gap-1">免费额度安全审计 &rarr;</span>
+        </a>
+
+        <a href="/lab/" class="group p-5 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/60 transition flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-mono font-bold text-sm">
+              04
+            </div>
+            <h3 class="text-base font-bold text-obs-text group-hover:text-indigo-300 transition">测速实验室 (Lab)</h3>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              公布完整测试方法论、吞吐量标尺与 4 维状态模型。内嵌 Mbps/MB/s 换算器与样本覆盖率计算器。
+            </p>
+          </div>
+          <span class="text-xs font-mono text-indigo-400 mt-4 inline-flex items-center gap-1">进入测速实验室 &rarr;</span>
+        </a>
+
+        <a href="/lines/" class="group p-5 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/60 transition flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 font-mono font-bold text-sm">
+              05
+            </div>
+            <h3 class="text-base font-bold text-obs-text group-hover:text-rose-300 transition">线路研究 (Lines)</h3>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              深度拆解 IEPL、IPLC、公网中转与普通直连的物理架构差异。分析 VLESS、Reality 等新协议抗封锁表现。
+            </p>
+          </div>
+          <span class="text-xs font-mono text-rose-400 mt-4 inline-flex items-center gap-1">探索线路底层逻辑 &rarr;</span>
+        </a>
+
+        <a href="/status/" class="group p-5 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/60 transition flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-mono font-bold text-sm">
+              06
+            </div>
+            <h3 class="text-base font-bold text-obs-text group-hover:text-cyan-300 transition">机场状态 (Status)</h3>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              基于 5 层解耦模型观测官网、节点与订阅分发状态。追踪历史重大中断事件与恢复周期。
+            </p>
+          </div>
+          <span class="text-xs font-mono text-cyan-400 mt-4 inline-flex items-center gap-1">查阅状态健康大盘 &rarr;</span>
+        </a>
+
+        <a href="/reviews/" class="group p-5 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/60 transition flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 font-mono font-bold text-sm">
+              07
+            </div>
+            <h3 class="text-base font-bold text-obs-text group-hover:text-purple-300 transition">深度评测 (Reviews)</h3>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              以事实档案为根基的长效评测体系。提供品牌间全维度横向对标与首测/复测机制说明。
+            </p>
+          </div>
+          <span class="text-xs font-mono text-purple-400 mt-4 inline-flex items-center gap-1">查阅全量评测体系 &rarr;</span>
+        </a>
+
+        <a href="/troubleshoot/" class="group p-5 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/60 transition flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 font-mono font-bold text-sm">
+              08
+            </div>
+            <h3 class="text-base font-bold text-obs-text group-hover:text-teal-300 transition">网络排障 (Troubleshoot)</h3>
+            <p class="text-xs text-obs-muted leading-relaxed">
+              5 层排障决策树交互工具。解决节点全红、流媒体无法解锁、TUN 驱动冲突及订阅 401 报错。
+            </p>
+          </div>
+          <span class="text-xs font-mono text-teal-400 mt-4 inline-flex items-center gap-1">启动排障决策树 &rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Comprehensive FAQ Section with FAQPage Schema -->
+    <section class="rounded-xl border border-obs-border bg-obs-panel p-6 sm:p-8 space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">常见问题与认知误区解答 (FAQ)</h2>
+        <p class="text-xs text-obs-muted">围绕晚高峰稳定性、专线真实性、套餐陷阱及测速水份的权威技术澄清</p>
+      </div>
+
+      <div class="divide-y divide-obs-border/60">
+        {indexFaqs.map((faq, idx) => (
+          <div class="py-4 space-y-2">
+            <h3 class="text-sm sm:text-base font-bold text-obs-text flex items-start gap-2">
+              <span class="text-sky-400 font-mono">Q{idx + 1}:</span>
+              <span>{faq.q}</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-obs-muted leading-relaxed pl-6">
+              {faq.a}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Transparency & Methodology Footnote -->
+    <section class="rounded-xl border border-obs-border/70 bg-obs-bg p-6 text-xs text-obs-muted leading-relaxed space-y-3">
+      <div class="flex items-center gap-2 text-obs-text font-bold">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span>关于本站数据来源与商业披露原则</span>
+      </div>
+      <p>
+        稳定机场指南（jichangwending.world）收录的 41 个品牌事实档案均源于原始入库资料、公开套餐表及可追溯的测速快照。我们明确公示：本站部分出站链接可能包含合规推广参数（Affiliate Code）。若用户通过推广链接完成订阅，本站可能会获得维持服务器运维与测试带宽的佣金。推广合作绝不会影响客观测试数据的真实性，亦不会增加用户的实际购买成本。若发现任何数据误差，请随时通过 <a href="/corrections/" class="text-sky-400 hover:underline">纠错通道</a> 提交佐证记录。
+      </p>
+    </section>
+
+  </div>
+</BaseLayout>

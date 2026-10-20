@@ -1,0 +1,189 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TwoBrandCompare from '../../components/tools/TwoBrandCompare.astro';
+import ServiceAvailabilityMatrix from '../../components/ServiceAvailabilityMatrix.astro';
+import brandsData from '../../data/brands.json';
+
+const pageTitle = '机场深度评测：全维度横向对标、双品牌对照与长效复测机制';
+const pageDescription = '稳定机场指南深度评测频道提供严谨的长效评测体系。内嵌两品牌资料对照工具与流媒体/AI可用性矩阵，解密首测与动态复测流程，拒绝一次性买断好评。';
+
+const reviewFaqs = [
+  {
+    q: '“品牌事实档案”与“深度评测报告”有什么核心区别？',
+    a: '“品牌事实档案（Brand Fact Profile）”是对机场客观商业信息的忠实记录，包括官方套餐表、折扣码、宣称线路类型、客户端支持度以及原始测速快照，强调客观性与不可篡改性；而“深度评测报告（In-depth Review）”则是基于长期网络观测、晚高峰多样本统计、客服工单响应速度、流媒体解锁稳定性以及同赛道竞品横向对比形成的综合技术研判，强调分析深度与选购决策建议。'
+  },
+  {
+    q: '市面上很多评测几年不更新一次，本站的“首测与动态复测机制”是如何运转的？',
+    a: '跨境网络环境处于极高频的动态变化之中，任何静态评测都会在几个月内迅速失效。本站建立“触发式复测机制”：当收录品牌发生以下任一重大变动时，系统自动将其标记为待复测状态并排期重新测试：① 基础套餐起步价或流量规格调整；② 核心跨境线路架构发生迁移（如由普通公网中转切换为 IEPL 专线，或反向缩水）；③ 发生超过 4 小时以上的重大网络中断事故；④ 距上次全量采样超过 90 天。'
+  },
+  {
+    q: '本站评测是否接受商家付费以换取“虚假五星好评”？',
+    a: '绝对不接受。稳定机场指南坚决推行“商业推广与技术评测彻底解耦”的治理准则。我们允许合规的商业推广合作（并在编辑推荐区固定前十位明确展示与透明披露佣金），但在任何深度评测正文、测速实验室数据或丢包率测试中，评分与实测结论完全由客观物理数据驱动。若品牌线路存在缩水、套餐存在虚标，我们会在其档案中如实公示冲突记录，绝不拿技术声誉做交易。'
+  },
+  {
+    q: '使用“两品牌资料对照工具”时，最应该关注哪几个参数？',
+    a: '首要关注“起步价格与月付门槛”，看是否存在过高的资金沉没风险；次要关注“线路类型（IEPL/IPLC 物理专线 vs 隧道中转）”，这直接决定了晚高峰体验上限；第三关注“流媒体与 AI 解锁能力”，核对是否满足特定的生产力需求；第四关注“资料冲突与核验记录”，识别是否存在虚标折扣或前后矛盾的宣传话术。'
+  },
+  {
+    q: '为什么有些老牌机场评测评分很高，但新用户买后体验并不理想？',
+    a: '这通常源于“超载红利期结束”。许多老牌机场在早期由于用户少、带宽充裕，测速极佳并积累了高口碑；但随着用户规模急剧膨胀，如果运营方未同步成倍采购昂贵的专线物理带宽，就会出现“老用户滚雪球、晚高峰万人挤独木桥”的拥塞困境。因此，参考评测时不仅要看历史口碑，更要看最近一个季度的晚高峰抽样数据。'
+  }
+];
+
+const reviewsSchema = {
+  '@type': 'Article',
+  headline: pageTitle,
+  description: pageDescription,
+  url: 'https://jichangwending.world/reviews/',
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  },
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: 'https://jichangwending.world/' },
+      { '@type': 'ListItem', position: 2, name: '深度评测', item: 'https://jichangwending.world/reviews/' }
+    ]
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/reviews/"
+  schema={reviewsSchema}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-purple-400">深度评测</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-xs font-mono text-purple-400">
+        <span>● 长效复测体系 · 双品牌即时对标 · 商业独立性保障</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-obs-text">
+        深度评测体系：横向多维对标、动态复测机制与两品牌即时对照
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted max-w-4xl leading-relaxed">
+        一份有价值的评测，必须经得起时间的检验与不同网络环境的苛刻推敲。
+        本频道摒弃一次性静态营销文，建立<strong>首测建档、触发式长效复测、两品牌多维横向对标与应用可用性矩阵</strong>。帮助用户在繁杂的品牌宣传中，一眼看清两款候选方案的优劣取舍。
+      </p>
+    </div>
+
+    <!-- Interactive Tool 3: Two Brand Comparison Component -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-xl font-bold text-obs-text">交互工具：两品牌全维度资料即时对照</h2>
+        <p class="text-xs text-obs-muted">在 41 个品牌事实数据库中任选两个，自动提取价格、专线属性、实测速度与资料冲突进行对标</p>
+      </div>
+      <TwoBrandCompare />
+    </section>
+
+    <!-- Core Visualization Component: Service Availability Matrix -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-xl font-bold text-obs-text">主流品牌应用支持与流媒体/AI可用性矩阵</h2>
+        <p class="text-xs text-obs-muted">遵照设计规范 B：拆分流媒体与 AI，明确标注文档声明与可观测窗口，杜绝永久解锁神话</p>
+      </div>
+      <ServiceAvailabilityMatrix />
+    </section>
+
+    <!-- Directory of All 41 Brand Reviews & Profiles -->
+    <section class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-obs-border pb-4 gap-2">
+        <div>
+          <h2 class="text-xl font-bold text-obs-text">41 个品牌独立评测档案索引库</h2>
+          <p class="text-xs text-obs-muted">点击任意品牌即可进入该品牌的独立事实档案与深度评测大纲</p>
+        </div>
+        <a href="/brands/" class="text-xs font-mono text-sky-400 hover:underline">
+          进入品牌库大全高级筛选 &rarr;
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {brandsData.map(b => (
+          <div class="p-4 rounded-xl border border-obs-border bg-obs-panel flex flex-col justify-between space-y-3 hover:border-obs-muted transition">
+            <div>
+              <div class="flex items-center justify-between">
+                <a href={`/brands/${b.id}/`} class="font-bold text-obs-text hover:text-sky-300">
+                  {b.name}
+                </a>
+                {b.isTop10 && (
+                  <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                    编辑前十
+                  </span>
+                )}
+              </div>
+              <div class="text-[10px] text-obs-muted font-mono">{b.id}</div>
+              <p class="text-xs text-obs-muted line-clamp-2 mt-2 leading-relaxed">
+                {b.pros?.[0] || b.vendorClaims?.[0] || b.comparisonSummary}
+              </p>
+            </div>
+
+            <div class="pt-3 border-t border-obs-border/50 flex items-center justify-between text-xs font-mono">
+              <span class="text-obs-text font-bold">
+                {b.pricingStarting.isApproximate ? `约¥${b.pricingStarting.monthlyEquivalent}/月` : `¥${b.pricingStarting.amount}/${b.pricingStarting.period}`}
+              </span>
+              <a
+                href={`/brands/${b.id}/`}
+                class="px-2 py-1 rounded bg-obs-bg border border-obs-border hover:border-sky-400 hover:text-sky-400 transition text-[11px] font-sans"
+              >
+                评测档案 &rarr;
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="rounded-xl border border-obs-border bg-obs-panel p-6 sm:p-8 space-y-6">
+      <div class="border-b border-obs-border pb-4">
+        <h2 class="text-xl font-bold text-obs-text">深度评测常见问题解答 (FAQ)</h2>
+        <p class="text-xs text-obs-muted">了解我们如何保证评测的客观性、独立性与时效性</p>
+      </div>
+
+      <div class="divide-y divide-obs-border/60">
+        {reviewFaqs.map((faq, idx) => (
+          <div class="py-4 space-y-2">
+            <h3 class="text-sm sm:text-base font-bold text-obs-text flex items-start gap-2">
+              <span class="text-purple-400 font-mono">Q{idx + 1}:</span>
+              <span>{faq.q}</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-obs-muted leading-relaxed pl-6">
+              {faq.a}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Internal Linking Navigation -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+      <a href="/recommend/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-sky-500/50 transition">
+        <div class="text-xs font-mono text-sky-400 mb-1">选购指引 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">精选机场推荐</div>
+        <div class="text-xs text-obs-muted mt-1">查看编辑前十与场景选型矩阵</div>
+      </a>
+      <a href="/stable/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-emerald-500/50 transition">
+        <div class="text-xs font-mono text-emerald-400 mb-1">物理证据 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">稳定机场核验标准</div>
+        <div class="text-xs text-obs-muted mt-1">晚高峰多样本统计与丢包模型</div>
+      </a>
+      <a href="/lab/" class="p-4 rounded-xl border border-obs-border bg-obs-panel hover:border-indigo-500/50 transition">
+        <div class="text-xs font-mono text-indigo-400 mb-1">测速快照 &rarr;</div>
+        <div class="text-sm font-bold text-obs-text">测速实验室报告</div>
+        <div class="text-xs text-obs-muted mt-1">查阅 41 个品牌原始测速快照与换算</div>
+      </a>
+    </section>
+
+  </div>
+</BaseLayout>
