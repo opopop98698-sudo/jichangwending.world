@@ -8,7 +8,7 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/admin/') && !page.includes('/scratch/'),
+      filter: (page) => !page.includes('/admin/') && !page.includes('/scratch/') && !page.includes('/404'),
       serialize(item) {
         item.lastmod = new Date().toISOString();
         item.changefreq = 'weekly';

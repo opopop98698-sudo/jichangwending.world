@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pageTitle = '404 - 页面未找到 | 稳定机场指南';
+const pageDescription = '抱歉，您访问的页面不存在、已被移除或链接已更新。请通过导航栏查阅稳定机场推荐、真实测速报告与网络排障工具。';
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/404/"
+  noindex={true}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center space-y-8">
+    <div class="space-y-3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-rose-500/30 bg-rose-500/10 text-xs font-mono text-rose-400">
+        <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+        <span>HTTP 404 · 目标路由不存在</span>
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-obs-text">
+        404 页面未找到
+      </h1>
+      <p class="text-sm sm:text-base text-obs-muted max-w-lg mx-auto leading-relaxed">
+        您请求的 URL 路径未在现行可观测数据库中建档，可能由于专题架构升级迁移或拼写偏差。
+      </p>
+    </div>
+
+    <!-- Quick Navigation Hub -->
+    <div class="p-6 sm:p-8 rounded-2xl border border-obs-border bg-obs-panel max-w-xl mx-auto space-y-4 text-left">
+      <div class="text-xs font-mono text-sky-400 font-bold uppercase tracking-wider">
+        建议核心入口快捷直达：
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+        <a
+          href="/"
+          class="p-3 rounded-lg bg-obs-bg border border-obs-border hover:border-sky-500/50 hover:text-sky-300 transition flex items-center justify-between"
+        >
+          <span>首页总览 (Home)</span>
+          <span class="text-obs-muted">&rarr;</span>
+        </a>
+        <a
+          href="/recommend/"
+          class="p-3 rounded-lg bg-obs-bg border border-obs-border hover:border-sky-500/50 hover:text-sky-300 transition flex items-center justify-between"
+        >
+          <span>机场推荐 (Recommend)</span>
+          <span class="text-obs-muted">&rarr;</span>
+        </a>
+        <a
+          href="/stable/"
+          class="p-3 rounded-lg bg-obs-bg border border-obs-border hover:border-sky-500/50 hover:text-sky-300 transition flex items-center justify-between"
+        >
+          <span>稳定机场判定 (Stable)</span>
+          <span class="text-obs-muted">&rarr;</span>
+        </a>
+        <a
+          href="/brands/"
+          class="p-3 rounded-lg bg-obs-bg border border-obs-border hover:border-sky-500/50 hover:text-sky-300 transition flex items-center justify-between"
+        >
+          <span>41个品牌名录 (Brands)</span>
+          <span class="text-obs-muted">&rarr;</span>
+        </a>
+        <a
+          href="/lab/"
+          class="p-3 rounded-lg bg-obs-bg border border-obs-border hover:border-sky-500/50 hover:text-sky-300 transition flex items-center justify-between"
+        >
+          <span>测速实验室 (Speed Lab)</span>
+          <span class="text-obs-muted">&rarr;</span>
+        </a>
+        <a
+          href="/troubleshoot/"
+          class="p-3 rounded-lg bg-obs-bg border border-obs-border hover:border-sky-500/50 hover:text-sky-300 transition flex items-center justify-between"
+        >
+          <span>网络排障决策树 (Debug)</span>
+          <span class="text-obs-muted">&rarr;</span>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-obs-bg font-bold text-xs font-mono transition shadow-lg shadow-sky-500/20"
+      >
+        <span>返回平台首页</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+  </div>
+</BaseLayout>

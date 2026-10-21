@@ -6,18 +6,33 @@ import brandsData from '../../data/brands.json';
 const pageTitle = '机场品牌库大全：收录41个主流与平价机场真实套餐、线路与测速档案';
 const pageDescription = '稳定机场指南收录全网41个机场品牌，提供实付套餐价格、IEPL/IPLC专线声明、客户端生态及真实测速快照。支持按协议、价格与客户端多维即时筛选。';
 
-// ItemList schema for Brand Directory
-const directorySchema = {
-  '@type': 'ItemList',
-  name: '41 个收录机场品牌大全',
-  description: pageDescription,
-  itemListElement: brandsData.map((b, idx) => ({
-    '@type': 'ListItem',
-    position: idx + 1,
-    name: b.name,
-    url: `https://jichangwending.world/brands/${b.id}/`
-  }))
-};
+// CollectionPage & ItemList schema for Brand Directory
+const directorySchema = [
+  {
+    '@type': 'CollectionPage',
+    name: pageTitle,
+    description: pageDescription,
+    url: 'https://jichangwending.world/brands/',
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: '首页', item: 'https://jichangwending.world/' },
+        { '@type': 'ListItem', position: 2, name: '机场品牌库', item: 'https://jichangwending.world/brands/' }
+      ]
+    }
+  },
+  {
+    '@type': 'ItemList',
+    name: '41 个收录机场品牌大全',
+    description: pageDescription,
+    itemListElement: brandsData.map((b, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: b.name,
+      url: `https://jichangwending.world/brands/${b.id}/`
+    }))
+  }
+];
 ---
 
 <BaseLayout

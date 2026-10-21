@@ -8,11 +8,32 @@ interface Props {
   title: string;
   description: string;
   canonicalUrl?: string;
-  ogType?: string;
+  ogType?: 'website' | 'article';
   schema?: Record<string, any> | Array<Record<string, any>>;
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  category?: string;
+  tags?: string[];
+  cover?: string;
+  noindex?: boolean;
 }
 
-const { title, description, canonicalUrl, ogType, schema } = Astro.props;
+const {
+  title,
+  description,
+  canonicalUrl,
+  ogType,
+  schema,
+  publishedTime,
+  modifiedTime,
+  author,
+  category,
+  tags,
+  cover,
+  noindex
+} = Astro.props;
+
 const currentPath = Astro.url.pathname;
 ---
 
@@ -25,6 +46,13 @@ const currentPath = Astro.url.pathname;
       canonicalUrl={canonicalUrl}
       ogType={ogType}
       schema={schema}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      author={author}
+      category={category}
+      tags={tags}
+      cover={cover}
+      noindex={noindex}
     />
   </head>
   <body class="min-h-screen flex flex-col bg-[#0B1220] text-[#E6EDF6] selection:bg-[#38BDF8]/20 selection:text-[#38BDF8]">

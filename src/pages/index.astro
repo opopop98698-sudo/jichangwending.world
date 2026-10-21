@@ -34,17 +34,30 @@ const indexFaqs = [
   }
 ];
 
-const homeSchema = {
-  '@type': 'WebSite',
-  name: '稳定机场指南',
-  url: 'https://jichangwending.world',
-  description: pageDescription,
-  publisher: {
-    '@type': 'Organization',
-    name: '稳定机场指南评测实验室',
-    url: 'https://jichangwending.world'
+const homeSchema = [
+  {
+    '@type': 'WebSite',
+    name: '稳定机场指南',
+    url: 'https://jichangwending.world/',
+    description: pageDescription,
+    publisher: {
+      '@type': 'Organization',
+      name: '稳定机场指南评测实验室',
+      url: 'https://jichangwending.world/'
+    }
+  },
+  {
+    '@type': 'FAQPage',
+    mainEntity: indexFaqs.map(f => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: f.a
+      }
+    }))
   }
-};
+];
 ---
 
 <BaseLayout

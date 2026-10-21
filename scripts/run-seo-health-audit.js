@@ -137,9 +137,11 @@ htmlFiles.forEach(filePath => {
   const normPath = filePath.replace(/\\/g, '/');
   // Determine web URL path
   let webPath = normPath.replace(/^dist/, '').replace(/index\.html$/, '');
+  if (webPath === '/404.html' || webPath === '404.html') webPath = '/404/';
   if (!webPath.startsWith('/')) webPath = '/' + webPath;
   if (!webPath.endsWith('/')) webPath = webPath + '/';
 
+  const is404 = filePath.endsWith('404.html');
   const html = fs.readFileSync(filePath, 'utf8');
 
   // 1. Canonical
@@ -149,7 +151,7 @@ htmlFiles.forEach(filePath => {
 
   if (!canonicalHref) {
     canonicalAnomalies.push({ path: normPath, issue: 'Missing canonical' });
-  } else if (canonicalHref !== expectedCanonical) {
+  } else if (!is404 && canonicalHref !== expectedCanonical) {
     canonicalAnomalies.push({ path: normPath, canonicalHref, expectedCanonical, issue: 'Mismatch or non-self-referencing' });
   }
 
@@ -351,6 +353,7 @@ let orphans = [];
 let depthStats = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, '5+': 0 };
 
 pageData.forEach((data, p) => {
+  if (p === '/404/') return;
   if (!depthMap.has(p)) {
     orphans.push(p);
   } else {

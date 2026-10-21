@@ -31,24 +31,37 @@ const reviewFaqs = [
   }
 ];
 
-const reviewsSchema = {
-  '@type': 'Article',
-  headline: pageTitle,
-  description: pageDescription,
-  url: 'https://jichangwending.world/reviews/',
-  publisher: {
-    '@type': 'Organization',
-    name: '稳定机场指南评测实验室',
-    url: 'https://jichangwending.world'
+const reviewsSchema = [
+  {
+    '@type': 'CollectionPage',
+    name: pageTitle,
+    description: pageDescription,
+    url: 'https://jichangwending.world/reviews/',
+    publisher: {
+      '@type': 'Organization',
+      name: '稳定机场指南评测实验室',
+      url: 'https://jichangwending.world'
+    },
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: '首页', item: 'https://jichangwending.world/' },
+        { '@type': 'ListItem', position: 2, name: '深度评测', item: 'https://jichangwending.world/reviews/' }
+      ]
+    }
   },
-  breadcrumb: {
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: '首页', item: 'https://jichangwending.world/' },
-      { '@type': 'ListItem', position: 2, name: '深度评测', item: 'https://jichangwending.world/reviews/' }
-    ]
+  {
+    '@type': 'FAQPage',
+    mainEntity: reviewFaqs.map(f => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: f.a
+      }
+    }))
   }
-};
+];
 ---
 
 <BaseLayout

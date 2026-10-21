@@ -1,24 +1,57 @@
 ---
+import { siteVerificationConfig } from '../config/siteVerification';
+
 interface Props {
   title: string;
   description: string;
   canonicalUrl?: string;
-  ogType?: string;
+  ogType?: 'website' | 'article';
   schema?: Record<string, any> | Array<Record<string, any>>;
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  category?: string;
+  tags?: string[];
+  cover?: string;
+  noindex?: boolean;
 }
 
 const {
   title,
   description,
-  canonicalUrl = Astro.url.href,
+  canonicalUrl,
   ogType = 'website',
-  schema
+  schema,
+  publishedTime,
+  modifiedTime,
+  author,
+  category,
+  tags = [],
+  cover,
+  noindex = false
 } = Astro.props;
 
 const siteName = '稳定机场指南';
 const formattedTitle = title.includes(siteName) ? title : `${title} - ${siteName}`;
 
-// Base default Organization schema
+// Strict Canonical Normalization to Production Domain
+const rawCanonical = canonicalUrl || Astro.url.href;
+let normalizedCanonical = 'https://jichangwending.world/';
+try {
+  const urlObj = new URL(rawCanonical, 'https://jichangwending.world');
+  let cleanPath = urlObj.pathname;
+  if (!cleanPath.endsWith('/')) cleanPath += '/';
+  normalizedCanonical = `https://jichangwending.world${cleanPath}`;
+} catch (e) {
+  normalizedCanonical = 'https://jichangwending.world/';
+}
+
+// Cover image normalization
+const ogImage = cover
+  ? (cover.startsWith('http') ? cover : `https://jichangwending.world${cover.startsWith('/') ? cover : '/' + cover}`)
+  : 'https://jichangwending.world/avatar.jpg';
+
+// Base default Organization & WebSite schema
 const baseSchema = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -28,40 +61,66 @@ const baseSchema = {
       url: 'https://jichangwending.world/',
       name: siteName,
       description: '基于可追溯测速、晚高峰样本与客观技术声明的中文机场评测与选购指南。',
-      inLanguage: 'zh-CN'
+      inLanguage: 'zh-CN',
+      publisher: {
+        '@type': 'Organization',
+        name: '稳定机场指南评测实验室',
+        url: 'https://jichangwending.world/',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://jichangwending.world/avatar.jpg'
+        }
+      }
     },
     ...(schema ? (Array.isArray(schema) ? schema : [schema]) : [])
   ]
 };
+
+// Robots directive
+const robotsContent = noindex
+  ? 'noindex, follow'
+  : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
 ---
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{formattedTitle}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonicalUrl} />
+<link rel="canonical" href={normalizedCanonical} />
 <link rel="icon" type="image/jpeg" href="/avatar.jpg" />
 <link rel="shortcut icon" href="/avatar.jpg" />
 <link rel="apple-touch-icon" href="/avatar.jpg" />
 
+<!-- Search Engine Verification Tags (Rendered if configured) -->
+{siteVerificationConfig.google && <meta name="google-site-verification" content={siteVerificationConfig.google} />}
+{siteVerificationConfig.bing && <meta name="msvalidate.01" content={siteVerificationConfig.bing} />}
+{siteVerificationConfig.shenma && <meta name="shenma-site-verification" content={siteVerificationConfig.shenma} />}
+{siteVerificationConfig.baidu && <meta name="baidu-site-verification" content={siteVerificationConfig.baidu} />}
+
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={ogType} />
-<meta property="og:url" content={canonicalUrl} />
+<meta property="og:url" content={normalizedCanonical} />
 <meta property="og:title" content={formattedTitle} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content="https://jichangwending.world/avatar.jpg" />
+<meta property="og:image" content={ogImage} />
 <meta property="og:site_name" content={siteName} />
 <meta property="og:locale" content="zh_CN" />
 
+{ogType === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+{ogType === 'article' && modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+{ogType === 'article' && author && <meta property="article:author" content={author} />}
+{ogType === 'article' && category && <meta property="article:section" content={category} />}
+{ogType === 'article' && tags.map((tag) => <meta property="article:tag" content={tag} />)}
+
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:url" content={canonicalUrl} />
+<meta name="twitter:url" content={normalizedCanonical} />
 <meta name="twitter:title" content={formattedTitle} />
 <meta name="twitter:description" content={description} />
-<meta name="twitter:image" content="https://jichangwending.world/avatar.jpg" />
+<meta name="twitter:image" content={ogImage} />
 
 <!-- Robot Directives -->
-<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+<meta name="robots" content={robotsContent} />
 
 <!-- Structured Data -->
 <script type="application/ld+json" set:html={JSON.stringify(baseSchema)} />

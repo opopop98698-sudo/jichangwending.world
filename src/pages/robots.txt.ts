@@ -28,7 +28,9 @@ Allow: /
 Disallow: /api/
 Disallow: /scratch/
 Disallow: /admin/
+Disallow: /404/
 
+Sitemap: https://jichangwending.world/sitemap.xml
 Sitemap: https://jichangwending.world/sitemap-index.xml
 `;
 

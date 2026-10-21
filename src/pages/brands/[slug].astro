@@ -62,6 +62,7 @@ const hasUnlock = !!brand.unlockEvidence;
   description={pageDescription}
   canonicalUrl={`https://jichangwending.world/brands/${brand.id}/`}
   schema={brandSchema}
+  cover={brand.logo || brand.speedtestEvidence?.file}
 >
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
     <!-- Breadcrumb -->

@@ -1,5 +1,5 @@
 {
-  "totalHtmlPages": 441,
+  "totalHtmlPages": 442,
   "robots": {
     "hasDisallowAll": false,
     "hasGooglebot": true,
@@ -7,6 +7,7 @@
     "hasBaidu": true,
     "hasYisou": true,
     "sitemapMatches": [
+      "Sitemap: https://jichangwending.world/sitemap.xml",
       "Sitemap: https://jichangwending.world/sitemap-index.xml"
     ]
   },
@@ -20,13 +21,13 @@
     "anomaliesCount": 0,
     "sampleAnomalies": []
   },
-  "noindexCount": 0,
+  "noindexCount": 1,
   "contentQuality": {
     "pagesUnder300Words": 0,
     "pagesUnder500Words": 0,
-    "minWords": 1030,
+    "minWords": 644,
     "maxWords": 6959,
-    "avgWords": 4053,
+    "avgWords": 4045,
     "dupTitles": 0,
     "dupDescs": 0,
     "dupH1s": 0
