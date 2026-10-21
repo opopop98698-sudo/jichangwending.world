@@ -58,6 +58,8 @@
   - [x] 编制 `/privacy/`（隐私保护与无状态运算）
   - [x] 编制 `/corrections/`（公开数据勘误与提报通道）
   - [x] 动态生成符合规范的 `/robots.txt`
+  - [x] 全量实现 384 篇三级专题文章系统 (`src/pages/[category]/articles/[slug].astro`)
+  - [x] 在 8 大业务频道底部上线三级专题知识库索引组件 (`CategoryArticlesList.astro`)
   - [x] 生成 `@astrojs/sitemap` 站点地图 (`sitemap-index.xml`)
-  - [x] 全站 56 个静态路由预渲染构建 100% 成功通过 (`npx astro build`)
+  - [x] 全站 440 个静态路由预渲染构建 100% 成功通过 (`npx astro build`)
   - [x] 自动化产物审计脚本 `scripts/audit-dist.js` 验证 100% 通过

@@ -24,6 +24,7 @@
 | **七大交互工具** | `src/components/tools/*.astro` | 纯前端无状态本地运算 7 大实用排障与决策工具 | ✅ 已实现 |
 | **核心业务频道** | `src/pages/*/index.astro` | 9 大一级导航主干频道（7,000–15,000 字高信息密度） | ✅ 已构建 |
 | **品牌全量详情页** | `src/pages/brands/[slug].astro` | 41 个品牌独立静态预渲染 HTML 页面 | ✅ 100% 通过 |
+| **三级专题文章系统** | `src/pages/[category]/articles/[slug].astro` | 全量预渲染 384 篇三级深度专题文章及各频道知识库索引 | ✅ 100% 通过 |
 | **合规与透明页面** | `src/pages/*.astro` | 关于、评测方法论、商业披露、隐私政策、勘误通道 | ✅ 已构建 |
 | **爬虫与站点地图** | `robots.txt`, `sitemap-index.xml` | 遵守合规 SEO 标准的动态爬虫规则与站点地图 | ✅ 已生成 |
 
@@ -158,7 +159,7 @@
 - yinxingren (隐形人) 未测试状态已严格标识 (Not Tested / 待核验): true
 - cyberguard 韩国 6000ms 异常标记完整保留: true
 - lightspeed (光速云) 编辑推荐第一主推地位明确呈现: true
-- 全站 56 个静态路由预渲染构建完成: true (0 errors, 100% success)
+- 全站 440 个静态路由预渲染构建完成 (含 56 个核心通道与 384 篇三级专题文章): true (0 errors, 100% success)
 ```
 
 ---
