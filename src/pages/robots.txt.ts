@@ -15,6 +15,9 @@ Allow: /
 User-agent: Applebot
 Allow: /
 
+User-agent: YandexBot
+Allow: /
+
 # AI Search & Retrieval Crawlers
 User-agent: OAI-SearchBot
 Allow: /

@@ -16,5 +16,8 @@ export const siteVerificationConfig = {
   shenma: process.env.PUBLIC_SHENMA_SITE_VERIFICATION || '',
 
   // 百度搜索资源平台: <meta name="baidu-site-verification" content="xxx" />
-  baidu: process.env.PUBLIC_BAIDU_SITE_VERIFICATION || ''
+  baidu: process.env.PUBLIC_BAIDU_SITE_VERIFICATION || '',
+
+  // Yandex Webmaster: <meta name="yandex-verification" content="xxx" />
+  yandex: process.env.PUBLIC_YANDEX_SITE_VERIFICATION || ''
 };
