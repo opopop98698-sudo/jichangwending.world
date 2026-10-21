@@ -123,10 +123,17 @@ const recommendSchema = {
                   </span>
                 </div>
                 <div>
-                  <a href={`/brands/${brand.id}/`} class="text-base font-bold text-obs-text hover:text-sky-400 transition">
-                    {brand.name}
-                  </a>
-                  <p class="text-[11px] text-obs-muted line-clamp-2 mt-1 leading-relaxed">
+                  <div class="flex items-center gap-2">
+                    {brand.logo ? (
+                      <img src={brand.logo} alt={brand.name} class="w-6 h-6 object-contain rounded bg-obs-bg p-0.5 border border-obs-border flex-shrink-0" />
+                    ) : (
+                      <span class="w-6 h-6 rounded bg-obs-bg text-sky-400 font-bold text-[10px] flex items-center justify-center border border-obs-border flex-shrink-0">{brand.name.slice(0, 2)}</span>
+                    )}
+                    <a href={`/brands/${brand.id}/`} class="text-base font-bold text-obs-text hover:text-sky-400 transition truncate">
+                      {brand.name}
+                    </a>
+                  </div>
+                  <p class="text-[11px] text-obs-muted line-clamp-2 mt-1.5 leading-relaxed">
                     {brand.pros?.[0] || brand.vendorClaims?.[0] || brand.comparisonSummary}
                   </p>
                 </div>
