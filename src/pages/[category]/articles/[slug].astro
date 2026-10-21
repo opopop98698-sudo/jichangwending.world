@@ -212,6 +212,75 @@ const articleSchema = [
       </div>
     </section>
 
+    <!-- 1.5. Article-Specific Core Engineering Analysis & Evidence Benchmark -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <h2 class="text-lg font-bold text-obs-text flex items-center gap-2">
+          <span class="w-1.5 h-4 bg-indigo-400 rounded-sm"></span>
+          专题实战证据链与量化核验基准 ({article.id})
+        </h2>
+        <span class="text-xs font-mono text-indigo-400">核验依据：{article.requiredEvidence}</span>
+      </div>
+
+      <div class="p-5 sm:p-6 rounded-xl bg-obs-panel border border-obs-border space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+        <div class="space-y-2">
+          <h3 class="text-sm font-bold text-obs-text">
+            一、围绕【{article.targetKeyword}】的核心痛点工程剖析
+          </h3>
+          <p>
+            用户在面对<strong>“{article.primaryQuestion}”</strong>这一实际挑战时，最常陷入的误区是<strong>“将商家的宣传文案等同于物理现实”</strong>。在跨境代理网络架构中，影响该问题的核心变量并非单一指标，而是涉及本地客户端配置、运营商路由对等与海外机房落地属性的复合链条。
+          </p>
+          <p>
+            针对当前专题集群<strong>【{article.clusterName}】</strong>，必须建立<strong>以可复现测试数据为核心的客观评价标准</strong>。如果某个节点在测速软件中显示 1000Mbps，但持续连续发包丢包率超过 2%，在实际使用中就会频繁遭遇 TCP 拥塞控制降速、流媒体缓冲转圈或网页首包长时间卡死。
+          </p>
+        </div>
+
+        <div class="pt-2">
+          <h3 class="text-sm font-bold text-obs-text mb-3">
+            二、专题量化检验基准与合格阈值对照表
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono border border-obs-border rounded-lg overflow-hidden">
+              <thead class="bg-obs-bg text-obs-text">
+                <tr class="border-b border-obs-border">
+                  <th class="py-2.5 px-3">测试核验维度</th>
+                  <th class="py-2.5 px-3">对应证据类型</th>
+                  <th class="py-2.5 px-3">工程合格阈值 (Pass)</th>
+                  <th class="py-2.5 px-3">异常风险预警 (Fail)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-obs-border/60">
+                <tr class="hover:bg-obs-bg/40">
+                  <td class="py-2 px-3 text-obs-text font-bold">晚高峰丢包率 (Packet Loss)</td>
+                  <td class="py-2 px-3 text-sky-400">{article.requiredEvidence}</td>
+                  <td class="py-2 px-3 text-emerald-400">&le; 0.5% (连续 100 包)</td>
+                  <td class="py-2 px-3 text-rose-400">&gt; 2.0% (TCP 剧烈降速)</td>
+                </tr>
+                <tr class="hover:bg-obs-bg/40">
+                  <td class="py-2 px-3 text-obs-text font-bold">往返延迟抖动标准差 (StDev)</td>
+                  <td class="py-2 px-3 text-sky-400">MTR 统计报告</td>
+                  <td class="py-2 px-3 text-emerald-400">&le; 2.5 ms</td>
+                  <td class="py-2 px-3 text-rose-400">&gt; 15.0 ms (严重微抖动)</td>
+                </tr>
+                <tr class="hover:bg-obs-bg/40">
+                  <td class="py-2 px-3 text-obs-text font-bold">首包响应时间 (TTFB)</td>
+                  <td class="py-2 px-3 text-sky-400">cURL 握手时间戳</td>
+                  <td class="py-2 px-3 text-emerald-400">&le; 180 ms</td>
+                  <td class="py-2 px-3 text-rose-400">&gt; 500 ms (首屏卡顿)</td>
+                </tr>
+                <tr class="hover:bg-obs-bg/40">
+                  <td class="py-2 px-3 text-obs-text font-bold">落地出口信誉 (Fraud Score)</td>
+                  <td class="py-2 px-3 text-sky-400">IP 属性库检测</td>
+                  <td class="py-2 px-3 text-emerald-400">&le; 25 分 (纯净机房/原生)</td>
+                  <td class="py-2 px-3 text-rose-400">&gt; 65 分 (易遭 403 封锁)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 2. ISP 3-Carrier Routing Analysis -->
     <section class="space-y-4">
       <div class="border-b border-obs-border pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
