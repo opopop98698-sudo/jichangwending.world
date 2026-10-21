@@ -19,5 +19,5 @@ export const siteVerificationConfig = {
   baidu: process.env.PUBLIC_BAIDU_SITE_VERIFICATION || '',
 
   // Yandex Webmaster: <meta name="yandex-verification" content="xxx" />
-  yandex: process.env.PUBLIC_YANDEX_SITE_VERIFICATION || ''
+  yandex: process.env.PUBLIC_YANDEX_SITE_VERIFICATION || '87d7192b6415cc1f'
 };
