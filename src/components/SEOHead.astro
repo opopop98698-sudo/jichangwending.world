@@ -40,12 +40,16 @@ const baseSchema = {
 <title>{formattedTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalUrl} />
+<link rel="icon" type="image/jpeg" href="/avatar.jpg" />
+<link rel="shortcut icon" href="/avatar.jpg" />
+<link rel="apple-touch-icon" href="/avatar.jpg" />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={ogType} />
 <meta property="og:url" content={canonicalUrl} />
 <meta property="og:title" content={formattedTitle} />
 <meta property="og:description" content={description} />
+<meta property="og:image" content="https://jichangwending.world/avatar.jpg" />
 <meta property="og:site_name" content={siteName} />
 <meta property="og:locale" content="zh_CN" />
 
@@ -54,6 +58,7 @@ const baseSchema = {
 <meta name="twitter:url" content={canonicalUrl} />
 <meta name="twitter:title" content={formattedTitle} />
 <meta name="twitter:description" content={description} />
+<meta name="twitter:image" content="https://jichangwending.world/avatar.jpg" />
 
 <!-- Robot Directives -->
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
