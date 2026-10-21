@@ -8,7 +8,13 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/admin/') && !page.includes('/scratch/')
+      filter: (page) => !page.includes('/admin/') && !page.includes('/scratch/'),
+      serialize(item) {
+        item.lastmod = new Date().toISOString();
+        item.changefreq = 'weekly';
+        item.priority = item.url === 'https://jichangwending.world/' ? 1.0 : (item.url.includes('/articles/') ? 0.8 : 0.9);
+        return item;
+      }
     })
   ],
   vite: {

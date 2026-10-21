@@ -6,6 +6,12 @@ Allow: /
 User-agent: Bingbot
 Allow: /
 
+User-agent: Baiduspider
+Allow: /
+
+User-agent: yisouspider
+Allow: /
+
 User-agent: Applebot
 Allow: /
 

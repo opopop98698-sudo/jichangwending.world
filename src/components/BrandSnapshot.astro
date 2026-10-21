@@ -66,7 +66,7 @@ const affData = AFFILIATE_LINKS[id] || { affiliateUrl: null, officialUrl: null, 
         <!-- Logo or Monogram Badge -->
         <div class="w-11 h-11 rounded-lg bg-[#0B1220] border border-[#26354D] flex items-center justify-center font-bold text-sm text-[#38BDF8] font-mono overflow-hidden flex-shrink-0 p-1">
           {logo ? (
-            <img src={logo} alt={`${name} Logo`} class="w-full h-full object-contain" loading="lazy" />
+            <img src={logo} alt={`${name} Logo`} width="36" height="36" class="w-full h-full object-contain" loading="lazy" />
           ) : (
             <span>{name.slice(0, 2)}</span>
           )}

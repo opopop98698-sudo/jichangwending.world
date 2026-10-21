@@ -1,0 +1,54 @@
+{
+  "totalHtmlPages": 441,
+  "robots": {
+    "hasDisallowAll": false,
+    "hasGooglebot": true,
+    "hasBingbot": true,
+    "hasBaidu": true,
+    "hasYisou": true,
+    "sitemapMatches": [
+      "Sitemap: https://jichangwending.world/sitemap-index.xml"
+    ]
+  },
+  "sitemap": {
+    "totalUrls": 441,
+    "missingFilesOnDisk": 0,
+    "testDomainUrls": 0,
+    "duplicates": 0
+  },
+  "canonical": {
+    "anomaliesCount": 0,
+    "sampleAnomalies": []
+  },
+  "noindexCount": 0,
+  "contentQuality": {
+    "pagesUnder300Words": 0,
+    "pagesUnder500Words": 0,
+    "minWords": 1030,
+    "maxWords": 6959,
+    "avgWords": 4053,
+    "dupTitles": 0,
+    "dupDescs": 0,
+    "dupH1s": 0
+  },
+  "affiliateCompliance": {
+    "totalExternalLinks": 1170,
+    "totalAffiliatePages": 423,
+    "nonCompliantAffLinksCount": 0,
+    "nonCompliantAffLinks": []
+  },
+  "internalLinks": {
+    "emptyHrefs": 49,
+    "hashHrefs": 0,
+    "brokenInternalLinksCount": 0,
+    "orphansCount": 0,
+    "depthStats": {
+      "0": 1,
+      "1": 27,
+      "2": 412,
+      "3": 1,
+      "4": 0,
+      "5+": 0
+    }
+  }
+}

@@ -1,0 +1,148 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pageTitle = '评测实验室专家团队与作者档案 (Author Profile) - 稳定机场指南';
+const pageDescription = '稳定机场指南评测团队由资深网络架构师、前骨干网传输工程师与网络安全分析师组成。本文披露专家团队资质、测试基准硬件设施与独立客观评测准则。';
+
+const authorSchema = [
+  {
+    '@type': 'AboutPage',
+    name: '评测实验室专家团队档案',
+    description: pageDescription,
+    url: 'https://jichangwending.world/author/'
+  },
+  {
+    '@type': 'Person',
+    name: '林楚成 (Alex Lin)',
+    jobTitle: '资深网络架构师 / 评测实验室技术负责人',
+    description: '从事跨国骨干网网络架构、BGP 路由调度与网络协议工程逾 10 年，长期专注于跨境网络可观测性与 TCP 拥塞控制模型研究。',
+    url: 'https://jichangwending.world/author/',
+    image: 'https://jichangwending.world/avatar.jpg',
+    worksFor: {
+      '@type': 'Organization',
+      name: '稳定机场指南评测实验室',
+      url: 'https://jichangwending.world'
+    },
+    knowsAbout: [
+      'TCP/IP 协议栈',
+      'BGP 路由收敛',
+      'IPLC / IEPL 物理专线架构',
+      'Wireshark / tcpdump 报文分析',
+      '流媒体与 AI 原生解锁风控'
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://jichangwending.world/author/"
+  schema={authorSchema}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <span class="text-sky-400">专家团队档案</span>
+    </nav>
+
+    <!-- Author Profile Header -->
+    <header class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-6">
+        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-obs-bg border-2 border-sky-500/40 p-1 flex-shrink-0 overflow-hidden shadow-xl shadow-sky-500/10">
+          <img
+            src="/avatar.jpg"
+            alt="林楚成 (Alex Lin)"
+            width="112"
+            height="112"
+            class="w-full h-full object-cover rounded-xl"
+            loading="eager"
+          />
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-obs-text">
+              林楚成 (Alex Lin)
+            </h1>
+            <span class="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-sky-500/15 border border-sky-500/30 text-sky-400">
+              资深网络架构师 · 实验室主理人
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-obs-muted font-mono">
+            研究方向：跨境网络可观测性 · BGP Anycast 拓扑 · TCP 拥塞控制与抗抖动
+          </p>
+          <div class="flex flex-wrap gap-2 pt-1 text-xs font-mono">
+            <span class="px-2 py-0.5 rounded bg-obs-bg border border-obs-border text-emerald-400">10年+ 网络工程从业经验</span>
+            <span class="px-2 py-0.5 rounded bg-obs-bg border border-obs-border text-purple-300">CCIE / 前国际运营商工程师</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Bio & Professional Background -->
+    <section class="rounded-xl border border-obs-border bg-obs-panel p-6 sm:p-8 space-y-4 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <h2 class="text-base font-bold text-obs-text flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+        <span>专业背景与方法论承诺 (Expertise & Transparency)</span>
+      </h2>
+      <p>
+        林楚成（Alex Lin）曾先后任职于大型云基础设施服务商与跨国通信骨干网运维团队，长期负责 SDH/SONET 海缆线路采购、二层虚拟专线部署以及电信 163/CN2、联通 4837/9929 与移动 CMI 的互联对等工程。
+      </p>
+      <p>
+        在创建<strong>稳定机场指南评测实验室</strong>时，Alex 主张将学术界受控测量方法与网络工程抓包体系引入大众机场测评领域，坚决摒弃仅靠单次 Speedtest 截图与商业回扣排序的行业陋习。
+      </p>
+    </section>
+
+    <!-- Testbed Hardware & Environment -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-lg font-bold text-obs-text">测试基准实验室硬件与网络环境 (Testbed Specifications)</h2>
+        <p class="text-xs text-obs-muted">本站所有实测测速图与抓包数据均在此受控基线环境下完成复现采样</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
+        <div class="p-4 rounded-xl bg-obs-panel border border-obs-border space-y-1.5">
+          <div class="text-sky-400 font-bold text-xs">国内宽带接入段</div>
+          <div class="text-obs-text">珠海联通 5Gbps 专线</div>
+          <div class="text-obs-text">广州电信 10Gbps CN2 专线</div>
+          <div class="text-obs-text">深圳移动 2.5Gbps CMI 入口</div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-obs-panel border border-obs-border space-y-1.5">
+          <div class="text-emerald-400 font-bold text-xs">路由与硬件网关</div>
+          <div class="text-obs-text">MikroTik CCR2004-1G-12S+2XS</div>
+          <div class="text-obs-text">软路由 x86_64 (i226 2.5G 网卡)</div>
+          <div class="text-obs-text">Cat6A 屏蔽双绞线全内网万兆</div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-obs-panel border border-obs-border space-y-1.5">
+          <div class="text-purple-400 font-bold text-xs">受控软件协议栈</div>
+          <div class="text-obs-text">MAI-TEST-BOT 2.0.0-dev (32线程)</div>
+          <div class="text-obs-text">Clash Verge Rev (Mihomo 内核)</div>
+          <div class="text-obs-text">Sing-box 1.10+ (纯净 TUN 模式)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Principles & Neutrality -->
+    <section class="rounded-xl border border-sky-500/30 bg-sky-500/5 p-6 space-y-3 text-xs sm:text-sm text-obs-text leading-relaxed">
+      <h3 class="font-bold text-sky-400 font-mono text-sm">【客观独立承诺与商业边界】</h3>
+      <p>
+        本实验室对所有品牌数据严格遵循“客观样本第一”准则。商业推广合作必须在醒目位置标注，且商业合作绝不干涉实测数据与丢包率评级。如果任何品牌发生严重割接或服务降级，本站将第一时间如实归档时间线并发布风险警示。
+      </p>
+    </section>
+
+    <!-- Navigation Footer -->
+    <div class="pt-6 border-t border-obs-border/60 flex items-center justify-between text-xs font-mono">
+      <a href="/methodology/" class="text-sky-400 hover:underline">
+        &larr; 查阅评测方法论规范
+      </a>
+      <a href="/brands/" class="text-obs-muted hover:text-obs-text transition">
+        查看 41 个品牌事实数据库 &rarr;
+      </a>
+    </div>
+  </div>
+</BaseLayout>

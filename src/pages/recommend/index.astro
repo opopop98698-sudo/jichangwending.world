@@ -125,7 +125,7 @@ const recommendSchema = {
                 <div>
                   <div class="flex items-center gap-2">
                     {brand.logo ? (
-                      <img src={brand.logo} alt={brand.name} class="w-6 h-6 object-contain rounded bg-obs-bg p-0.5 border border-obs-border flex-shrink-0" />
+                      <img src={brand.logo} alt={brand.name} width="24" height="24" loading="lazy" class="w-6 h-6 object-contain rounded bg-obs-bg p-0.5 border border-obs-border flex-shrink-0" />
                     ) : (
                       <span class="w-6 h-6 rounded bg-obs-bg text-sky-400 font-bold text-[10px] flex items-center justify-center border border-obs-border flex-shrink-0">{brand.name.slice(0, 2)}</span>
                     )}
