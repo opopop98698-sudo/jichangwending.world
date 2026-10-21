@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryArticlesList from '../../components/CategoryArticlesList.astro';
 import brandsData from '../../data/brands.json';
 
 const pageTitle = '机场状态与网络可用性观测：五层解耦模型、故障溯源与事件追踪';
@@ -294,6 +295,9 @@ const statusSchema = {
         ))}
       </div>
     </section>
+
+    <!-- Category Level-3 Topic Articles Directory (48 articles) -->
+    <CategoryArticlesList parentRoute="/status/" categoryName="机场状态" />
 
     <!-- Internal Linking Navigation -->
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">

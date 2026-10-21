@@ -1,0 +1,345 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import contentMap from '../../../data/content-map.json';
+import brandsData from '../../../data/brands.json';
+import { getAffiliateLink } from '../../../lib/links';
+
+// Interactive Tools
+import RequirementSelector from '../../../components/tools/RequirementSelector.astro';
+import BrandFilter from '../../../components/tools/BrandFilter.astro';
+import TwoBrandCompare from '../../../components/tools/TwoBrandCompare.astro';
+import BandwidthConverter from '../../../components/tools/BandwidthConverter.astro';
+import BillingCycleComparator from '../../../components/tools/BillingCycleComparator.astro';
+import MetricCalculator from '../../../components/tools/MetricCalculator.astro';
+import TroubleshootTree from '../../../components/tools/TroubleshootTree.astro';
+import NetworkPathDiagram from '../../../components/NetworkPathDiagram.astro';
+
+export async function getStaticPaths() {
+  return contentMap.map((article) => {
+    const category = article.parentRoute.replace(/\//g, '');
+    const slug = article.id.toLowerCase();
+    return {
+      params: { category, slug },
+      props: { article }
+    };
+  });
+}
+
+const { article } = Astro.props;
+
+// Find sibling articles in the same cluster
+const siblingArticles = contentMap.filter(
+  (a) => a.clusterId === article.clusterId && a.id !== article.id
+);
+
+// Find related brand entities if any
+const relatedBrands = brandsData.filter((b) =>
+  article.relatedEntities && article.relatedEntities.includes(b.id)
+);
+
+// Fallback brands if no specific brand is mapped
+const displayBrands = relatedBrands.length > 0 ? relatedBrands : brandsData.slice(0, 2);
+
+const pageTitle = `${article.title} - 稳定机场指南`;
+const pageDescription = `针对“${article.primaryQuestion}”的深度技术解答。围绕${article.targetKeyword}，提供核验证据（${article.requiredEvidence}）、线路对标分析与客观选购避坑建议。`;
+
+// Targeted FAQs for this topic
+const articleFaqs = [
+  {
+    q: `如何针对“${article.primaryQuestion}”进行本地快速验证？`,
+    a: `建议在本地客户端与运营商网络环境中，使用 MTR 连续发送 50-100 个探测包，记录晚高峰（20:00-23:30）期间的丢包率（Packet Loss 应 < 1%）与往返延迟抖动。若涉及特定应用（如 ChatGPT 或流媒体），应检查落地出口 IP 的风控得分与原生解锁属性。`
+  },
+  {
+    q: `本专题涉及的“${article.requiredEvidence}”主要依据哪些指标？`,
+    a: `依据本站推行的四维状态模型：来源属性（如原始资料记录快照或独立测试）、核验状态（已核验/待核验）、时效鲜度（记录时间戳）及结果结构（下行/上行带宽、RTT 首包延迟、抖动与丢包率），确保结论具备可复现的工程证据支撑。`
+  }
+];
+
+const articleSchema = {
+  '@type': 'Article',
+  headline: article.title,
+  description: pageDescription,
+  url: `https://jichangwending.world${article.suggestedUrl}`,
+  publisher: {
+    '@type': 'Organization',
+    name: '稳定机场指南评测实验室',
+    url: 'https://jichangwending.world'
+  },
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: 'https://jichangwending.world/' },
+      { '@type': 'ListItem', position: 2, name: article.parentCategory, item: `https://jichangwending.world${article.parentRoute}` },
+      { '@type': 'ListItem', position: 3, name: `${article.parentTopicName} · ${article.clusterName}`, item: `https://jichangwending.world${article.suggestedUrl}` },
+      { '@type': 'ListItem', position: 4, name: article.title, item: `https://jichangwending.world${article.suggestedUrl}` }
+    ]
+  }
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={`https://jichangwending.world${article.suggestedUrl}`}
+  schema={articleSchema}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center space-x-2 text-xs font-mono text-obs-muted overflow-x-auto whitespace-nowrap pb-1">
+      <a href="/" class="hover:text-obs-text transition">首页</a>
+      <span>/</span>
+      <a href={article.parentRoute} class="hover:text-obs-text transition">{article.parentCategory}</a>
+      <span>/</span>
+      <span class="text-obs-muted">{article.parentTopicName}</span>
+      <span>/</span>
+      <span class="text-sky-400 truncate max-w-[200px]">{article.clusterName}</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="rounded-2xl border border-obs-border bg-gradient-to-b from-obs-panel to-obs-bg p-6 sm:p-8 space-y-4">
+      <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+        <span class="px-2.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 font-bold">
+          {article.id} · 三级专题指南
+        </span>
+        <span class="px-2 py-0.5 rounded bg-obs-bg text-obs-muted border border-obs-border">
+          所属集群: {article.clusterName}
+        </span>
+        <span class="px-2 py-0.5 rounded bg-obs-bg text-obs-muted border border-obs-border">
+          意图: {article.searchIntent}
+        </span>
+      </div>
+
+      <h1 class="text-xl sm:text-3xl font-extrabold tracking-tight text-obs-text leading-tight">
+        {article.title}
+      </h1>
+
+      <p class="text-xs sm:text-sm text-obs-muted leading-relaxed">
+        <strong>核心聚焦问题：</strong>{article.primaryQuestion}
+      </p>
+    </div>
+
+    <!-- Answer-First Core Answer Box -->
+    <section class="rounded-xl border border-sky-500/40 bg-sky-500/5 p-6 space-y-3">
+      <div class="flex items-center gap-2 text-sky-400 font-bold text-sm">
+        <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+        <span>结论先行与工程解答 (Answer-First)</span>
+      </div>
+      <div class="text-xs sm:text-sm text-obs-text leading-relaxed space-y-2">
+        <p>
+          针对<strong>“{article.primaryQuestion}”</strong>，核心原则在于：不要轻信商家的口头宣传或单次瞬时跑分，而应依据<strong>实际物理链路属性（物理 IEPL/IPLC 专线 vs 公网隧道中转）、晚高峰丢包与抖动实测样本、以及本地客户端的分流规则配置</strong>做出判断。
+        </p>
+        <p class="text-obs-muted">
+          在网络工程实践中，任何涉及跨境网络访问的问题均可定界为 5 个层级之一：本地客户端与系统代理设置 &rarr; 运营商本地宽带接入段 &rarr; 国内入口中转服务器 &rarr; 跨境专线/公网海缆 &rarr; 境外落地机与目标网站反爬风控。掌握这套定界框架，即可在几分钟内识别绝大部分网络瓶颈与营销套路。
+        </p>
+      </div>
+    </section>
+
+    <!-- Evidence & Standards Table -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3 flex items-center justify-between">
+        <h2 class="text-lg font-bold text-obs-text">专题核验依据与指标清单</h2>
+        <span class="text-xs font-mono text-obs-muted">数据治理规范</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
+        <div class="p-3.5 rounded-lg bg-obs-panel border border-obs-border space-y-1">
+          <div class="text-[11px] text-obs-muted">目标核心关键词</div>
+          <div class="text-obs-text font-bold text-xs">{article.targetKeyword}</div>
+        </div>
+        <div class="p-3.5 rounded-lg bg-obs-panel border border-obs-border space-y-1">
+          <div class="text-[11px] text-obs-muted">所需验证证据类型</div>
+          <div class="text-sky-300 font-bold text-xs">{article.requiredEvidence}</div>
+        </div>
+        <div class="p-3.5 rounded-lg bg-obs-panel border border-obs-border space-y-1">
+          <div class="text-[11px] text-obs-muted">专题分类归属</div>
+          <div class="text-emerald-400 font-bold text-xs">{article.parentCategory} &rarr; {article.parentTopicName}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Deep-dive Technical Analysis -->
+    <section class="space-y-6 text-xs sm:text-sm text-obs-muted leading-relaxed">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-lg font-bold text-obs-text">技术机理剖析与避坑指南</h2>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-base font-bold text-obs-text">一、为什么该问题频繁困扰跨境网络用户？</h3>
+        <p>
+          跨境网络通信不同于普通的国内网页访问。数据包需要跨越复杂的国际网络骨干网、深层流量检测防火墙与公网海缆。当用户在搜索引擎检索“{article.targetKeyword}”时，通常遇到了以下三种底层冲突之一：
+        </p>
+        <ul class="list-disc list-inside space-y-1 pl-2 text-xs">
+          <li><strong>协议与加密封装层冲突</strong>：客户端采用的协议（如 Shadowsocks、VLESS Reality、Trojan 等）在握手阶段与本地杀毒软件、系统代理注册表或 TUN 虚拟网卡驱动产生死锁。</li>
+          <li><strong>骨干网 QoS 限速与主动丢包</strong>：在晚高峰 20:00 至 23:30 期间，非专线的普通公网中转链路遭遇运营商的主动丢包，导致 TCP 拥塞控制窗口剧烈抖动。</li>
+          <li><strong>出口 IP 风险库信誉过低</strong>：目标平台（如 OpenAI、Netflix、各大外贸金融平台）将机房 IDC 数据中心 ASN 列入风控名单，即使网络延迟很低也会返回 403 / 1020 拒绝访问。</li>
+        </ul>
+
+        <h3 class="text-base font-bold text-obs-text pt-2">二、标准排查与决策操作四步法</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="p-3 rounded-lg bg-obs-panel border border-obs-border space-y-1">
+            <span class="font-mono text-sky-400 font-bold">第 1 步：本地网络与时间同步</span>
+            <p class="text-obs-muted">检查本地系统时钟与真实互联网原子钟偏差是否在 90 秒内，核对系统代理 127.0.0.1:7890 端口监听状态。</p>
+          </div>
+          <div class="p-3 rounded-lg bg-obs-panel border border-obs-border space-y-1">
+            <span class="font-mono text-emerald-400 font-bold">第 2 步：核对套餐与订阅时效</span>
+            <p class="text-obs-muted">登录机场用户控制台，核验当月流量是否用光、套餐是否到期，并在客户端执行一次强制订阅更新。</p>
+          </div>
+          <div class="p-3 rounded-lg bg-obs-panel border border-obs-border space-y-1">
+            <span class="font-mono text-amber-400 font-bold">第 3 步：连续 Ping 观测丢包率</span>
+            <p class="text-obs-muted">使用终端向目标节点发送 100 个数据包，统计丢包率是否小于 1%，避免被单次瞬时 Speedtest 误导。</p>
+          </div>
+          <div class="p-3 rounded-lg bg-obs-panel border border-obs-border space-y-1">
+            <span class="font-mono text-purple-400 font-bold">第 4 步：按需切换原生出口</span>
+            <p class="text-obs-muted">若为 AI 生产力或流媒体追剧，切换至标注有原生住宅（Residential）或专用解锁的独立落地节点。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Relevant Brand Entities Snapshot -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3 flex items-center justify-between">
+        <h2 class="text-lg font-bold text-obs-text">相关品牌实体档案参考</h2>
+        <a href="/brands/" class="text-xs font-mono text-sky-400 hover:underline">查看全部 41 个品牌档案 &rarr;</a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {displayBrands.map((b) => {
+          const aff = getAffiliateLink(b.id);
+          const maxSpeed = b.speedTest?.results?.reduce((max, r) => Math.max(max, r.downloadMbps || 0), 0) || 0;
+          return (
+            <div class="p-4 rounded-xl border border-obs-border bg-obs-panel space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <a href={`/brands/${b.id}/`} class="text-base font-bold text-obs-text hover:text-sky-300">
+                    {b.name}
+                  </a>
+                  <div class="text-[10px] text-obs-muted font-mono">{b.id}</div>
+                </div>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 truncate max-w-[120px]">
+                  {b.lineType.split('（')[0]}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-obs-bg p-2.5 rounded border border-obs-border/70">
+                <div>
+                  <span class="text-[10px] text-obs-muted block">起步价格</span>
+                  <span class="text-obs-text font-bold">
+                    {b.pricingStarting.isApproximate ? `约¥${b.pricingStarting.monthlyEquivalent}/月` : `¥${b.pricingStarting.amount}/${b.pricingStarting.period}`}
+                  </span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-obs-muted block">测速快照</span>
+                  <span class={maxSpeed > 0 ? 'text-sky-400 font-bold' : 'text-obs-muted/60'}>
+                    {maxSpeed > 0 ? `${maxSpeed} Mbps` : '待核验'}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 pt-1">
+                <a
+                  href={`/brands/${b.id}/`}
+                  class="flex-1 text-center py-1.5 rounded bg-obs-bg border border-obs-border hover:border-obs-muted text-xs text-obs-text transition"
+                >
+                  详细档案
+                </a>
+                {aff.url ? (
+                  <a
+                    href={aff.url}
+                    target="_blank"
+                    rel="nofollow sponsored noopener"
+                    class="flex-1 text-center py-1.5 rounded bg-sky-500 hover:bg-sky-400 text-obs-bg font-bold text-xs transition"
+                  >
+                    官网直达 &rarr;
+                  </a>
+                ) : (
+                  <span class="flex-1 text-center py-1.5 rounded bg-obs-bg/50 border border-obs-border/50 text-[11px] text-obs-muted">
+                    暂无独立入口
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- Contextual Interactive Tool Embed -->
+    <section class="space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-lg font-bold text-obs-text">配套专业交互工具</h2>
+        <p class="text-xs text-obs-muted">结合当前专题，使用本地工具即时运算或排障诊断</p>
+      </div>
+
+      {article.parentRoute === '/recommend/' && <RequirementSelector />}
+      {article.parentRoute === '/stable/' && <MetricCalculator />}
+      {article.parentRoute === '/lab/' && <BandwidthConverter />}
+      {article.parentRoute === '/troubleshoot/' && <TroubleshootTree />}
+      {article.parentRoute === '/lines/' && <NetworkPathDiagram />}
+      {article.parentRoute === '/reviews/' && <TwoBrandCompare />}
+      {article.parentRoute === '/free/' && <BrandFilter />}
+      {article.parentRoute === '/status/' && <TroubleshootTree />}
+    </section>
+
+    <!-- Sibling Articles in Same Cluster -->
+    {siblingArticles.length > 0 && (
+      <section class="space-y-4">
+        <div class="border-b border-obs-border pb-3 flex items-center justify-between">
+          <h2 class="text-lg font-bold text-obs-text">同专题集群深度阅读 ({article.clusterName})</h2>
+          <span class="text-xs font-mono text-obs-muted">{siblingArticles.length} 篇相关文章</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {siblingArticles.map((sib) => (
+            <a
+              href={sib.suggestedUrl}
+              class="p-3.5 rounded-lg border border-obs-border bg-obs-panel hover:border-sky-500/50 transition flex flex-col justify-between group"
+            >
+              <div class="space-y-1">
+                <span class="text-[10px] font-mono text-sky-400">{sib.id}</span>
+                <h3 class="text-xs font-bold text-obs-text group-hover:text-sky-300 transition line-clamp-2">
+                  {sib.title}
+                </h3>
+              </div>
+              <span class="text-[10px] font-mono text-obs-muted mt-2 inline-flex items-center gap-1 group-hover:text-sky-400 transition">
+                阅读文章 &rarr;
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- FAQ Section with Schema -->
+    <section class="rounded-xl border border-obs-border bg-obs-panel p-6 space-y-4">
+      <div class="border-b border-obs-border pb-3">
+        <h2 class="text-base font-bold text-obs-text">专题核心答疑 (FAQ)</h2>
+      </div>
+
+      <div class="divide-y divide-obs-border/50">
+        {articleFaqs.map((faq, idx) => (
+          <div class="py-3 space-y-1.5 text-xs">
+            <h3 class="font-bold text-obs-text flex items-start gap-2">
+              <span class="text-sky-400 font-mono">Q{idx + 1}:</span>
+              <span>{faq.q}</span>
+            </h3>
+            <p class="text-obs-muted leading-relaxed pl-5">
+              {faq.a}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Upstream Channel Footnote -->
+    <div class="pt-4 border-t border-obs-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono">
+      <a href={article.parentRoute} class="text-sky-400 hover:underline">
+        &larr; 返回 {article.parentCategory} 频道总览
+      </a>
+      <a href="/brands/" class="text-obs-muted hover:text-obs-text transition">
+        查阅 41 个品牌事实数据库 &rarr;
+      </a>
+    </div>
+
+  </div>
+</BaseLayout>

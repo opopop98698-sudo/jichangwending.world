@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryArticlesList from '../../components/CategoryArticlesList.astro';
 import brandsData from '../../data/brands.json';
 
 const pageTitle = '免费机场的真实代价与安全审计：试用额度、风险模型与平价替代';
@@ -242,6 +243,9 @@ const freeSchema = {
         ))}
       </div>
     </section>
+
+    <!-- Category Level-3 Topic Articles Directory (48 articles) -->
+    <CategoryArticlesList parentRoute="/free/" categoryName="免费机场" />
 
     <!-- Internal Linking Navigation -->
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">

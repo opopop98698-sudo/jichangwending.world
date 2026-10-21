@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TroubleshootTree from '../../components/tools/TroubleshootTree.astro';
+import CategoryArticlesList from '../../components/CategoryArticlesList.astro';
 
 const pageTitle = '网络排障指南：节点全红、TUN冲突、流媒体阻断与订阅错误处置';
 const pageDescription = '机场连不上、节点超时全红、订阅更新报错？稳定机场指南网络排障中心提供交互式决策树与五层排障手册，快速定界本地代理、虚拟网卡驱动、DNS污染与落地IP风控。';
@@ -220,6 +221,9 @@ traceroute 1.1.1.1</pre>
         ))}
       </div>
     </section>
+
+    <!-- Category Level-3 Topic Articles Directory (48 articles) -->
+    <CategoryArticlesList parentRoute="/troubleshoot/" categoryName="网络排障" />
 
     <!-- Internal Linking Navigation -->
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">

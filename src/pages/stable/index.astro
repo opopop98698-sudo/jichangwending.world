@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import MetricCalculator from '../../components/tools/MetricCalculator.astro';
+import CategoryArticlesList from '../../components/CategoryArticlesList.astro';
 import brandsData from '../../data/brands.json';
 
 const pageTitle = '稳定机场标准与晚高峰核验规范：低丢包、专线冗余与长连接保活';
@@ -267,6 +268,9 @@ const stableSchema = {
         ))}
       </div>
     </section>
+
+    <!-- Category Level-3 Topic Articles Directory (48 articles) -->
+    <CategoryArticlesList parentRoute="/stable/" categoryName="稳定机场" />
 
     <!-- Internal Linking Navigation -->
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">

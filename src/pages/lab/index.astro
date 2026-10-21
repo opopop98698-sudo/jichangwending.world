@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PerformanceReport from '../../components/PerformanceReport.astro';
 import BandwidthConverter from '../../components/tools/BandwidthConverter.astro';
 import MetricCalculator from '../../components/tools/MetricCalculator.astro';
+import CategoryArticlesList from '../../components/CategoryArticlesList.astro';
 import brandsData from '../../data/brands.json';
 
 const pageTitle = '测速实验室：真实测速快照、换算工具与四维度量模型';
@@ -252,6 +253,9 @@ const labSchema = {
         ))}
       </div>
     </section>
+
+    <!-- Category Level-3 Topic Articles Directory (48 articles) -->
+    <CategoryArticlesList parentRoute="/lab/" categoryName="测速实验室" />
 
     <!-- Internal Linking Navigation -->
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">

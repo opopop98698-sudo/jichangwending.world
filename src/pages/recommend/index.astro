@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import RequirementSelector from '../../components/tools/RequirementSelector.astro';
 import BrandFilter from '../../components/tools/BrandFilter.astro';
+import CategoryArticlesList from '../../components/CategoryArticlesList.astro';
 import brandsData from '../../data/brands.json';
 import { getAffiliateLink } from '../../lib/links';
 
@@ -309,6 +310,9 @@ const recommendSchema = {
         ))}
       </div>
     </section>
+
+    <!-- Category Level-3 Topic Articles Directory (48 articles) -->
+    <CategoryArticlesList parentRoute="/recommend/" categoryName="机场推荐" />
 
     <!-- Next Reading & Internal Linking -->
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
